@@ -1,5 +1,5 @@
 import React from 'react';
-import { Phone, LifeBuoy } from 'lucide-react';
+import { Phone, LifeBuoy, Mic, Sparkles, Bot } from 'lucide-react';
 
 export default function TopHeader({
   language,
@@ -9,6 +9,7 @@ export default function TopHeader({
   highContrast,
   setHighContrast,
   onOpenHelpdesk,
+  onOpenVoiceAgent,
   t
 }) {
   return (
@@ -69,18 +70,25 @@ export default function TopHeader({
           {/* Right: Helpline, Helpdesk Button, Accessibility & Language Switch */}
           <div className="flex items-center gap-4 sm:gap-6 ml-auto sm:ml-0">
             
-            {/* Toll Free Kisan Helpline */}
-            <a
-              href="tel:18001801551"
-              className="hidden md:flex items-center gap-1.5 font-mono text-white hover:text-[#e0b87e] transition-colors py-0.5"
-              title="Kisan Call Centre Toll-Free Helpline"
-            >
-              <Phone className="w-3.5 h-3.5 text-[#e0b87e] animate-pulse" />
-              <span className="text-[11px] font-medium text-slate-200">
-                {t('Kisan Helpline:', 'हेल्पलाइन:')}{' '}
-                <strong className="font-mono text-[#e0b87e] font-bold">1800-180-1551</strong>
-              </span>
-            </a>
+            {/* AI Voice Agent (Replaces Old Helpline Number) */}
+            {onOpenVoiceAgent && (
+              <button
+                onClick={onOpenVoiceAgent}
+                className="flex items-center gap-2 bg-gradient-to-r from-[#71873f] via-[#5b722e] to-[#40541d] hover:from-[#607434] hover:to-[#354616] text-white px-3 py-1 rounded-full font-bold shadow-md hover:shadow-lg transition-all active:scale-95 group border border-white/20"
+                title={t('Talk to AI Kisan Voice Agent (24x7 Live)', 'आर्टिफिशियल इंटेलिजेंस किसान वॉइस एजेंट से बात करें')}
+              >
+                <div className="relative flex items-center justify-center">
+                  <Mic className="w-3.5 h-3.5 text-[#e0b87e] group-hover:scale-110 transition-transform animate-pulse" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 absolute -top-0.5 -right-0.5 animate-ping" />
+                </div>
+                <span className="text-[11px] font-extrabold tracking-wide">
+                  {t('AI Voice Agent', 'किसान वॉइस एजेंट')}
+                </span>
+                <span className="bg-[#e0b87e] text-[#1a2512] text-[9px] font-mono font-black px-1.5 py-0.5 rounded-md leading-none">
+                  24x7
+                </span>
+              </button>
+            )}
 
             {/* Citizen Helpdesk & Bug Report Trigger Button */}
             {onOpenHelpdesk && (

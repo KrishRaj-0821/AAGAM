@@ -4,7 +4,7 @@ import {
   TrendingUp, TrendingDown, BarChart3, Activity, Zap, Globe,
   Truck, Warehouse, QrCode, Phone, Mail, ShieldCheck,
   MapPin, Clock, Coins, Building2, UserCheck, FileText,
-  Sprout, Gavel, Send, LifeBuoy, Users, Lock
+  Sprout, Gavel, Send, LifeBuoy, Users, Lock, Mic, Bot
 } from 'lucide-react';
 
 // ─── Crop price data for Analytics pages ──────────────────────────────────────
@@ -124,7 +124,7 @@ function CropPriceChart({ cropName, data, msp }) {
   );
 }
 
-export default function PersonaPortalPage({ activeRole, setActiveRole, setCurrentView, currentUser, t }) {
+export default function PersonaPortalPage({ activeRole, setActiveRole, setCurrentView, currentUser, onOpenVoiceAgent, t }) {
   const [activePageNum, setActivePageNum] = useState(1);
   const [searchFilter, setSearchFilter] = useState('');
   const [actionSuccessMsg, setActionSuccessMsg] = useState('');
@@ -651,10 +651,17 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
     if (id === 10) return (
       <div className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="bg-emerald-50 border border-emerald-300 p-4 rounded-2xl font-mono text-center">
-            <Phone className="w-6 h-6 text-emerald-600 mx-auto mb-1" />
-            <div className="text-sm font-extrabold text-emerald-900">1800-180-1551</div>
-            <div className="text-[10px] text-emerald-700">Kisan Call Centre (24x7 Free)</div>
+          <div 
+            onClick={() => onOpenVoiceAgent && onOpenVoiceAgent()}
+            className="bg-emerald-50 hover:bg-emerald-100/80 border-2 border-emerald-500 p-4 rounded-2xl font-mono text-center cursor-pointer transition-all shadow-sm group active:scale-95"
+            title="Talk to 24x7 AI Voice Agent"
+          >
+            <div className="relative inline-block mb-1">
+              <Mic className="w-6 h-6 text-emerald-700 animate-pulse group-hover:scale-110 transition-transform" />
+              <span className="w-2 h-2 rounded-full bg-emerald-500 absolute -top-0.5 -right-0.5 animate-ping" />
+            </div>
+            <div className="text-xs font-extrabold text-emerald-950">AAGAM AI Voice Agent</div>
+            <div className="text-[10px] text-emerald-700 font-bold">24x7 Live (Click to Speak)</div>
           </div>
           <div className="bg-sky-50 border border-sky-300 p-4 rounded-2xl font-mono text-center">
             <Mail className="w-6 h-6 text-sky-600 mx-auto mb-1" />

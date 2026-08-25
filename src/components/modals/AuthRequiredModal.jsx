@@ -13,7 +13,8 @@ import {
   ShieldCheck, 
   Sparkles, 
   UserPlus, 
-  LogIn 
+  LogIn,
+  Mic
 } from 'lucide-react';
 
 export default function AuthRequiredModal({
@@ -22,6 +23,7 @@ export default function AuthRequiredModal({
   targetPortalName = 'Portal',
   onLoginSuccess,
   onOpenFullAuth,
+  onOpenVoiceAgent,
   t
 }) {
   if (!isOpen) return null;
@@ -222,7 +224,16 @@ export default function AuthRequiredModal({
             <ShieldCheck className="w-3.5 h-3.5 text-[#71873f]" />
             <span>MeriPahchan GOI Verified</span>
           </span>
-          <span>Helpline: <strong>1800-180-1551</strong></span>
+          <button
+            onClick={() => {
+              onClose();
+              if (onOpenVoiceAgent) onOpenVoiceAgent();
+            }}
+            className="flex items-center gap-1 text-[#71873f] hover:text-[#5b722e] font-bold hover:underline cursor-pointer"
+          >
+            <Mic className="w-3.5 h-3.5 text-[#71873f] animate-pulse" />
+            <span>AI Voice Agent: <strong>24x7 Active</strong></span>
+          </button>
         </div>
 
       </div>

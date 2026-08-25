@@ -14,7 +14,8 @@ import {
   ShieldCheck,
   Building2,
   Sprout,
-  LifeBuoy
+  LifeBuoy,
+  Mic
 } from 'lucide-react';
 
 export default function Navbar({
@@ -28,6 +29,7 @@ export default function Navbar({
   openDbtWithAuth,
   openGatePassWithAuth,
   onOpenHelpdesk,
+  onOpenVoiceAgent,
   currentUser,
   isAuthenticated,
   onRequestLogout,
@@ -251,6 +253,21 @@ export default function Navbar({
                 <QrCode className="w-4 h-4" />
                 <span>{t('Gate Pass', 'गेट पास')}</span>
               </button>
+
+              {/* AI Voice Agent Trigger */}
+              {onOpenVoiceAgent && (
+                <button
+                  onClick={onOpenVoiceAgent}
+                  className="flex items-center gap-1.5 bg-gradient-to-r from-[#f0f4ea] to-[#f4efe6] hover:from-[#e3eed6] hover:to-[#e8dfd1] text-[#243118] font-extrabold px-3.5 py-2 rounded-xl border border-[#71873f]/60 transition-all shadow-xs whitespace-nowrap group"
+                  title={t('Talk to AI Voice Agent', 'वॉइस एजेंट')}
+                >
+                  <div className="relative">
+                    <Mic className="w-4 h-4 text-[#71873f] group-hover:scale-110 transition-transform animate-pulse" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 absolute -top-0.5 -right-0.5 animate-ping" />
+                  </div>
+                  <span className="hidden md:inline">{t('Voice Agent', 'वॉइस एजेंट')}</span>
+                </button>
+              )}
 
               {/* Helpdesk / Bug Report Trigger */}
               {onOpenHelpdesk && (

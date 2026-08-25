@@ -394,6 +394,7 @@ export default function GatePassModal({
           <li>Valid only for ${date} during slot ${timeSlot}.</li>
           <li>Carry official Farmer ID or Aadhaar for weighbridge verification.</li>
           <li>MSP payment will be credited via NPCI-DBT within 48 hours of acceptance.</li>
+          <li>AAGAM 24x7 AI Voice Agent: Active on Portal for Instant Voice Support (Hindi & English).</li>
         </ul>
       </div>
 
@@ -407,7 +408,7 @@ export default function GatePassModal({
     <!-- FOOTER -->
     <div class="footer">
       <span>Issued: ${printTime}</span>
-      <span>Kisan Toll-Free Helpline: 1800-180-1551</span>
+      <span>AAGAM AI Kisan Voice Agent: 24x7 Active</span>
       <span>Token Hash: GOI-${token}</span>
     </div>
 

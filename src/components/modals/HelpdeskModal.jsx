@@ -16,7 +16,9 @@ import {
   HelpCircle,
   Headphones,
   Paperclip,
-  Inbox
+  Inbox,
+  Mic,
+  Bot
 } from 'lucide-react';
 
 export default function HelpdeskModal({
@@ -24,6 +26,7 @@ export default function HelpdeskModal({
   onClose,
   currentUser,
   triggerSuccessNotification,
+  onOpenVoiceAgent,
   t
 }) {
   if (!isOpen) return null;
@@ -252,8 +255,8 @@ Ministry of Agriculture & Farmers Welfare, Govt of India`
                 : 'bg-[#fcfaf7] text-[#637554] hover:bg-[#f0f4ea]'
             }`}
           >
-            <Headphones className="w-3.5 h-3.5" />
-            <span>{t('24x7 Helplines', 'हेल्पलाइन नंबर')}</span>
+            <Bot className="w-3.5 h-3.5" />
+            <span>{t('AI Voice Agent & Desk', 'एआई वॉइस एजेंट व संपर्क')}</span>
           </button>
 
           <button
@@ -490,23 +493,38 @@ Ministry of Agriculture & Farmers Welfare, Govt of India`
           <div className="space-y-4 text-xs">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               
-              {/* Kisan Call Center */}
-              <div className="bg-[#fcfaf7] border border-[#abbe99] p-4 rounded-2xl space-y-2 shadow-sm hover:border-[#71873f] transition-all">
+              {/* AAGAM AI Voice Agent (ElevenLabs ConvAI) */}
+              <div className="bg-gradient-to-br from-[#f0f4ea] to-[#fcfaf7] border-2 border-[#71873f] p-4 rounded-2xl space-y-2.5 shadow-md hover:shadow-lg transition-all">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-xs text-[#243118]">Toll-Free Kisan Call Center</span>
-                  <span className="bg-emerald-100 text-emerald-800 text-[10px] font-mono px-2 py-0.5 rounded-full font-bold">24x7 FREE</span>
+                  <div className="flex items-center gap-1.5 font-bold text-xs text-[#243118]">
+                    <Bot className="w-4 h-4 text-[#71873f]" />
+                    <span>{t('AAGAM AI Kisan Voice Agent', 'आगामी किसान एआई वॉइस एजेंट')}</span>
+                  </div>
+                  <span className="bg-emerald-100 text-emerald-800 text-[10px] font-mono px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                    <span>24x7 ACTIVE</span>
+                  </span>
                 </div>
-                <div className="text-lg font-mono font-extrabold text-[#71873f]">1800-180-1551</div>
-                <p className="text-[11px] text-[#637554]">
-                  Available in 22 official Indian languages. Connects directly to agricultural specialists.
+                <div className="text-sm font-mono font-extrabold text-[#71873f] flex items-center gap-1.5">
+                  <Mic className="w-4 h-4 text-[#71873f] animate-pulse" />
+                  <span>ElevenLabs ConvAI v3</span>
+                </div>
+                <p className="text-[11px] text-[#637554] leading-relaxed">
+                  {t(
+                    'Instant real-time conversational voice assistance for MSP rates, gate pass slots, DBT payments, and quality testing in Hindi & English.',
+                    'एमएसपी भाव, मंडी स्लॉट, डीबीटी भुगतान और अनाज गुणवत्ता के लिए हिंदी एवं अंग्रेजी में त्वरित 24x7 वॉइस सहायता।'
+                  )}
                 </p>
-                <a 
-                  href="tel:18001801551" 
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#71873f] hover:underline pt-1"
+                <button 
+                  onClick={() => {
+                    onClose();
+                    if (onOpenVoiceAgent) onOpenVoiceAgent();
+                  }}
+                  className="w-full py-2.5 px-4 rounded-xl bg-[#71873f] hover:bg-[#5b722e] text-white font-extrabold text-xs shadow-md flex items-center justify-center gap-2 transition-all active:scale-95 group cursor-pointer"
                 >
-                  <PhoneCall className="w-3.5 h-3.5" />
-                  <span>Call 1800-180-1551</span>
-                </a>
+                  <Mic className="w-3.5 h-3.5 text-[#e0b87e] group-hover:scale-110 transition-transform" />
+                  <span>{t('Launch AI Voice Agent Now', 'अभी वॉइस एजेंट से बात करें')}</span>
+                </button>
               </div>
 
               {/* Technical Helpdesk */}

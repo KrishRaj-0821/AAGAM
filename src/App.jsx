@@ -25,8 +25,9 @@ import QuickSearchModal from './components/modals/QuickSearchModal';
 import LogoutConfirmModal from './components/modals/LogoutConfirmModal';
 import AuthRequiredModal from './components/modals/AuthRequiredModal';
 import HelpdeskModal from './components/modals/HelpdeskModal';
+import VoiceAgentModal from './components/voice/VoiceAgentModal';
 import SuccessToast from './components/common/SuccessToast';
-import { LifeBuoy } from 'lucide-react';
+import { LifeBuoy, Mic, Bot } from 'lucide-react';
 
 export default function App() {
   // System & Accessibility States
@@ -62,6 +63,7 @@ export default function App() {
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
   const [isAuthRequiredModalOpen, setIsAuthRequiredModalOpen] = useState(false);
   const [isHelpdeskOpen, setIsHelpdeskOpen] = useState(false);
+  const [isVoiceAgentOpen, setIsVoiceAgentOpen] = useState(false);
   const [targetPortalName, setTargetPortalName] = useState('Portal');
   const [pendingRedirect, setPendingRedirect] = useState(null);
 
@@ -256,6 +258,7 @@ export default function App() {
         highContrast={highContrast}
         setHighContrast={setHighContrast}
         onOpenHelpdesk={() => setIsHelpdeskOpen(true)}
+        onOpenVoiceAgent={() => setIsVoiceAgentOpen(true)}
         t={t}
       />
 
@@ -271,6 +274,7 @@ export default function App() {
         openDbtWithAuth={openDbtWithAuth}
         openGatePassWithAuth={openGatePassWithAuth}
         onOpenHelpdesk={() => setIsHelpdeskOpen(true)}
+        onOpenVoiceAgent={() => setIsVoiceAgentOpen(true)}
         currentUser={currentUser}
         isAuthenticated={isAuthenticated}
         onRequestLogout={handleRequestLogout}
@@ -367,7 +371,6 @@ export default function App() {
 
 
 
-// In portal view render block:
       {currentView === 'portal' && (
         <div>
           {/* Persona Role Switcher Header Bar */}
@@ -454,6 +457,7 @@ export default function App() {
               setActiveRole={setActiveRole}
               setCurrentView={setCurrentView}
               currentUser={currentUser}
+              onOpenVoiceAgent={() => setIsVoiceAgentOpen(true)}
               t={t}
             />
           )}
@@ -468,6 +472,7 @@ export default function App() {
           authView={authView}
           setAuthView={setAuthView}
           isAuthGate={false}
+          onOpenVoiceAgent={() => setIsVoiceAgentOpen(true)}
         />
       )}
 
@@ -479,6 +484,7 @@ export default function App() {
           authView={authView}
           setAuthView={setAuthView}
           isAuthGate={false}
+          onOpenVoiceAgent={() => setIsVoiceAgentOpen(true)}
         />
       )}
 
@@ -487,6 +493,7 @@ export default function App() {
         highContrast={highContrast}
         language={language}
         onOpenHelpdesk={() => setIsHelpdeskOpen(true)}
+        onOpenVoiceAgent={() => setIsVoiceAgentOpen(true)}
         t={t}
       />
 
@@ -530,6 +537,7 @@ export default function App() {
         targetPortalName={targetPortalName}
         onLoginSuccess={handleLoginSuccess}
         onOpenFullAuth={handleOpenFullAuth}
+        onOpenVoiceAgent={() => setIsVoiceAgentOpen(true)}
         t={t}
       />
 
@@ -539,25 +547,52 @@ export default function App() {
         onClose={() => setIsHelpdeskOpen(false)}
         currentUser={currentUser}
         triggerSuccessNotification={triggerSuccessNotification}
+        onOpenVoiceAgent={() => setIsVoiceAgentOpen(true)}
         t={t}
       />
 
-      {/* Floating 24x7 Helpdesk & Bug Report Trigger Widget Button */}
-      <div className="fixed bottom-6 right-6 z-40">
+      {/* Official AAGAM AI Voice Agent Modal (ElevenLabs ConvAI Integration) */}
+      <VoiceAgentModal
+        isOpen={isVoiceAgentOpen}
+        onClose={() => setIsVoiceAgentOpen(false)}
+        language={language}
+        t={t}
+      />
+
+      {/* Floating 24x7 Support Dock: AI Voice Agent & Helpdesk Buttons */}
+      <div className="fixed bottom-6 right-6 z-40 flex flex-col sm:flex-row items-end sm:items-center gap-2.5">
+        
+        {/* Primary AI Voice Agent Trigger Widget */}
         <button
-          onClick={() => setIsHelpdeskOpen(true)}
-          className="bg-[#a36627] hover:bg-[#804d19] text-white p-3.5 sm:px-5 sm:py-3.5 rounded-full shadow-2xl hover:shadow-[#a36627]/50 border-2 border-white/80 transition-all flex items-center gap-2.5 group active:scale-95"
-          title="Open Helpdesk & Bug Report"
+          onClick={() => setIsVoiceAgentOpen(true)}
+          className="bg-gradient-to-r from-[#71873f] via-[#5c6e33] to-[#40541d] hover:from-[#5e7033] hover:to-[#354616] text-white p-3.5 sm:px-5 sm:py-3.5 rounded-full shadow-2xl hover:shadow-[#71873f]/60 border-2 border-white/90 transition-all flex items-center gap-2.5 group active:scale-95 cursor-pointer"
+          title="Talk to AAGAM AI Voice Agent (ElevenLabs 24x7)"
         >
-          <div className="relative">
-            <LifeBuoy className="w-5 h-5 group-hover:rotate-45 transition-transform" />
+          <div className="relative flex items-center justify-center">
+            <Mic className="w-5 h-5 text-[#e0b87e] group-hover:scale-110 transition-transform animate-pulse" />
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-white absolute -top-1 -right-1 animate-ping" />
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-white absolute -top-1 -right-1" />
           </div>
           <span className="hidden sm:inline font-extrabold text-xs tracking-wide">
-            {t('24x7 Helpdesk / Bug Report', '24x7 हेल्पडेस्क / बग रिपोर्ट')}
+            {t('AI Voice Agent (कृषि वाणी)', 'किसान वॉइस एजेंट')}
+          </span>
+          <span className="bg-[#e0b87e] text-[#1a2512] text-[9px] font-mono font-black px-1.5 py-0.5 rounded-md hidden md:inline">
+            24x7
           </span>
         </button>
+
+        {/* Citizen Helpdesk Trigger */}
+        <button
+          onClick={() => setIsHelpdeskOpen(true)}
+          className="bg-[#a36627] hover:bg-[#804d19] text-white p-3 sm:px-4 sm:py-3.5 rounded-full shadow-xl hover:shadow-[#a36627]/50 border-2 border-white/80 transition-all flex items-center gap-2 group active:scale-95 cursor-pointer"
+          title="Open Helpdesk & Grievance Report"
+        >
+          <LifeBuoy className="w-4 h-4 group-hover:rotate-45 transition-transform" />
+          <span className="hidden lg:inline font-bold text-xs tracking-wide">
+            {t('Helpdesk', 'हेल्पडेस्क')}
+          </span>
+        </button>
+
       </div>
 
       {/* Floating System-Wide Success Toast Notification */}

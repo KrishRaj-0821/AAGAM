@@ -17,7 +17,9 @@ import {
   KeyRound,
   UserPlus,
   Mail,
-  Smartphone
+  Smartphone,
+  Mic,
+  Bot
 } from 'lucide-react';
 
 export default function LoginPage({ 
@@ -26,7 +28,8 @@ export default function LoginPage({
   onLoginSuccess, 
   authView = 'login', 
   setAuthView, 
-  isAuthGate = false 
+  isAuthGate = false,
+  onOpenVoiceAgent 
 }) {
   const [loginRole, setLoginRole] = useState('Farmer');
   const [authMethod, setAuthMethod] = useState('google'); // 'google' | 'mobile' | 'staffId'
@@ -288,8 +291,16 @@ export default function LoginPage({
                 <span className="text-[#243118] font-bold">Enabled & Verified</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-[#637554]">Kisan Toll-Free Helpline:</span>
-                <span className="text-[#a36627] font-bold">1800-180-1551</span>
+                <span className="text-[#637554]">AI Kisan Voice Agent:</span>
+                <button
+                  type="button"
+                  onClick={onOpenVoiceAgent}
+                  className="text-[#71873f] hover:text-[#5b722e] font-bold flex items-center gap-1.5 hover:underline group cursor-pointer"
+                  title="Talk to 24x7 AI Voice Agent"
+                >
+                  <Mic className="w-3.5 h-3.5 text-[#71873f] group-hover:scale-110 transition-transform animate-pulse" />
+                  <span>24x7 Active (Start Call)</span>
+                </button>
               </div>
             </div>
           </div>

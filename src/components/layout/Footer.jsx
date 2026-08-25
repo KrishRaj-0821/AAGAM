@@ -1,7 +1,8 @@
 import React from 'react';
 import { directoryCategories } from '../../data/mockData';
+import { Mic } from 'lucide-react';
 
-export default function Footer({ highContrast, language, onOpenHelpdesk, t }) {
+export default function Footer({ highContrast, language, onOpenHelpdesk, onOpenVoiceAgent, t }) {
   return (
     <footer className={`${highContrast ? 'bg-black text-yellow-300 border-t border-yellow-500' : 'bg-[#243118] text-white border-t border-[#abbe99]/40'}`}>
       
@@ -34,10 +35,19 @@ export default function Footer({ highContrast, language, onOpenHelpdesk, t }) {
               <div className="text-xs text-[#e0b87e] font-mono font-bold">Official Support Inbox</div>
               <div className="text-[11px] text-slate-200 font-mono font-semibold">aagam.help.gov@gmail.com</div>
             </a>
-            <div className="bg-[#243118] border border-[#abbe99]/40 px-4 py-2 rounded-xl text-center">
-              <div className="text-xs text-[#e0b87e] font-mono font-bold">24x7 Toll Free</div>
-              <div className="text-[10px] text-slate-300 font-mono">1800-180-1551</div>
-            </div>
+            
+            {/* AI Voice Agent (Replaced 1800 Helpline) */}
+            <button
+              onClick={onOpenVoiceAgent}
+              className="bg-[#243118] hover:bg-[#1a2512] border border-[#abbe99]/50 hover:border-[#e0b87e] px-4 py-2 rounded-xl text-center transition-all shadow-sm group active:scale-95 cursor-pointer"
+              title="Talk to 24x7 AI Voice Agent"
+            >
+              <div className="text-xs text-[#e0b87e] font-mono font-bold flex items-center justify-center gap-1.5">
+                <Mic className="w-3.5 h-3.5 text-[#e0b87e] animate-pulse group-hover:scale-110 transition-transform" />
+                <span>{t('24x7 AI Voice Agent', '24x7 किसान वॉइस एजेंट')}</span>
+              </div>
+              <div className="text-[10px] text-emerald-300 font-mono font-bold">{t('Hindi • English • ElevenLabs AI', 'हिन्दी • English • ElevenLabs AI')}</div>
+            </button>
             {onOpenHelpdesk && (
               <button
                 onClick={onOpenHelpdesk}
