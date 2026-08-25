@@ -367,29 +367,278 @@ export default function GatePassModal({
         <div style="font-weight: 800; color: #166534; font-size: 14px;">100% SCANNABLE OFFICIAL IN-GATE QR CODE</div>
         <div style="font-size: 12px; color: #15803d; margin-top: 4px;">
           Scan with any mobile camera / barrier reader for fast-track automatic gate opening & lane access. Token: <strong>${token}</strong>
-        </div>
+  <div class="bill-card">
+
+    <!-- BG WATERMARK STAMP -->
+    <div class="stamp-watermark">
+      <svg width="380" height="380" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="100" cy="100" r="94" stroke="#243118" stroke-width="1.5" fill="none"/>
+        <circle cx="100" cy="100" r="80" stroke="#243118" stroke-width="0.5" fill="none" stroke-dasharray="4 2"/>
+        <text x="50%" y="48%" dominant-baseline="middle" text-anchor="middle" font-size="11" font-weight="bold" fill="#243118" font-family="serif">भारत सरकार</text>
+        <text x="50%" y="58%" dominant-baseline="middle" text-anchor="middle" font-size="9" fill="#243118" font-family="serif">GOVERNMENT OF INDIA</text>
+        <text x="50%" y="67%" dominant-baseline="middle" text-anchor="middle" font-size="7.5" fill="#243118" font-family="serif">AAGAM — Ministry of Agriculture</text>
+      </svg>
+    </div>
+
+    <!-- HEADER with GOI Emblem -->
+    <div class="bill-header">
+      <div class="emblem-box">
+        <!-- Ashoka Stambha SVG Emblem -->
+        <svg width="60" height="64" viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg">
+          <!-- Base & platform -->
+          <rect x="28" y="200" width="144" height="10" rx="2" fill="#1a3010"/>
+          <rect x="42" y="190" width="116" height="12" rx="2" fill="#1a3010"/>
+          <!-- Dharma Chakra with spokes -->
+          <circle cx="100" cy="176" r="13" fill="none" stroke="#1a3010" stroke-width="3"/>
+          <circle cx="100" cy="176" r="3.5" fill="#1a3010"/>
+          <line x1="100" y1="163" x2="100" y2="189" stroke="#1a3010" stroke-width="1.5"/>
+          <line x1="87" y1="176" x2="113" y2="176" stroke="#1a3010" stroke-width="1.5"/>
+          <line x1="91" y1="167" x2="109" y2="185" stroke="#1a3010" stroke-width="1.2"/>
+          <line x1="109" y1="167" x2="91" y2="185" stroke="#1a3010" stroke-width="1.2"/>
+          <!-- Pillar -->
+          <rect x="88" y="100" width="24" height="88" rx="2" fill="#1a3010"/>
+          <!-- Capital abacus block -->
+          <rect x="70" y="92" width="60" height="10" rx="2" fill="#1a3010"/>
+          <!-- Left lion -->
+          <ellipse cx="77" cy="75" rx="15" ry="17" fill="#1a3010"/>
+          <ellipse cx="71" cy="61" rx="11" ry="11" fill="#1a3010"/>
+          <circle cx="71" cy="58" r="13" fill="none" stroke="#1a3010" stroke-width="3.5"/>
+          <!-- Right lion -->
+          <ellipse cx="123" cy="75" rx="15" ry="17" fill="#1a3010"/>
+          <ellipse cx="129" cy="61" rx="11" ry="11" fill="#1a3010"/>
+          <circle cx="129" cy="58" r="13" fill="none" stroke="#1a3010" stroke-width="3.5"/>
+          <!-- Front center lion -->
+          <ellipse cx="100" cy="70" rx="14" ry="17" fill="#1a3010"/>
+          <ellipse cx="100" cy="56" rx="11" ry="11" fill="#1a3010"/>
+          <circle cx="100" cy="53" r="13" fill="none" stroke="#1a3010" stroke-width="3.5"/>
+          <!-- Satyamev Jayate -->
+          <text x="100" y="220" text-anchor="middle" font-size="10" font-weight="bold" fill="#1a3010" font-family="serif">सत्यमेव जयते</text>
+        </svg>
+      </div>
+      <div class="bill-header-text">
+        <h1>Government of India — Ministry of Agriculture & Farmers Welfare</h1>
+        <p>AAGAM National Automated Grain & Allocation Management • Official Procurement Dispatch Note</p>
+        <p style="margin-top:3px;font-size:9px;color:#a8c08a;">मंत्रालय पर्ची • NIC MeitY Certified • NPCI-DBT Linked</p>
+      </div>
+      <div class="bill-header-right">
+        <div class="inv-no">PASS #: ${token}</div>
+        <div class="inv-date">Issued: ${printTime}</div>
+        <div style="margin-top:5px; background:#2e7d32; color:white; font-size:10px; font-weight:800; padding:3px 10px; border-radius:2px; letter-spacing:1px;">✓ VERIFIED & ACTIVE</div>
       </div>
     </div>
 
-    <div class="notice-box">
-      <strong>⚠️ 1-Hour Prior Scheduled Reminder:</strong> An automated SMS with real-time weighbridge lane queue status will be sent to your registered mobile 1 hour prior to your window.
+    <!-- STATUS BAR — NO circular box, plain chips -->
+    <div class="status-bar">
+      <span class="status-chip">✓ ACTIVE & CONFIRMED</span>
+      <span class="token-text">TOKEN: ${token}</span>
+      <span class="msp-chip">MSP PROTECTED</span>
     </div>
 
-    <div class="footer">
-      <span>Generated On: ${printTime}</span>
-      <span>National Kisan Helpline: 1800-180-1551</span>
-      <span>Security Hash: GOI-SHA256-${token}</span>
+    <!-- BILL TO / SHIP TO -->
+    <div class="bill-parties">
+      <div class="bill-party">
+        <h3>Farmer Details (Bill From)</h3>
+        <div class="party-name">${bookingDetails.farmerName || 'Gurpreet Singh'}</div>
+        <div class="party-row">Farmer ID: <span>${farmerId}</span></div>
+        <div class="party-row">District: <span>${district}, ${state}</span></div>
+        <div class="party-row">Mobile: <span>${mobile}</span></div>
+        <div class="party-row">Email: <span>${email}</span></div>
+        <div class="party-row">Aadhaar e-KYC: <span style="color:#2e7d32;">✓ VERIFIED</span></div>
+        <div class="party-row">PM-KISAN ID: <span>PMKN-${farmerId}</span></div>
+        <div class="party-row">PAN: <span>XXXXX9999X (Masked)</span></div>
+      </div>
+      <div class="bill-party">
+        <h3>Procurement Center (Consigned To)</h3>
+        <div class="party-name">${mandi}</div>
+        <div class="party-row">Center Type: <span>GOI Authorized APMC Mandi</span></div>
+        <div class="party-row">State & District: <span>${district}, ${state}</span></div>
+        <div class="party-row">Weighbridge Lane: <span style="color:#2e7d32;">${lane}</span></div>
+        <div class="party-row">Arrival Date: <span>${date}</span></div>
+        <div class="party-row">Time Slot: <span>${timeSlot}</span></div>
+        <div class="party-row">Issuing Authority: <span>District Procurement Officer</span></div>
+        <div class="party-row">Place of Supply: <span>${state}</span></div>
+      </div>
+    </div>
+
+    <!-- ITEMS TABLE -->
+    <div class="items-table-wrap">
+      <table class="items-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Commodity / Crop Details</th>
+            <th>HSN</th>
+            <th>Quantity</th>
+            <th>MSP Rate/Qtl</th>
+            <th>Tax/Fee</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>
+              <strong>${crop}</strong><br>
+              <span class="hsn-chip">HSN: 1001</span>
+              <span class="grade-chip">GRADE A FAQ</span><br>
+              <span style="font-size:10px;color:#475569;">Moisture ≤12% • Protein ≥11% • FM ≤2% (NIR Verified)</span>
+            </td>
+            <td>1001</td>
+            <td>${qty} Qtl<br><span style="font-size:10px;color:#475569;">(${(parseFloat(qty||0)*100)} Kg)</span></td>
+            <td>₹2,425</td>
+            <td>₹0.00<br><span style="font-size:9px;color:#2e7d32;">(Exempt)</span></td>
+            <td style="font-weight:800;">₹${(parseFloat(qty||150)*2425).toLocaleString('en-IN')}</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>
+              <strong>Transport & Handling (Farm → Mandi)</strong><br>
+              <span class="hsn-chip">SAC: 9965</span><br>
+              <span style="font-size:10px;color:#475569;">AAGAM GPS Fleet — GOI Subsidized</span>
+            </td>
+            <td>9965</td>
+            <td>1 Trip</td>
+            <td>₹0.00</td>
+            <td>₹0.00</td>
+            <td style="font-weight:700; color:#2e7d32;">₹0.00 (GOI)</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>
+              <strong>AI NIR Quality Inspection</strong><br>
+              <span class="hsn-chip">SAC: 9983</span><br>
+              <span style="font-size:10px;color:#475569;">ICAR AgriVision v3.1 — 45 sec scan</span>
+            </td>
+            <td>9983</td>
+            <td>1 Lot</td>
+            <td>₹0.00</td>
+            <td>₹0.00</td>
+            <td style="font-weight:700; color:#2e7d32;">₹0.00 (GOI)</td>
+          </tr>
+          <tr class="subtotal-row">
+            <td colspan="3"><strong>Sub Total (2.00 items)</strong></td>
+            <td><strong>${qty} Qtl</strong></td>
+            <td>—</td>
+            <td>₹0.00</td>
+            <td><strong>₹${(parseFloat(qty||150)*2425).toLocaleString('en-IN')}</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- BOTTOM: QR + Bank left | Tax summary right -->
+    <div class="bottom-split">
+      <div class="bottom-left">
+        <div class="qr-bank">
+          <div class="qr-img-box">
+            ${qrCodeImgSrc
+              ? `<img src="${qrCodeImgSrc}" alt="Scan QR" style="width:100%;height:100%;object-fit:contain;"/>`
+              : `<div style="font-size:9px;color:#475569;text-align:center;padding:6px;">SCAN<br>QR CODE</div>`}
+          </div>
+          <div class="bank-info">
+            <h4>DBT Bank Details</h4>
+            <div class="bank-row">Account Holder: <span>${bookingDetails.farmerName || 'Gurpreet Singh'}</span></div>
+            <div class="bank-row">Bank: <span>State Bank of India</span></div>
+            <div class="bank-row">Account No: <span>XXXX XXXX 4892</span></div>
+            <div class="bank-row">IFSC: <span>SBIN0004829</span></div>
+            <div class="bank-row">Branch: <span>${district}</span></div>
+            <div class="bank-row">NPCI DBT: <span style="color:#2e7d32;">✓ Aadhaar Linked</span></div>
+          </div>
+        </div>
+        <div style="background:#fffbeb;border-left:3px solid #f59e0b;padding:7px 10px;border-radius:2px;font-size:10px;color:#92400e;">
+          <strong>⚠ 1-Hour SMS Alert Scheduled:</strong> Auto-notification will be sent to ${mobile} before your arrival slot.
+        </div>
+      </div>
+      <div class="bottom-right">
+        <table class="summary-table">
+          <tr><td>Taxable Amount</td><td>₹${(parseFloat(qty||150)*2425).toLocaleString('en-IN')}</td></tr>
+          <tr><td>CGST @ 0.00</td><td>₹0.00</td></tr>
+          <tr><td>SGST @ 0.00</td><td>₹0.00</td></tr>
+          <tr><td>Mandi Cess (GOI Exempt)</td><td>₹0.00</td></tr>
+          <tr><td>Received Amount</td><td>₹0.00 (Pending DBT)</td></tr>
+          <tr class="summary-total"><td><strong>Total DBT Payable</strong></td><td><strong>₹${(parseFloat(qty||150)*2425).toLocaleString('en-IN')}</strong></td></tr>
+          <tr><td style="font-size:10px;color:#475569;">Balance</td><td style="font-size:10px;color:#475569;">₹0.00 (After DBT)</td></tr>
+          <tr class="summary-words">
+            <td colspan="2" style="padding-top:8px;">
+              <strong>Total Amount in Words:</strong><br>
+              ${(() => {
+                const amt = Math.round(parseFloat(qty||150) * 2425);
+                const units=['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+                const tens=['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+                const f=(n)=>{
+                  if(n===0)return'';
+                  if(n<20)return units[n]+' ';
+                  if(n<100)return tens[Math.floor(n/10)]+' '+(n%10?units[n%10]+' ':'');
+                  if(n<1000)return units[Math.floor(n/100)]+' Hundred '+(n%100?f(n%100):'');
+                  if(n<100000)return f(Math.floor(n/1000))+'Thousand '+(n%1000?f(n%1000):'');
+                  if(n<10000000)return f(Math.floor(n/100000))+'Lakh '+(n%100000?f(n%100000):'');
+                  return f(Math.floor(n/10000000))+'Crore '+(n%10000000?f(n%10000000):'');
+                };
+                return (f(amt).trim()||'Zero')+' Rupees Only /-';
+              })()}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- STAMP + TERMS + SIGNATURE -->
+    <div class="stamp-section">
+      <div class="terms-box">
+        <h4>Terms & Conditions</h4>
+        <ul>
+          <li>This Gate Pass is valid only for the date & time slot mentioned above.</li>
+          <li>Present this pass (QR or printed) at the mandi gate barrier. Non-transferable.</li>
+          <li>Grain must meet GOI FAQ norms: Moisture ≤12%, Foreign Matter ≤2%.</li>
+          <li>MSP payment will be credited via NPCI-DBT within 48 hours of weighment acceptance.</li>
+          <li>Goods once submitted for procurement cannot be taken back after weighment.</li>
+          <li>Misuse of this pass is liable under APMC Act 2003 & IT Act 2000.</li>
+          <li>Kisan Helpline: 1800-180-1551 (Toll Free • 24x7 • All Languages)</li>
+        </ul>
+      </div>
+
+      <!-- OFFICIAL GOI GOVERNMENT STAMP -->
+      <div class="gov-stamp-area">
+        <div class="gov-stamp-box">
+          <svg width="44" height="44" viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg">
+            <rect x="28" y="200" width="144" height="10" rx="2" fill="#1a3010"/>
+            <rect x="42" y="190" width="116" height="12" rx="2" fill="#1a3010"/>
+            <circle cx="100" cy="176" r="13" fill="none" stroke="#1a3010" stroke-width="5"/>
+            <circle cx="100" cy="176" r="4" fill="#1a3010"/>
+            <line x1="100" y1="163" x2="100" y2="189" stroke="#1a3010" stroke-width="2"/>
+            <line x1="87" y1="176" x2="113" y2="176" stroke="#1a3010" stroke-width="2"/>
+            <line x1="91" y1="167" x2="109" y2="185" stroke="#1a3010" stroke-width="1.5"/>
+            <line x1="109" y1="167" x2="91" y2="185" stroke="#1a3010" stroke-width="1.5"/>
+            <rect x="88" y="100" width="24" height="88" rx="2" fill="#1a3010"/>
+            <rect x="70" y="92" width="60" height="10" rx="2" fill="#1a3010"/>
+            <ellipse cx="77" cy="75" rx="15" ry="17" fill="#1a3010"/>
+            <ellipse cx="71" cy="61" rx="11" ry="11" fill="#1a3010"/>
+            <ellipse cx="123" cy="75" rx="15" ry="17" fill="#1a3010"/>
+            <ellipse cx="129" cy="61" rx="11" ry="11" fill="#1a3010"/>
+            <ellipse cx="100" cy="70" rx="14" ry="17" fill="#1a3010"/>
+            <ellipse cx="100" cy="56" rx="11" ry="11" fill="#1a3010"/>
+            <text x="100" y="218" text-anchor="middle" font-size="9" font-weight="bold" fill="#1a3010" font-family="serif">सत्यमेव जयते</text>
+          </svg>
+          <div class="stamp-text">Ministry of Agriculture<br>Govt. of India<br>भारत सरकार</div>
+          <div class="auth-line">Authorised Signatory</div>
+        </div>
+        <div style="font-size:9px;color:#475569;margin-top:5px;text-align:center;">District Procurement Officer<br>${district}, ${state}</div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="bill-footer">
+      <span>Generated: ${printTime}</span>
+      <span>AAGAM Portal — aagam.gov.in • NIC MeitY Certified</span>
+      <span>SHA256: GOI-${token}</span>
     </div>
   </div>
 
-  <div class="no-print" style="text-align: center; margin-top: 20px;">
-    <button class="btn-print" onclick="window.print()">🖨️ Print / Save as PDF Document</button>
+  <div class="no-print" style="text-align:center; margin:18px auto;">
+    <button class="btn-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
   </div>
-
   <script>
-    window.onload = function() {
-      setTimeout(function() { window.print(); }, 400);
-    };
+    window.onload = function() { setTimeout(function() { window.print(); }, 500); };
   </script>
 </body>
 </html>`;
