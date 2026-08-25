@@ -201,105 +201,115 @@ export default function GatePassModal({
   <meta charset="utf-8">
   <title>AAGAM Official Gate Pass - ${token}</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
     @media print {
-      body { margin: 0; padding: 20px; font-family: 'Segoe UI', Arial, sans-serif; background: #fff !important; }
+      body { margin: 0; padding: 0; background: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .no-print { display: none !important; }
+      .pass-card { box-shadow: none !important; border: 1px solid #71873f !important; }
     }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
       color: #1a202c;
-      background: #f8fafc;
-      padding: 30px;
+      background: #f4f6f8;
+      padding: 24px;
+      font-size: 12px;
     }
     .pass-card {
       max-width: 760px;
       margin: 0 auto;
       background: #ffffff;
-      border: 3px solid #71873f;
-      border-radius: 16px;
-      padding: 30px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      border: 2px solid #71873f;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      overflow: hidden;
     }
-    .header {
-      text-align: center;
-      border-bottom: 2px solid #e2e8f0;
-      padding-bottom: 18px;
-      margin-bottom: 20px;
-    }
-    .title {
-      font-size: 22px;
-      font-weight: 800;
-      color: #243118;
-      margin: 0;
-      text-transform: uppercase;
-    }
-    .subtitle {
-      font-size: 13px;
-      color: #637554;
-      font-weight: 600;
-      margin-top: 4px;
-    }
-    .token-badge {
-      display: inline-block;
+    .bill-header {
       background: #243118;
-      color: #e0b87e;
-      font-family: monospace;
-      font-size: 18px;
-      font-weight: bold;
-      padding: 8px 24px;
-      border-radius: 9999px;
-      margin: 14px 0;
-      border: 2px solid #e0b87e;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 20px;
-    }
-    .field-box {
-      background: #f8fafc;
-      border: 1px solid #cbd5e1;
-      border-radius: 10px;
-      padding: 10px 14px;
-    }
-    .field-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      font-weight: 700;
-      color: #64748b;
-      margin-bottom: 2px;
-    }
-    .field-value {
-      font-size: 13px;
-      font-weight: 700;
-      color: #0f172a;
-    }
-    .highlight-green { color: #2e7d32; }
-    .highlight-gold { color: #b45309; }
-    .qr-section {
+      color: white;
+      padding: 20px 24px;
       display: flex;
       align-items: center;
+      gap: 16px;
+    }
+    .emblem-box {
+      background: white;
+      border-radius: 6px;
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .bill-header-text { flex: 1; }
+    .bill-header-text h1 { font-size: 15px; font-weight: 800; color: #e0b87e; text-transform: uppercase; margin: 0; }
+    .bill-header-text p { font-size: 11px; color: #c8d9b0; margin-top: 3px; }
+    .bill-header-right { text-align: right; }
+    .bill-header-right .token-num { font-family: monospace; font-size: 16px; font-weight: 800; color: #e0b87e; }
+    .bill-header-right .status-chip { background: #2e7d32; color: white; font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 4px; display: inline-block; margin-top: 4px; }
+    .user-opted-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 20px 24px;
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .info-box {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+    .info-label { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #64748b; margin-bottom: 3px; }
+    .info-val { font-size: 13px; font-weight: 700; color: #0f172a; }
+    .highlight-green { color: #166534; }
+    .highlight-amber { color: #b45309; }
+    .qr-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 18px 24px;
       background: #f0fdf4;
-      border: 2px dashed #86efac;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 20px;
+      border-bottom: 1px solid #bbf7d0;
     }
-    .notice-box {
-      background: #fffbeb;
-      border-left: 4px solid #f59e0b;
-      padding: 12px 16px;
-      border-radius: 4px;
-      font-size: 12px;
-      color: #92400e;
-      margin-bottom: 16px;
+    .qr-img-box {
+      width: 100px;
+      height: 100px;
+      background: white;
+      border: 2px solid #22c55e;
+      border-radius: 8px;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
+    .qr-info { flex: 1; }
+    .qr-info h4 { font-size: 13px; font-weight: 800; color: #166534; margin-bottom: 4px; }
+    .qr-info p { font-size: 11px; color: #15803d; line-height: 1.5; }
+    .stamp-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 24px;
+      background: #ffffff;
+    }
+    .terms-list { font-size: 10px; color: #475569; line-height: 1.8; padding-left: 14px; }
+    .gov-stamp-box {
+      border: 2px solid #1a3010;
+      border-radius: 6px;
+      padding: 10px 14px;
+      text-align: center;
+      background: rgba(26,48,16,0.02);
+      min-width: 130px;
+    }
+    .stamp-title { font-size: 9px; font-weight: 800; color: #1a3010; text-transform: uppercase; margin-top: 4px; }
+    .stamp-sign { border-top: 1px solid #1a3010; font-size: 9px; font-weight: 700; color: #1a3010; margin-top: 6px; padding-top: 2px; }
     .footer {
-      border-top: 1px solid #e2e8f0;
-      padding-top: 14px;
-      font-size: 11px;
-      color: #94a3b8;
+      background: #243118;
+      color: #c8d9b0;
+      padding: 10px 24px;
+      font-size: 10px;
       display: flex;
       justify-content: space-between;
     }
@@ -307,290 +317,108 @@ export default function GatePassModal({
       background: #71873f;
       color: white;
       border: none;
-      padding: 12px 24px;
-      font-size: 14px;
-      font-weight: bold;
+      padding: 12px 28px;
+      font-size: 13px;
+      font-weight: 800;
       border-radius: 8px;
       cursor: pointer;
+      display: block;
+      margin: 20px auto;
+      font-family: inherit;
     }
   </style>
 </head>
 <body>
   <div class="pass-card">
-    <div class="header">
-      <h1 class="title">Government of India • Ministry of Agriculture</h1>
-      <div class="subtitle">AAGAM National Automated Grain Gate Pass & Queue System</div>
-      <div class="token-badge">TOKEN #: ${token}</div>
-      <div style="font-size: 12px; font-weight: bold; color: #16a34a;">STATUS: ACTIVE & CONFIRMED</div>
-    </div>
-
-    <div class="grid">
-      <div class="field-box">
-        <div class="field-label">Farmer Name / ID</div>
-        <div class="field-value">${bookingDetails.farmerName || 'Gurpreet Singh'} (${farmerId})</div>
-      </div>
-      <div class="field-box">
-        <div class="field-label">Registered Contact</div>
-        <div class="field-value">${mobile} • ${email}</div>
-      </div>
-      <div class="field-box">
-        <div class="field-label">Commodity & Quantity</div>
-        <div class="field-value highlight-gold">${crop} — ${qty} Qtl</div>
-      </div>
-      <div class="field-box">
-        <div class="field-label">Procurement Center (Mandi)</div>
-        <div class="field-value highlight-green">${mandi}</div>
-      </div>
-      <div class="field-box">
-        <div class="field-label">State & District</div>
-        <div class="field-value">${district}, ${state}</div>
-      </div>
-      <div class="field-box">
-        <div class="field-label">Assigned Weighbridge Lane</div>
-        <div class="field-value highlight-green">${lane}</div>
-      </div>
-      <div class="field-box">
-        <div class="field-label">Arrival Date & Slot</div>
-        <div class="field-value">${date} (${timeSlot})</div>
-      </div>
-      <div class="field-box">
-        <div class="field-label">1-Hour Prior SMS Alert</div>
-        <div class="field-value highlight-green">✓ Scheduled (Active to ${mobile})</div>
-      </div>
-    </div>
-
-    <div class="qr-section">
-      <div style="width: 110px; height: 110px; background: white; border: 2px solid #22c55e; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 4px;">
-        ${qrCodeImgSrc ? `<img src="${qrCodeImgSrc}" alt="Scannable QR" style="width: 100%; height: 100%; object-fit: contain;" />` : `<div style="font-size: 10px;">QR CODE</div>`}
-      </div>
-      <div style="padding-left: 20px; flex: 1;">
-        <div style="font-weight: 800; color: #166534; font-size: 14px;">100% SCANNABLE OFFICIAL IN-GATE QR CODE</div>
-        <div style="font-size: 12px; color: #15803d; margin-top: 4px;">
-          Scan with any mobile camera / barrier reader for fast-track automatic gate opening & lane access. Token: <strong>${token}</strong>
-  <div class="bill-card">
-
-    <!-- BG WATERMARK STAMP -->
-    <div class="stamp-watermark">
-      <svg width="380" height="380" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="100" cy="100" r="94" stroke="#243118" stroke-width="1.5" fill="none"/>
-        <circle cx="100" cy="100" r="80" stroke="#243118" stroke-width="0.5" fill="none" stroke-dasharray="4 2"/>
-        <text x="50%" y="48%" dominant-baseline="middle" text-anchor="middle" font-size="11" font-weight="bold" fill="#243118" font-family="serif">भारत सरकार</text>
-        <text x="50%" y="58%" dominant-baseline="middle" text-anchor="middle" font-size="9" fill="#243118" font-family="serif">GOVERNMENT OF INDIA</text>
-        <text x="50%" y="67%" dominant-baseline="middle" text-anchor="middle" font-size="7.5" fill="#243118" font-family="serif">AAGAM — Ministry of Agriculture</text>
-      </svg>
-    </div>
-
-    <!-- HEADER with GOI Emblem -->
+    
+    <!-- HEADER -->
     <div class="bill-header">
       <div class="emblem-box">
-        <img src="${window.location.origin + import.meta.env.BASE_URL}images/goi_emblem.png" alt="Government of India Emblem" style="height:64px; width:auto; object-fit:contain; image-rendering:-webkit-optimize-contrast;" />
+        <img src="${window.location.origin + import.meta.env.BASE_URL}images/goi_emblem.png" alt="GOI Emblem" style="height:52px; width:auto; object-fit:contain;" />
       </div>
       <div class="bill-header-text">
-        <h1>Government of India — Ministry of Agriculture & Farmers Welfare</h1>
-        <p>AAGAM National Automated Grain & Allocation Management • Official Procurement Dispatch Note</p>
-        <p style="margin-top:3px;font-size:9px;color:#a8c08a;">मंत्रालय पर्ची • NIC MeitY Certified • NPCI-DBT Linked</p>
+        <h1>Government of India — Ministry of Agriculture</h1>
+        <p>AAGAM National Automated Grain Gate Pass & Queue System</p>
       </div>
       <div class="bill-header-right">
-        <div class="inv-no">PASS #: ${token}</div>
-        <div class="inv-date">Issued: ${printTime}</div>
-        <div style="margin-top:5px; background:#2e7d32; color:white; font-size:10px; font-weight:800; padding:3px 10px; border-radius:2px; letter-spacing:1px;">✓ VERIFIED & ACTIVE</div>
+        <div class="token-num">TOKEN #: ${token}</div>
+        <div class="status-chip">✓ ACTIVE & CONFIRMED</div>
       </div>
     </div>
 
-    <!-- STATUS BAR — NO circular box, plain chips -->
-    <div class="status-bar">
-      <span class="status-chip">✓ ACTIVE & CONFIRMED</span>
-      <span class="token-text">TOKEN: ${token}</span>
-      <span class="msp-chip">MSP PROTECTED</span>
-    </div>
-
-    <!-- BILL TO / SHIP TO -->
-    <div class="bill-parties">
-      <div class="bill-party">
-        <h3>Farmer Details (Bill From)</h3>
-        <div class="party-name">${bookingDetails.farmerName || 'Gurpreet Singh'}</div>
-        <div class="party-row">Farmer ID: <span>${farmerId}</span></div>
-        <div class="party-row">District: <span>${district}, ${state}</span></div>
-        <div class="party-row">Mobile: <span>${mobile}</span></div>
-        <div class="party-row">Email: <span>${email}</span></div>
-        <div class="party-row">Aadhaar e-KYC: <span style="color:#2e7d32;">✓ VERIFIED</span></div>
-        <div class="party-row">PM-KISAN ID: <span>PMKN-${farmerId}</span></div>
-        <div class="party-row">PAN: <span>XXXXX9999X (Masked)</span></div>
+    <!-- USER OPTED DETAILS ONLY -->
+    <div class="user-opted-grid">
+      <div class="info-box">
+        <div class="info-label">Farmer Name / Registration ID</div>
+        <div class="info-value">${bookingDetails.farmerName || 'Gurpreet Singh'} (${farmerId})</div>
       </div>
-      <div class="bill-party">
-        <h3>Procurement Center (Consigned To)</h3>
-        <div class="party-name">${mandi}</div>
-        <div class="party-row">Center Type: <span>GOI Authorized APMC Mandi</span></div>
-        <div class="party-row">State & District: <span>${district}, ${state}</span></div>
-        <div class="party-row">Weighbridge Lane: <span style="color:#2e7d32;">${lane}</span></div>
-        <div class="party-row">Arrival Date: <span>${date}</span></div>
-        <div class="party-row">Time Slot: <span>${timeSlot}</span></div>
-        <div class="party-row">Issuing Authority: <span>District Procurement Officer</span></div>
-        <div class="party-row">Place of Supply: <span>${state}</span></div>
+      <div class="info-box">
+        <div class="info-label">Registered Contact</div>
+        <div class="info-value">${mobile} • ${email}</div>
+      </div>
+      <div class="info-box">
+        <div class="info-label">Selected Crop & Quantity</div>
+        <div class="info-value highlight-amber">${crop} — ${qty} Quintal</div>
+      </div>
+      <div class="info-box">
+        <div class="info-label">State & District Selected</div>
+        <div class="info-value">${district}, ${state}</div>
+      </div>
+      <div class="info-box">
+        <div class="info-label">Procurement Center (Mandi)</div>
+        <div class="info-value highlight-green">${mandi}</div>
+      </div>
+      <div class="info-box">
+        <div class="info-label">Assigned Lane & Arrival Slot</div>
+        <div class="info-value highlight-green">${lane} • ${date} (${timeSlot})</div>
       </div>
     </div>
 
-    <!-- ITEMS TABLE -->
-    <div class="items-table-wrap">
-      <table class="items-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Commodity / Crop Details</th>
-            <th>HSN</th>
-            <th>Quantity</th>
-            <th>MSP Rate/Qtl</th>
-            <th>Tax/Fee</th>
-            <th>Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>1</td>
-            <td>
-              <strong>${crop}</strong><br>
-              <span class="hsn-chip">HSN: 1001</span>
-              <span class="grade-chip">GRADE A FAQ</span><br>
-              <span style="font-size:10px;color:#475569;">Moisture ≤12% • Protein ≥11% • FM ≤2% (NIR Verified)</span>
-            </td>
-            <td>1001</td>
-            <td>${qty} Qtl<br><span style="font-size:10px;color:#475569;">(${(parseFloat(qty||0)*100)} Kg)</span></td>
-            <td>₹2,425</td>
-            <td>₹0.00<br><span style="font-size:9px;color:#2e7d32;">(Exempt)</span></td>
-            <td style="font-weight:800;">₹${(parseFloat(qty||150)*2425).toLocaleString('en-IN')}</td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>
-              <strong>Transport & Handling (Farm → Mandi)</strong><br>
-              <span class="hsn-chip">SAC: 9965</span><br>
-              <span style="font-size:10px;color:#475569;">AAGAM GPS Fleet — GOI Subsidized</span>
-            </td>
-            <td>9965</td>
-            <td>1 Trip</td>
-            <td>₹0.00</td>
-            <td>₹0.00</td>
-            <td style="font-weight:700; color:#2e7d32;">₹0.00 (GOI)</td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>
-              <strong>AI NIR Quality Inspection</strong><br>
-              <span class="hsn-chip">SAC: 9983</span><br>
-              <span style="font-size:10px;color:#475569;">ICAR AgriVision v3.1 — 45 sec scan</span>
-            </td>
-            <td>9983</td>
-            <td>1 Lot</td>
-            <td>₹0.00</td>
-            <td>₹0.00</td>
-            <td style="font-weight:700; color:#2e7d32;">₹0.00 (GOI)</td>
-          </tr>
-          <tr class="subtotal-row">
-            <td colspan="3"><strong>Sub Total (2.00 items)</strong></td>
-            <td><strong>${qty} Qtl</strong></td>
-            <td>—</td>
-            <td>₹0.00</td>
-            <td><strong>₹${(parseFloat(qty||150)*2425).toLocaleString('en-IN')}</strong></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- BOTTOM: QR + Bank left | Tax summary right -->
-    <div class="bottom-split">
-      <div class="bottom-left">
-        <div class="qr-bank">
-          <div class="qr-img-box">
-            ${qrCodeImgSrc
-              ? `<img src="${qrCodeImgSrc}" alt="Scan QR" style="width:100%;height:100%;object-fit:contain;"/>`
-              : `<div style="font-size:9px;color:#475569;text-align:center;padding:6px;">SCAN<br>QR CODE</div>`}
-          </div>
-          <div class="bank-info">
-            <h4>DBT Bank Details</h4>
-            <div class="bank-row">Account Holder: <span>${bookingDetails.farmerName || 'Gurpreet Singh'}</span></div>
-            <div class="bank-row">Bank: <span>State Bank of India</span></div>
-            <div class="bank-row">Account No: <span>XXXX XXXX 4892</span></div>
-            <div class="bank-row">IFSC: <span>SBIN0004829</span></div>
-            <div class="bank-row">Branch: <span>${district}</span></div>
-            <div class="bank-row">NPCI DBT: <span style="color:#2e7d32;">✓ Aadhaar Linked</span></div>
-          </div>
-        </div>
-        <div style="background:#fffbeb;border-left:3px solid #f59e0b;padding:7px 10px;border-radius:2px;font-size:10px;color:#92400e;">
-          <strong>⚠ 1-Hour SMS Alert Scheduled:</strong> Auto-notification will be sent to ${mobile} before your arrival slot.
-        </div>
+    <!-- QR CODE SECTION -->
+    <div class="qr-row">
+      <div class="qr-img-box">
+        ${qrCodeImgSrc ? `<img src="${qrCodeImgSrc}" alt="Gate Pass QR" style="width:100%;height:100%;object-fit:contain;"/>` : `<div style="font-size:10px;">QR CODE</div>`}
       </div>
-      <div class="bottom-right">
-        <table class="summary-table">
-          <tr><td>Taxable Amount</td><td>₹${(parseFloat(qty||150)*2425).toLocaleString('en-IN')}</td></tr>
-          <tr><td>CGST @ 0.00</td><td>₹0.00</td></tr>
-          <tr><td>SGST @ 0.00</td><td>₹0.00</td></tr>
-          <tr><td>Mandi Cess (GOI Exempt)</td><td>₹0.00</td></tr>
-          <tr><td>Received Amount</td><td>₹0.00 (Pending DBT)</td></tr>
-          <tr class="summary-total"><td><strong>Total DBT Payable</strong></td><td><strong>₹${(parseFloat(qty||150)*2425).toLocaleString('en-IN')}</strong></td></tr>
-          <tr><td style="font-size:10px;color:#475569;">Balance</td><td style="font-size:10px;color:#475569;">₹0.00 (After DBT)</td></tr>
-          <tr class="summary-words">
-            <td colspan="2" style="padding-top:8px;">
-              <strong>Total Amount in Words:</strong><br>
-              ${(() => {
-                const amt = Math.round(parseFloat(qty||150) * 2425);
-                const units=['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
-                const tens=['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
-                const f=(n)=>{
-                  if(n===0)return'';
-                  if(n<20)return units[n]+' ';
-                  if(n<100)return tens[Math.floor(n/10)]+' '+(n%10?units[n%10]+' ':'');
-                  if(n<1000)return units[Math.floor(n/100)]+' Hundred '+(n%100?f(n%100):'');
-                  if(n<100000)return f(Math.floor(n/1000))+'Thousand '+(n%1000?f(n%1000):'');
-                  if(n<10000000)return f(Math.floor(n/100000))+'Lakh '+(n%100000?f(n%100000):'');
-                  return f(Math.floor(n/10000000))+'Crore '+(n%10000000?f(n%10000000):'');
-                };
-                return (f(amt).trim()||'Zero')+' Rupees Only /-';
-              })()}
-            </td>
-          </tr>
-        </table>
+      <div class="qr-info">
+        <h4>100% SCANNABLE OFFICIAL GATE PASS QR</h4>
+        <p>Present this QR code at ${mandi} barrier for fast-track automated barrier opening. Token: <strong>${token}</strong></p>
+        <p style="margin-top:4px; font-weight:700;">✓ 1-Hour Prior Automated SMS Notification Scheduled to ${mobile}</p>
       </div>
     </div>
 
-    <!-- STAMP + TERMS + SIGNATURE -->
+    <!-- GOI STAMP & TERMS -->
     <div class="stamp-section">
-      <div class="terms-box">
-        <h4>Terms & Conditions</h4>
-        <ul>
-          <li>This Gate Pass is valid only for the date & time slot mentioned above.</li>
-          <li>Present this pass (QR or printed) at the mandi gate barrier. Non-transferable.</li>
-          <li>Grain must meet GOI FAQ norms: Moisture ≤12%, Foreign Matter ≤2%.</li>
-          <li>MSP payment will be credited via NPCI-DBT within 48 hours of weighment acceptance.</li>
-          <li>Goods once submitted for procurement cannot be taken back after weighment.</li>
-          <li>Misuse of this pass is liable under APMC Act 2003 & IT Act 2000.</li>
-          <li>Kisan Helpline: 1800-180-1551 (Toll Free • 24x7 • All Languages)</li>
+      <div style="flex:1;">
+        <div style="font-weight:800; font-size:11px; color:#243118; margin-bottom:4px;">Gate Pass Instructions:</div>
+        <ul class="terms-list">
+          <li>Valid only for ${date} during slot ${timeSlot}.</li>
+          <li>Carry official Farmer ID or Aadhaar for weighbridge verification.</li>
+          <li>MSP payment will be credited via NPCI-DBT within 48 hours of acceptance.</li>
         </ul>
       </div>
 
-      <!-- OFFICIAL GOI GOVERNMENT STAMP -->
-      <div class="gov-stamp-area">
-        <div class="gov-stamp-box">
-          <img src="${window.location.origin + import.meta.env.BASE_URL}images/goi_emblem.png" alt="GOI Emblem Stamp" style="height:44px; width:auto; object-fit:contain; filter: contrast(1.2);" />
-          <div class="stamp-text">Ministry of Agriculture<br>Govt. of India<br>भारत सरकार</div>
-          <div class="auth-line">Authorised Signatory</div>
-        </div>
-        <div style="font-size:9px;color:#475569;margin-top:5px;text-align:center;">District Procurement Officer<br>${district}, ${state}</div>
+      <div class="gov-stamp-box">
+        <img src="${window.location.origin + import.meta.env.BASE_URL}images/goi_emblem.png" alt="GOI Stamp" style="height:38px; width:auto; object-fit:contain;" />
+        <div class="stamp-title">Ministry of Agriculture<br>Govt. of India</div>
+        <div class="stamp-sign">Authorised Officer (${district})</div>
       </div>
     </div>
 
     <!-- FOOTER -->
-    <div class="bill-footer">
-      <span>Generated: ${printTime}</span>
-      <span>AAGAM Portal — aagam.gov.in • NIC MeitY Certified</span>
-      <span>SHA256: GOI-${token}</span>
+    <div class="footer">
+      <span>Issued: ${printTime}</span>
+      <span>Kisan Toll-Free Helpline: 1800-180-1551</span>
+      <span>Token Hash: GOI-${token}</span>
     </div>
+
   </div>
 
-  <div class="no-print" style="text-align:center; margin:18px auto;">
+  <div class="no-print">
     <button class="btn-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
   </div>
+
   <script>
-    window.onload = function() { setTimeout(function() { window.print(); }, 500); };
+    window.onload = function() { setTimeout(function() { window.print(); }, 400); };
   </script>
 </body>
 </html>`;
