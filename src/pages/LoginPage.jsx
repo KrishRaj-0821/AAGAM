@@ -333,8 +333,9 @@ export default function LoginPage({
 
             {/* Persona Role Selection Grid */}
             <div className="space-y-2">
-              <label className="text-xs font-bold text-[#243118]">
-                {t('1. Select Your Role Persona:', '1. अपनी भूमिका का चयन करें:')}
+              <label className="text-xs font-bold text-[#243118] flex items-center justify-between">
+                <span>{t('1. Select Your Role Persona:', '1. अपनी भूमिका का चयन करें:')}</span>
+                <span className="text-[10px] text-amber-700 font-mono font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">8 Roles Available (Includes System Admin)</span>
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                 {[
@@ -345,7 +346,7 @@ export default function LoginPage({
                   { role: 'Quality', labelEn: 'Quality Assayer', labelHi: 'गुणवत्ता निरीक्षक', icon: Microscope },
                   { role: 'Logistics', labelEn: 'Transporter', labelHi: 'परिवहनकर्ता', icon: Truck },
                   { role: 'Warehouse', labelEn: 'Godam Manager', labelHi: 'गोदाम प्रबंधक', icon: Warehouse },
-                  { role: 'Admin', labelEn: 'System Admin', labelHi: 'सिस्टम एडमिन', icon: ShieldCheck }
+                  { role: 'Admin', labelEn: 'System Admin ⚙️', labelHi: 'सिस्टम एडमिन ⚙️', icon: ShieldCheck, isSpecial: true }
                 ].map((item) => {
                   const IconC = item.icon;
                   const isSel = loginRole === item.role;
@@ -353,13 +354,18 @@ export default function LoginPage({
                     <button
                       key={item.role}
                       onClick={() => setLoginRole(item.role)}
-                      className={`p-3 rounded-xl border text-left flex flex-col justify-between gap-2 transition-all ${
+                      className={`p-3 rounded-xl border text-left flex flex-col justify-between gap-2 transition-all relative ${
                         isSel 
                           ? 'bg-[#71873f] text-white border-[#71873f] shadow-md scale-[1.02]' 
-                          : 'bg-[#fcfaf7] text-[#243118] border-[#abbe99]/60 hover:border-[#71873f]'
+                          : item.isSpecial 
+                            ? 'bg-amber-50/80 text-[#243118] border-amber-400 hover:border-amber-600 font-extrabold'
+                            : 'bg-[#fcfaf7] text-[#243118] border-[#abbe99]/60 hover:border-[#71873f]'
                       }`}
                     >
-                      <IconC className={`w-4 h-4 ${isSel ? 'text-white' : 'text-[#a36627]'}`} />
+                      <div className="flex justify-between items-center w-full">
+                        <IconC className={`w-4 h-4 ${isSel ? 'text-white' : item.isSpecial ? 'text-amber-700' : 'text-[#a36627]'}`} />
+                        {item.isSpecial && !isSel && <span className="bg-amber-600 text-white text-[8px] font-mono px-1 rounded">GOI ADMIN</span>}
+                      </div>
                       <span className="font-extrabold text-[11px] leading-tight">
                         {t(item.labelEn, item.labelHi)}
                       </span>

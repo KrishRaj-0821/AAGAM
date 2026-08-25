@@ -52,6 +52,36 @@ export default function App() {
   const [currentView, setCurrentView] = useState('home');
   const [activeRole, setActiveRole] = useState(() => currentUser?.role || 'Farmer');
 
+  // Dynamic URL Path Router (Handles routes like /admin, /operator, /persona/81, /aagam/v2/operator/81)
+  useEffect(() => {
+    const path = window.location.pathname.toLowerCase();
+    if (path.includes('admin')) {
+      setCurrentView('portal');
+      setActiveRole('Admin');
+    } else if (path.includes('operator')) {
+      setCurrentView('portal');
+      setActiveRole('Operator');
+    } else if (path.includes('farmer') || path.includes('kisan')) {
+      setCurrentView('portal');
+      setActiveRole('Farmer');
+    } else if (path.includes('buyer') || path.includes('trader')) {
+      setCurrentView('portal');
+      setActiveRole('Buyer');
+    } else if (path.includes('officer')) {
+      setCurrentView('portal');
+      setActiveRole('Officer');
+    } else if (path.includes('quality') || path.includes('assay')) {
+      setCurrentView('portal');
+      setActiveRole('Quality');
+    } else if (path.includes('warehouse') || path.includes('godam')) {
+      setCurrentView('portal');
+      setActiveRole('Warehouse');
+    } else if (path.includes('persona')) {
+      setCurrentView('portal');
+      setActiveRole('Navigator');
+    }
+  }, []);
+
   // Hero Slider State
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -394,7 +424,12 @@ export default function App() {
                   key={r.key}
                   onClick={() => {
                     if (isAuthenticated && currentUser?.role && currentUser.role !== r.key && r.key !== 'Navigator') {
-                      alert(`🔒 Role Locked: You are signed in as "${currentUser.role}".\n\nYour role cannot be changed while logged in. To switch to the "${r.key}" portal, please Sign Out first and log in as ${r.key}.`);
+                      const shouldLogout = window.confirm(
+                        `🔒 Role Lock Policy\n\nYou are currently signed in as "${currentUser.role}".\n\nTo access the "${r.key}" portal, you must log out of your current account first.\n\nWould you like to Log Out now?`
+                      );
+                      if (shouldLogout) {
+                        handleRequestLogout();
+                      }
                       return;
                     }
                     setActiveRole(r.key);
@@ -565,13 +600,13 @@ export default function App() {
         t={t}
       />
 
-      {/* Floating 24x7 Support Dock: AI Voice Agent & Helpdesk Buttons */}
-      <div className="fixed bottom-6 right-6 z-40 flex flex-col sm:flex-row items-end sm:items-center gap-2.5">
+      {/* Floating 24x7 Support Dock: AI Voice Agent & Helpdesk Buttons (Positioned at bottom-left to prevent overlap with ElevenLabs widget at bottom-right) */}
+      <div className="fixed bottom-6 left-6 z-40 flex flex-row items-center gap-3">
         
         {/* Primary AI Voice Agent Trigger Widget */}
         <button
           onClick={() => setIsVoiceAgentOpen(true)}
-          className="bg-gradient-to-r from-[#71873f] via-[#5c6e33] to-[#40541d] hover:from-[#5e7033] hover:to-[#354616] text-white p-3.5 sm:px-5 sm:py-3.5 rounded-full shadow-2xl hover:shadow-[#71873f]/60 border-2 border-white/90 transition-all flex items-center gap-2.5 group active:scale-95 cursor-pointer"
+          className="bg-gradient-to-r from-[#71873f] via-[#5c6e33] to-[#40541d] hover:from-[#5e7033] hover:to-[#354616] text-white px-4 py-3 sm:px-5 sm:py-3.5 rounded-full shadow-2xl hover:shadow-[#71873f]/60 border-2 border-white/90 transition-all flex items-center gap-2.5 group active:scale-95 cursor-pointer backdrop-blur-md"
           title="Talk to AAGAM AI Voice Agent (ElevenLabs 24x7)"
         >
           <div className="relative flex items-center justify-center">
@@ -579,7 +614,7 @@ export default function App() {
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-white absolute -top-1 -right-1 animate-ping" />
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-white absolute -top-1 -right-1" />
           </div>
-          <span className="hidden sm:inline font-extrabold text-xs tracking-wide">
+          <span className="inline font-extrabold text-xs tracking-wide">
             {t('AI Voice Agent (कृषि वाणी)', 'किसान वॉइस एजेंट')}
           </span>
           <span className="bg-[#e0b87e] text-[#1a2512] text-[9px] font-mono font-black px-1.5 py-0.5 rounded-md hidden md:inline">
@@ -590,11 +625,11 @@ export default function App() {
         {/* Citizen Helpdesk Trigger */}
         <button
           onClick={() => setIsHelpdeskOpen(true)}
-          className="bg-[#a36627] hover:bg-[#804d19] text-white p-3 sm:px-4 sm:py-3.5 rounded-full shadow-xl hover:shadow-[#a36627]/50 border-2 border-white/80 transition-all flex items-center gap-2 group active:scale-95 cursor-pointer"
+          className="bg-[#a36627] hover:bg-[#804d19] text-white px-4 py-3 sm:px-4 sm:py-3.5 rounded-full shadow-xl hover:shadow-[#a36627]/50 border-2 border-white/80 transition-all flex items-center gap-2 group active:scale-95 cursor-pointer backdrop-blur-md"
           title="Open Helpdesk & Grievance Report"
         >
           <LifeBuoy className="w-4 h-4 group-hover:rotate-45 transition-transform" />
-          <span className="hidden lg:inline font-bold text-xs tracking-wide">
+          <span className="inline font-bold text-xs tracking-wide">
             {t('Helpdesk', 'हेल्पडेस्क')}
           </span>
         </button>

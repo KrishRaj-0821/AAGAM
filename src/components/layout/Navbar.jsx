@@ -68,18 +68,26 @@ export default function Navbar({
 
   const handlePortalClick = (roleKey) => {
     setIsPortalDropdownOpen(false);
-    if (isAuthenticated && currentUser?.role && currentUser.role !== roleKey) {
-      alert(`🔒 Role Locked: You are currently signed in as "${currentUser.role}".\n\nYour role cannot be changed while logged in. If you want to access the "${roleKey}" portal, please Sign Out first and log in with a ${roleKey} account.`);
+    if (isAuthenticated && currentUser?.role) {
+      if (currentUser.role !== roleKey) {
+        const shouldLogout = window.confirm(
+          `🔒 Role Lock Policy\n\nYou are currently signed in as "${currentUser.role}".\n\nTo access the "${roleKey}" portal, you must log out of your current account first.\n\nWould you like to Log Out now?`
+        );
+        if (shouldLogout) {
+          if (onRequestLogout) {
+            onRequestLogout();
+          }
+        }
+        return;
+      }
       setActiveRole(currentUser.role);
       setCurrentView('portal');
       return;
     }
-    if (navigateWithAuth) {
-      navigateWithAuth('portal', roleKey);
-    } else {
-      setActiveRole(roleKey);
-      setCurrentView('portal');
-    }
+    
+    // Unauthenticated user clicking a role portal -> set active role and open portal
+    setActiveRole(roleKey);
+    setCurrentView('portal');
   };
 
   return (

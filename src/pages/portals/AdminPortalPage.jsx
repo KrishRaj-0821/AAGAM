@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { dbEngine } from '../../data/dbEngine';
 import { 
   ChevronLeft, Users, ShieldCheck, Database, Activity, Server, Bell, 
   Settings, Lock, MapPin, Building2, Warehouse, Sprout, Gavel, FileText, 
   AlertTriangle, RefreshCw, CheckCircle2, XCircle, Search, Filter, Plus, 
-  Edit3, Trash2, Eye, ShieldAlert, Key, Download, Upload, Zap, Globe, DollarSign
+  Edit3, Trash2, Eye, ShieldAlert, Key, Download, Upload, Zap, Globe, DollarSign, ArrowRight
 } from 'lucide-react';
 
 export default function AdminPortalPage({ setCurrentView, currentUser, t }) {
@@ -11,9 +12,16 @@ export default function AdminPortalPage({ setCurrentView, currentUser, t }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRoleFilter, setSelectedRoleFilter] = useState('All');
   const [selectedStateFilter, setSelectedStateFilter] = useState('All');
+  
+  // Real DB state
+  const [dbState, setDbState] = useState(dbEngine.getDb());
+  const [metrics, setMetrics] = useState(dbEngine.getAdminMetrics());
+  const [tracedLotId, setTracedLotId] = useState('LOT-2026-00452');
 
-  // Interactive mock state for Users
+  // Interactive state for User Management
   const [users, setUsers] = useState([
+    { id: 'FRM-10245', name: 'Rajesh Kumar', role: 'Farmer', state: 'Bihar', district: 'Patna', status: 'ACTIVE', verified: true, phone: '+91 98765 43210', email: 'rajesh.kisan@gmail.com', lastActive: '10 mins ago' },
+    { id: 'BUY-0091', name: 'ABC Agro Traders', role: 'Buyer', state: 'Bihar', district: 'Patna', status: 'ACTIVE', verified: true, phone: '+91 98110 88391', email: 'rajesh.trader@agri-corp.in', lastActive: '2 mins ago' },
     { id: 'USR-1001', name: 'Gurpreet Singh', role: 'Farmer', state: 'Haryana', district: 'Karnal', status: 'ACTIVE', verified: true, phone: '+91 98765 43210', email: 'gurpreet@kisan.in', lastActive: '10 mins ago' },
     { id: 'USR-1002', name: 'Punjab Agri Corp', role: 'Buyer', state: 'Punjab', district: 'Ludhiana', status: 'ACTIVE', verified: true, phone: '+91 98123 45678', email: 'trade@punjabagri.com', lastActive: '2 mins ago' },
     { id: 'USR-1003', name: 'Rajesh Kumar', role: 'Officer', state: 'Haryana', district: 'Karnal', status: 'ACTIVE', verified: true, phone: '+91 94160 12345', email: 'rajesh.dpo@gov.in', lastActive: '1 hour ago' },
@@ -23,6 +31,16 @@ export default function AdminPortalPage({ setCurrentView, currentUser, t }) {
     { id: 'USR-1007', name: 'Vikramaditya Rao', role: 'Farmer', state: 'Rajasthan', district: 'Bharatpur', status: 'SUSPENDED', verified: false, phone: '+91 99880 77665', email: 'vikram@yahoo.com', lastActive: '3 days ago' },
     { id: 'USR-1008', name: 'Maneesh Traders', role: 'Buyer', state: 'Maharashtra', district: 'Latur', status: 'PENDING_APPROVAL', verified: false, phone: '+91 98220 33445', email: 'maneeshtraders@gmail.com', lastActive: 'Just registered' },
   ]);
+
+  useEffect(() => {
+    const unsubscribe = dbEngine.subscribe((newDb) => {
+      setDbState(newDb);
+      setMetrics(dbEngine.getAdminMetrics());
+    });
+    return unsubscribe;
+  }, []);
+
+  const traceInfo = dbEngine.traceLotLifecycle(tracedLotId);
 
   // Interactive mock state for Crop Master
   const [crops, setCrops] = useState([
@@ -167,15 +185,15 @@ export default function AdminPortalPage({ setCurrentView, currentUser, t }) {
                 </span>
               </div>
 
-              {/* 6 Key Overview Metric Cards */}
+              {/* 6 Key Overview Metric Cards (Live Calculated from Central Database) */}
               <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                 {[
-                  { label: 'Total Farmers', val: '1,25,420', sub: '100% Aadhaar Verified', color: 'indigo', icon: Users },
-                  { label: 'Total Buyers', val: '8,542', sub: 'eNAM Licensed', color: 'amber', icon: Gavel },
-                  { label: 'Total Procurement', val: '₹245 Cr', sub: 'Current Season', color: 'emerald', icon: DollarSign },
-                  { label: 'Active Mandis', val: '342', sub: 'Across 36 States/UTs', color: 'sky', icon: Building2 },
-                  { label: 'Warehouses', val: '186', sub: 'WDRA Registered', color: 'purple', icon: Warehouse },
-                  { label: 'Active Staff', val: '2,450', sub: 'Officers & Inspectors', color: 'rose', icon: ShieldCheck },
+                  { label: 'Total Farmers', val: metrics.totalFarmers, sub: 'COUNT(Farmers) in DB', color: 'indigo', icon: Users },
+                  { label: 'Total Buyers', val: metrics.totalBuyers, sub: 'COUNT(Buyers) in DB', color: 'amber', icon: Gavel },
+                  { label: 'Total Procurement', val: metrics.totalProcurementValue, sub: 'SUM(PO.totalValue)', color: 'emerald', icon: DollarSign },
+                  { label: 'Active Mandis', val: metrics.activeMandis, sub: 'COUNT(Mandis ACTIVE)', color: 'sky', icon: Building2 },
+                  { label: 'Total Inventory', val: metrics.totalInventoryQty, sub: 'SUM(Inventory.avail)', color: 'purple', icon: Warehouse },
+                  { label: 'Pending Payments', val: metrics.pendingPaymentsSum, sub: 'SUM(Payments PENDING)', color: 'rose', icon: ShieldCheck },
                 ].map(card => {
                   const CIcon = card.icon;
                   return (
@@ -189,6 +207,80 @@ export default function AdminPortalPage({ setCurrentView, currentUser, t }) {
                     </div>
                   );
                 })}
+              </div>
+
+              {/* CONTROL TOWER: Dynamic 15-Stage Lot Lifecycle Traceability */}
+              <div className="bg-white rounded-2xl border border-indigo-200 p-5 shadow-sm space-y-4 font-mono">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-indigo-100 pb-3">
+                  <div>
+                    <h3 className="font-extrabold text-sm text-[#140e48] flex items-center gap-2">
+                      <Zap className="w-4 h-4 text-amber-500" />
+                      <span>CONTROL TOWER: CENTRAL DATABASE LIFECYCLE TRACEABILITY</span>
+                    </h3>
+                    <p className="text-[11px] text-[#637554]">Search any Lot ID to dynamically reconstruct the 15-stage timeline from related DB records</p>
+                  </div>
+                  <div className="flex items-center gap-2 bg-[#f4f6fc] px-3 py-1.5 rounded-xl border border-indigo-200">
+                    <Search className="w-3.5 h-3.5 text-indigo-600" />
+                    <input
+                      type="text"
+                      placeholder="Enter Lot ID (e.g. LOT-2026-00452)"
+                      value={tracedLotId}
+                      onChange={e => setTracedLotId(e.target.value)}
+                      className="bg-transparent text-xs font-bold text-[#140e48] focus:outline-none w-48"
+                    />
+                  </div>
+                </div>
+
+                {/* 15-Stage Relational Flow Timeline */}
+                <div className="bg-[#f8f6fc] p-4 rounded-xl border border-indigo-100 space-y-3 text-xs">
+                  <div className="font-extrabold text-[#140e48] flex justify-between">
+                    <span>Lot Record: {traceInfo.lot?.id || tracedLotId} ({traceInfo.lot?.product})</span>
+                    <span className="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px]">Status: {traceInfo.lot?.status}</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-[11px]">
+                    <div className="p-2.5 bg-white rounded-lg border border-indigo-100">
+                      <div className="text-[9px] text-[#637554] uppercase font-bold">1. Farmer</div>
+                      <div className="font-bold text-[#140e48]">{traceInfo.farmer?.name || 'N/A'}</div>
+                      <div className="text-[9px] text-[#637554]">{traceInfo.farmer?.id}</div>
+                    </div>
+                    <div className="p-2.5 bg-white rounded-lg border border-indigo-100">
+                      <div className="text-[9px] text-[#637554] uppercase font-bold">2. Farm</div>
+                      <div className="font-bold text-[#140e48]">{traceInfo.farm?.area || 'N/A'}</div>
+                      <div className="text-[9px] text-[#637554]">{traceInfo.farm?.location}</div>
+                    </div>
+                    <div className="p-2.5 bg-white rounded-lg border border-indigo-100">
+                      <div className="text-[9px] text-[#637554] uppercase font-bold">3. Mandi Entry</div>
+                      <div className="font-bold text-[#140e48]">{traceInfo.mandi?.name || 'N/A'}</div>
+                      <div className="text-[9px] text-[#637554]">{traceInfo.mandi?.id}</div>
+                    </div>
+                    <div className="p-2.5 bg-white rounded-lg border border-indigo-100">
+                      <div className="text-[9px] text-[#637554] uppercase font-bold">4. Weighment</div>
+                      <div className="font-bold text-[#140e48]">{traceInfo.weighment?.netWeight || 'N/A'} KG</div>
+                      <div className="text-[9px] text-[#637554]">ID: {traceInfo.weighment?.id}</div>
+                    </div>
+                    <div className="p-2.5 bg-white rounded-lg border border-indigo-100">
+                      <div className="text-[9px] text-[#637554] uppercase font-bold">5. Quality Assay</div>
+                      <div className="font-bold text-emerald-700">{traceInfo.quality?.grade || 'N/A'}</div>
+                      <div className="text-[9px] text-[#637554]">Moisture: {traceInfo.quality?.moisture}%</div>
+                    </div>
+                    <div className="p-2.5 bg-white rounded-lg border border-indigo-100">
+                      <div className="text-[9px] text-[#637554] uppercase font-bold">6. Procurement Order</div>
+                      <div className="font-bold text-[#140e48]">{traceInfo.procurement?.id || 'N/A'}</div>
+                      <div className="text-[9px] text-[#637554]">Val: ₹{traceInfo.procurement?.totalValue?.toLocaleString('en-IN')}</div>
+                    </div>
+                    <div className="p-2.5 bg-white rounded-lg border border-indigo-100">
+                      <div className="text-[9px] text-[#637554] uppercase font-bold">7. DBT Payment</div>
+                      <div className="font-bold text-emerald-700">{traceInfo.payment?.status || 'N/A'}</div>
+                      <div className="text-[9px] text-[#637554]">{traceInfo.payment?.txnRef}</div>
+                    </div>
+                    <div className="p-2.5 bg-white rounded-lg border border-indigo-100">
+                      <div className="text-[9px] text-[#637554] uppercase font-bold">8. Warehouse & Buyer Order</div>
+                      <div className="font-bold text-[#140e48]">{traceInfo.buyerOrder?.id || 'N/A'}</div>
+                      <div className="text-[9px] text-[#637554]">Buyer: {traceInfo.buyer?.businessName}</div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* System Alerts & Notifications */}
