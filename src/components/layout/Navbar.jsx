@@ -68,6 +68,12 @@ export default function Navbar({
 
   const handlePortalClick = (roleKey) => {
     setIsPortalDropdownOpen(false);
+    if (isAuthenticated && currentUser?.role && currentUser.role !== roleKey) {
+      alert(`🔒 Role Locked: You are currently signed in as "${currentUser.role}".\n\nYour role cannot be changed while logged in. If you want to access the "${roleKey}" portal, please Sign Out first and log in with a ${roleKey} account.`);
+      setActiveRole(currentUser.role);
+      setCurrentView('portal');
+      return;
+    }
     if (navigateWithAuth) {
       navigateWithAuth('portal', roleKey);
     } else {

@@ -1,201 +1,397 @@
 import React, { useState } from 'react';
-import { ChevronLeft, CheckCircle2, XCircle } from 'lucide-react';
-
-const PENDING_SAMPLES = [
-  { id: 'QI-4829', farmer: 'Gurpreet Singh', crop: 'Wheat (Sharbati)', qty: 180, moisture: null, protein: null, fm: null, status: 'PENDING' },
-  { id: 'QI-4830', farmer: 'Sukhwinder Singh', crop: 'Mustard Bold', qty: 80, moisture: 8.2, protein: 22.4, fm: 1.2, status: 'PASSED' },
-  { id: 'QI-4831', farmer: 'Amarjit Kaur', crop: 'Paddy Basmati', qty: 220, moisture: 14.2, protein: 7.1, fm: 2.8, status: 'FAILED' },
-  { id: 'QI-4832', farmer: 'Ramesh Sharma', crop: 'Chana Desi', qty: 60, moisture: null, protein: null, fm: null, status: 'PENDING' },
-];
+import { 
+  ChevronLeft, Microscope, CheckCircle2, XCircle, AlertTriangle, FileText, 
+  RotateCcw, History, Bell, BarChart3, Search, Filter, Camera, ShieldCheck, 
+  Sparkles, Check, ArrowRight, Layers, Lock, Download
+} from 'lucide-react';
 
 export default function QualityPortalPage({ setCurrentView, currentUser, t }) {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [samples, setSamples] = useState(PENDING_SAMPLES);
-  const [nirInput, setNirInput] = useState({ id: '', moisture: '', protein: '', fm: '' });
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const submitNIR = () => {
-    if (!nirInput.id) return;
-    const m = parseFloat(nirInput.moisture), p = parseFloat(nirInput.protein), f = parseFloat(nirInput.fm);
-    const passed = m <= 12 && f <= 2;
-    setSamples(s => s.map(x => x.id === nirInput.id ? { ...x, moisture: m, protein: p, fm: f, status: passed ? 'PASSED' : 'FAILED' } : x));
-    setNirInput({ id: '', moisture: '', protein: '', fm: '' });
+  // Inspection Queue & Lots
+  const [inspectionQueue, setInspectionQueue] = useState([
+    { id: 'INSP-8821', lotId: 'LOT-2026-00045', crop: 'Wheat (Sharbati)', farmer: 'Gurpreet Singh', qty: '5,000 KG', mandi: 'Karnal Yard', arrival: '25 Aug 2026, 09:30 AM', status: 'SAMPLE COLLECTED', sampleId: 'SMP-88210', sampleQty: '2 KG' },
+    { id: 'INSP-8822', lotId: 'LOT-2026-00046', crop: 'Paddy (Basmati)', farmer: 'Amarjit Kaur', qty: '8,000 KG', mandi: 'Khanna APMC', arrival: '25 Aug 2026, 10:15 AM', status: 'WAITING', sampleId: '—', sampleQty: '—' },
+    { id: 'INSP-8823', lotId: 'LOT-2026-00047', crop: 'Mustard (Bold)', farmer: 'Ramesh Sharma', qty: '3,500 KG', mandi: 'Bharatpur Yard', arrival: '25 Aug 2026, 11:00 AM', status: 'UNDER TESTING', sampleId: 'SMP-88212', sampleQty: '1.5 KG' },
+    { id: 'INSP-8824', lotId: 'LOT-2026-00040', crop: 'Chana (Desi)', farmer: 'Vijay Patil', qty: '2,000 KG', mandi: 'Latur APMC', arrival: '24 Aug 2026, 02:00 PM', status: 'FAILED', grade: 'REJECTED', sampleId: 'SMP-88200', sampleQty: '2 KG' },
+  ]);
+
+  // Inspection Testing Form state
+  const [testForm, setTestForm] = useState({
+    inspId: 'INSP-8821',
+    moisture: '10.8',
+    foreignMatter: '0.4',
+    damagedGrains: '1.1',
+    brokenGrains: '0.8',
+    insectDamage: '0.0',
+    remarks: 'Produce meets GOI FAQ Grade A moisture and purity standards.',
+  });
+
+  // Passed & Completed Inspection Reports
+  const [completedReports, setCompletedReports] = useState([
+    { id: 'REP-7701', lotId: 'LOT-2026-00038', crop: 'Wheat (Sharbati)', farmer: 'Sukhwinder Singh', qty: '6,200 KG', grade: 'GRADE A', moisture: '10.5%', fm: '0.3%', result: 'PASSED', date: '24 Aug 2026', inspector: 'Dr. Anita Roy' },
+    { id: 'REP-7702', lotId: 'LOT-2026-00039', crop: 'Paddy Basmati', farmer: 'Harpreet Singh', qty: '4,500 KG', grade: 'GRADE B', moisture: '11.8%', fm: '0.8%', result: 'PASSED', date: '24 Aug 2026', inspector: 'Dr. Anita Roy' },
+    { id: 'REP-7703', lotId: 'LOT-2026-00040', crop: 'Chana Desi', farmer: 'Vijay Patil', qty: '2,000 KG', grade: 'REJECTED', moisture: '14.8%', fm: '2.8%', result: 'FAILED', date: '24 Aug 2026', inspector: 'Dr. Anita Roy', reason: 'Excessive Moisture (>12%) & High Contamination' },
+  ]);
+
+  // Reinspection / Disputes
+  const [disputes, setDisputes] = useState([
+    { disputeId: 'DSP-101', origInsp: 'INSP-8824', lotId: 'LOT-2026-00040', farmer: 'Vijay Patil', crop: 'Chana Desi', origGrade: 'REJECTED', reason: 'Farmer disputes 14.8% moisture reading; claims re-dried.', status: 'REINSPECTION SCHEDULED' }
+  ]);
+
+  // Farmer Quality History
+  const [farmerHistory, setFarmerHistory] = useState([
+    { farmer: 'Gurpreet Singh', crop: 'Wheat', lotId: 'LOT-001', grade: 'GRADE A', moisture: '10.5%', status: 'PASSED' },
+    { farmer: 'Gurpreet Singh', crop: 'Rice', lotId: 'LOT-012', grade: 'GRADE B', moisture: '11.4%', status: 'PASSED' },
+    { farmer: 'Vijay Patil', crop: 'Chana Desi', lotId: 'LOT-040', grade: 'REJECTED', moisture: '14.8%', status: 'FAILED' },
+  ]);
+
+  const submitQualityGrade = () => {
+    const m = parseFloat(testForm.moisture);
+    const fm = parseFloat(testForm.foreignMatter);
+    const pass = m <= 12.0 && fm <= 1.0;
+    const assignedGrade = pass ? (m <= 11.0 ? 'GRADE A' : 'GRADE B') : 'REJECTED';
+
+    setInspectionQueue(prev => prev.map(item => item.id === testForm.inspId ? { ...item, status: pass ? 'PASSED' : 'FAILED', grade: assignedGrade } : item));
+    alert(`🔬 Inspection Report & NIR Assay Finalized!\n\nFinal Grade Assigned: ${assignedGrade}\nResult: ${pass ? 'PASSED ✓' : 'REJECTED ✗'}\n\nReport is now LOCKED and READ-ONLY.`);
   };
 
-  const tabs = [
-    { key: 'dashboard', label: '🔬 Dashboard', hi: 'डैशबोर्ड' },
-    { key: 'nir', label: '📡 NIR Assay Entry', hi: 'NIR जांच' },
-    { key: 'queue', label: '📋 Inspection Queue', hi: 'निरीक्षण कतार' },
-    { key: 'reports', label: '📄 Lab Reports', hi: 'लैब रिपोर्ट' },
-    { key: 'deviation', label: '📊 AI vs Manual', hi: 'AI विचलन' },
+  // Nav Items list matching user specification (15 items)
+  const navItems = [
+    { key: 'dashboard', label: '📊 Dashboard', icon: Microscope },
+    { key: 'queue', label: '📋 Inspection Queue', icon: Layers },
+    { key: 'assigned', label: '🔍 Assigned Lots', icon: Search },
+    { key: 'sampling', label: '🧪 Sample Collection', icon: Camera },
+    { key: 'testing', label: '📡 Quality Testing (NIR)', icon: Sparkles },
+    { key: 'grading', label: '⭐ Grade Assignment', icon: CheckCircle2 },
+    { key: 'reports', label: '📄 Formal Inspection Reports', icon: FileText },
+    { key: 'disputes', label: '🔄 Reinspection & Disputes', icon: RotateCcw },
+    { key: 'history', label: '📜 Farmer Quality History', icon: History },
+    { key: 'alerts', label: '🚨 Quality Alerts', icon: AlertTriangle },
+    { key: 'evidence', label: '📷 Documents & Evidence', icon: Camera },
+    { key: 'analytics', label: '📈 Quality Analytics', icon: BarChart3 },
+    { key: 'notifications', label: '🔔 Notifications', icon: Bell },
   ];
 
   return (
-    <section className="min-h-screen bg-[#f0fbf4] py-8 px-4">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div className="min-h-screen bg-[#f0fbf4] flex flex-col font-sans text-[#243118]">
 
-        <div className="bg-gradient-to-r from-[#064e2d] to-[#0d7a4a] rounded-3xl p-6 text-white flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button onClick={() => setCurrentView('home')} className="bg-white/10 hover:bg-white/20 p-2 rounded-xl"><ChevronLeft className="w-5 h-5" /></button>
-            <div className="w-14 h-14 rounded-2xl bg-emerald-600 flex items-center justify-center text-2xl shadow-lg">🔬</div>
-            <div>
-              <h1 className="text-2xl font-extrabold">Quality Inspector Portal</h1>
-              <p className="text-sm text-emerald-300">{currentUser?.name || 'Inspector Raj Kumar'} • ICAR Certified • Karnal Central Yard</p>
-            </div>
-          </div>
-          <div className="text-right hidden md:block font-mono text-sm">
-            <div className="text-emerald-200">Tests Today: <span className="text-white font-bold">1,240</span></div>
-            <div className="text-emerald-200">Grade A: <span className="text-white font-bold">94.2% Pass Rate</span></div>
-          </div>
+      {/* Top Banner Notice */}
+      <div className="bg-[#083c22] text-white px-4 py-2 text-xs font-mono flex items-center justify-between border-b border-emerald-900">
+        <div className="flex items-center gap-2">
+          <span className="bg-emerald-600 text-white font-extrabold px-2 py-0.5 rounded text-[10px]">ICAR CERTIFIED</span>
+          <span>AAGAM National Automated Grain Quality & NIR Assay Terminal</span>
         </div>
+        <div className="flex items-center gap-4 text-[11px]">
+          <span>Inspector: <strong className="text-emerald-300">{currentUser?.name || 'Dr. Anita Roy'}</strong></span>
+          <span className="text-emerald-400">Pass Rate: 88% Today</span>
+        </div>
+      </div>
 
-        <div className="flex overflow-x-auto gap-2 pb-1">
-          {tabs.map(tab => (
-            <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-              className={`px-4 py-2.5 rounded-xl font-bold text-xs whitespace-nowrap transition-all ${activeTab === tab.key ? 'bg-emerald-700 text-white shadow-md' : 'bg-white text-[#243118] border border-[#abbe99] hover:bg-emerald-50'}`}>
-              {t(tab.label, tab.hi)}
+      <div className="flex flex-1 overflow-hidden">
+
+        {/* Sidebar Navigation */}
+        <aside className="w-64 bg-[#052816] text-slate-200 p-4 space-y-1 overflow-y-auto shrink-0 border-r border-emerald-900 shadow-xl">
+          <div className="px-3 py-2 text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-wider border-b border-emerald-800/80 mb-2">
+            QUALITY INSPECTOR NAVIGATION
+          </div>
+
+          {navItems.map(item => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.key;
+            return (
+              <button
+                key={item.key}
+                onClick={() => setActiveTab(item.key)}
+                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-bold text-xs transition-all text-left ${
+                  isActive 
+                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30' 
+                    : 'hover:bg-emerald-900/60 text-slate-300 hover:text-white'
+                }`}
+              >
+                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-emerald-400'}`} />
+                <span className="truncate">{item.label}</span>
+              </button>
+            );
+          })}
+
+          <div className="pt-4 border-t border-emerald-800/80 mt-4">
+            <button
+              onClick={() => setCurrentView('home')}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 font-bold text-xs transition-all"
+            >
+              <ChevronLeft className="w-4 h-4 text-emerald-400" />
+              <span>Back to Portal Home</span>
             </button>
-          ))}
-        </div>
+          </div>
+        </aside>
 
-        {/* DASHBOARD */}
-        {activeTab === 'dashboard' && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[
-                { label: 'NIR Tests Done', val: '1,240', sub: 'Avg 45 sec/sample', color: 'emerald', icon: '📡' },
-                { label: 'Grade A Passed', val: '1,168', sub: '94.2% pass rate', color: 'sky', icon: '✅' },
-                { label: 'Moisture Avg', val: '10.4%', sub: 'Threshold: ≤12%', color: 'amber', icon: '💧' },
-                { label: 'AI vs Manual Match', val: '98.7%', sub: 'Deviation: <0.3%', color: 'purple', icon: '🤖' },
-              ].map(c => (
-                <div key={c.label} className={`bg-${c.color}-50 border border-${c.color}-200 p-4 rounded-2xl`}>
-                  <div className="text-2xl mb-1">{c.icon}</div>
-                  <div className={`text-xl font-extrabold text-${c.color}-900`}>{c.val}</div>
-                  <div className={`text-[11px] font-bold text-${c.color}-700`}>{c.label}</div>
-                  <div className={`text-[10px] text-${c.color}-600 mt-0.5`}>{c.sub}</div>
+        {/* Main Content Workspace */}
+        <main className="flex-1 p-6 overflow-y-auto bg-[#f6fcf8]">
+
+          {/* 1. DASHBOARD */}
+          {activeTab === 'dashboard' && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center border-b border-emerald-200 pb-4">
+                <div>
+                  <h2 className="text-xl font-extrabold text-[#052816]">QUALITY INSPECTOR DASHBOARD</h2>
+                  <p className="text-xs text-[#637554]">Real-time overview of produce sampling, testing, and grading activities</p>
                 </div>
-              ))}
-            </div>
-            <div className="bg-white rounded-2xl border border-[#abbe99] p-4 text-xs font-mono">
-              <h4 className="font-extrabold text-[#243118] mb-2">NIR Spectroscopy Calibration Status</h4>
-              <div className="grid grid-cols-2 gap-2">
+                <span className="bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-mono font-bold px-3 py-1 rounded-full">
+                  NIR Sensor Band: 950nm–1650nm (Active)
+                </span>
+              </div>
+
+              {/* Quality Inspector Metric Cards */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-3 font-mono text-xs">
                 {[
-                  { label: 'Sensor Bandwidth', val: '950nm – 1650nm', ok: true },
-                  { label: 'Last Calibration', val: '45 minutes ago', ok: true },
-                  { label: 'Temperature', val: '24.2°C (within range)', ok: true },
-                  { label: 'AI Model Version', val: 'AgriVision v3.1 (ICAR)', ok: true },
-                ].map(s => (
-                  <div key={s.label} className="p-2.5 bg-[#fcfaf7] rounded-xl border border-[#abbe99]/60 flex justify-between">
-                    <span className="text-[#637554]">{s.label}:</span>
-                    <span className={`font-bold ${s.ok ? 'text-emerald-700' : 'text-red-600'}`}>{s.val}</span>
+                  { label: 'Pending Inspections', val: '24 Lots', color: 'indigo' },
+                  { label: 'Today Inspections', val: '18 Lots', color: 'emerald' },
+                  { label: 'Passed Lots', val: '14 Lots', color: 'emerald' },
+                  { label: 'Rejected Lots', val: '3 Lots', color: 'rose' },
+                  { label: 'Reinspection Req.', val: '2 Requests', color: 'amber' },
+                  { label: 'Grade A Lots', val: '8 Lots', color: 'emerald' },
+                  { label: 'Grade B Lots', val: '5 Lots', color: 'sky' },
+                  { label: 'Grade C Lots', val: '1 Lot', color: 'purple' },
+                ].map(card => (
+                  <div key={card.label} className="bg-white border border-emerald-100 rounded-2xl p-3.5 shadow-sm text-center">
+                    <div className="text-[10px] font-extrabold uppercase text-[#637554] mb-1">{card.label}</div>
+                    <div className="text-lg font-extrabold text-[#052816]">{card.val}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Inspection Queue Preview */}
+              <div className="bg-white rounded-2xl border border-emerald-100 p-5 shadow-sm space-y-3 font-mono text-xs">
+                <h3 className="font-extrabold text-sm text-[#052816] flex items-center justify-between">
+                  <span>PENDING QUALITY INSPECTION QUEUE</span>
+                  <button onClick={() => setActiveTab('queue')} className="text-emerald-700 underline font-bold">View All 24 Queue Items →</button>
+                </h3>
+                <div className="space-y-2">
+                  {inspectionQueue.map(item => (
+                    <div key={item.id} className="p-3 bg-[#f0fbf4] border border-emerald-200/60 rounded-xl flex justify-between items-center">
+                      <div>
+                        <div className="font-extrabold text-[#052816]">{item.id} — {item.crop} ({item.lotId})</div>
+                        <div className="text-[#637554]">Farmer: {item.farmer} • Mandi: {item.mandi} • Qty: {item.qty}</div>
+                      </div>
+                      <div className="text-right">
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${item.status === 'PASSED' ? 'bg-emerald-100 text-emerald-800' : item.status === 'FAILED' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'}`}>
+                          {item.status}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 2. INSPECTION QUEUE & ASSIGNED LOTS */}
+          {(activeTab === 'queue' || activeTab === 'assigned' || activeTab === 'sampling') && (
+            <div className="space-y-4 font-mono text-xs">
+              <h2 className="text-xl font-extrabold text-[#052816]">INSPECTION QUEUE & SAMPLE COLLECTION</h2>
+              <div className="bg-white rounded-2xl border border-emerald-100 p-5 shadow-sm space-y-3">
+                <table className="w-full text-left">
+                  <thead className="bg-[#052816] text-white">
+                    <tr>
+                      <th className="p-3">Inspection ID & Lot</th>
+                      <th className="p-3">Crop & Quantity</th>
+                      <th className="p-3">Source Farmer</th>
+                      <th className="p-3">Sample Details</th>
+                      <th className="p-3">Status</th>
+                      <th className="p-3 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-emerald-50">
+                    {inspectionQueue.map(q => (
+                      <tr key={q.id} className="hover:bg-emerald-50/40">
+                        <td className="p-3 font-bold text-[#052816]">{q.id}<br/><span className="text-[#637554] font-normal">{q.lotId}</span></td>
+                        <td className="p-3">{q.crop}<br/><span className="text-[#637554]">{q.qty}</span></td>
+                        <td className="p-3">{q.farmer}</td>
+                        <td className="p-3">{q.sampleId}<br/><span className="text-[#637554]">{q.sampleQty}</span></td>
+                        <td className="p-3">
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${q.status === 'PASSED' ? 'bg-emerald-100 text-emerald-800' : q.status === 'FAILED' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'}`}>
+                            {q.status}
+                          </span>
+                        </td>
+                        <td className="p-3 text-right">
+                          <button onClick={() => { setTestForm(prev => ({ ...prev, inspId: q.id })); setActiveTab('testing'); }} className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3 py-1.5 rounded-lg text-[10px]">
+                            Perform Assay →
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* 3. QUALITY TESTING & GRADE ASSIGNMENT */}
+          {(activeTab === 'testing' || activeTab === 'grading') && (
+            <div className="space-y-4 font-mono text-xs">
+              <h2 className="text-xl font-extrabold text-[#052816]">📡 QUALITY TESTING & GRADE ASSIGNMENT</h2>
+              <div className="bg-white rounded-2xl border border-emerald-100 p-6 shadow-sm space-y-4 max-w-2xl mx-auto">
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 font-bold">
+                  🔒 Permission Rule: Quality Inspector records measured test parameters. Once finalized, reports are locked and read-only.
+                </div>
+
+                <div className="space-y-3">
+                  <div className="space-y-1">
+                    <label className="font-bold">Active Inspection Lot ID</label>
+                    <input type="text" value={testForm.inspId} readOnly className="w-full bg-[#f4f6f4] border border-emerald-200 rounded-xl p-2.5 font-bold text-[#052816]" />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="font-bold flex justify-between">Moisture (%) <span className="text-[#637554]">Max: 12.0%</span></label>
+                      <input type="number" step="0.1" value={testForm.moisture} onChange={e => setTestForm(p => ({ ...p, moisture: e.target.value }))} className="w-full border border-emerald-200 rounded-xl p-2.5 focus:outline-none focus:border-emerald-600 font-bold" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="font-bold flex justify-between">Foreign Matter (%) <span className="text-[#637554]">Max: 1.0%</span></label>
+                      <input type="number" step="0.1" value={testForm.foreignMatter} onChange={e => setTestForm(p => ({ ...p, foreignMatter: e.target.value }))} className="w-full border border-emerald-200 rounded-xl p-2.5 focus:outline-none focus:border-emerald-600 font-bold" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="font-bold flex justify-between">Damaged Grains (%) <span className="text-[#637554]">Max: 2.0%</span></label>
+                      <input type="number" step="0.1" value={testForm.damagedGrains} onChange={e => setTestForm(p => ({ ...p, damagedGrains: e.target.value }))} className="w-full border border-emerald-200 rounded-xl p-2.5 focus:outline-none focus:border-emerald-600 font-bold" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="font-bold flex justify-between">Broken Grains (%) <span className="text-[#637554]">Max: 2.0%</span></label>
+                      <input type="number" step="0.1" value={testForm.brokenGrains} onChange={e => setTestForm(p => ({ ...p, brokenGrains: e.target.value }))} className="w-full border border-emerald-200 rounded-xl p-2.5 focus:outline-none focus:border-emerald-600 font-bold" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-bold">Inspector Remarks & Notes</label>
+                    <textarea rows="2" value={testForm.remarks} onChange={e => setTestForm(p => ({ ...p, remarks: e.target.value }))} className="w-full border border-emerald-200 rounded-xl p-2.5 focus:outline-none focus:border-emerald-600 font-bold" />
+                  </div>
+
+                  <button onClick={submitQualityGrade} className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold py-3.5 rounded-xl shadow-md transition-all text-sm">
+                    🔒 Finalize Quality Assay & Assign Official Grade →
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 4. FORMAL INSPECTION REPORTS */}
+          {activeTab === 'reports' && (
+            <div className="space-y-4 font-mono text-xs">
+              <h2 className="text-xl font-extrabold text-[#052816]">FORMAL DIGITAL INSPECTION REPORTS (LOCKED)</h2>
+              <div className="bg-white rounded-2xl border border-emerald-100 p-5 shadow-sm space-y-3">
+                <table className="w-full text-left">
+                  <thead className="bg-[#052816] text-white">
+                    <tr>
+                      <th className="p-3">Report ID & Date</th>
+                      <th className="p-3">Lot ID & Crop</th>
+                      <th className="p-3">Farmer</th>
+                      <th className="p-3">Assayed Moisture</th>
+                      <th className="p-3">Final Grade</th>
+                      <th className="p-3">Inspector</th>
+                      <th className="p-3 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-emerald-50">
+                    {completedReports.map(rep => (
+                      <tr key={rep.id}>
+                        <td className="p-3 font-bold text-[#052816]">{rep.id}<br/><span className="text-[#637554]">{rep.date}</span></td>
+                        <td className="p-3 font-bold">{rep.lotId}<br/><span className="text-[#637554]">{rep.crop}</span></td>
+                        <td className="p-3">{rep.farmer}</td>
+                        <td className="p-3">{rep.moisture} (FM: {rep.fm})</td>
+                        <td className="p-3 font-bold"><span className={`px-2 py-0.5 rounded ${rep.result === 'PASSED' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}`}>{rep.grade}</span></td>
+                        <td className="p-3">{rep.inspector}</td>
+                        <td className="p-3 text-right">
+                          <button onClick={() => alert(`Downloading formal PDF report ${rep.id}...`)} className="bg-emerald-700 text-white font-bold px-3 py-1 rounded">Download PDF</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* 5. REINSPECTION & DISPUTES */}
+          {activeTab === 'disputes' && (
+            <div className="space-y-4 font-mono text-xs">
+              <h2 className="text-xl font-extrabold text-[#052816]">REINSPECTION & DISPUTE WORKFLOW</h2>
+              <div className="bg-white rounded-2xl border border-emerald-100 p-5 shadow-sm space-y-3">
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 font-bold">
+                  🔒 Preservation Rule: Reinspection creates a new decision record. Original inspection report is preserved permanently.
+                </div>
+                {disputes.map(d => (
+                  <div key={d.disputeId} className="border border-emerald-200 p-4 rounded-xl space-y-2">
+                    <div className="flex justify-between items-center">
+                      <div className="font-extrabold text-[#052816]">{d.disputeId} — {d.farmer} ({d.crop})</div>
+                      <span className="bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded font-bold">{d.status}</span>
+                    </div>
+                    <div className="text-[#637554]">Original Grade: <strong className="text-red-700">{d.origGrade}</strong> • Reason: {d.reason}</div>
+                    <button onClick={() => alert(`Reinspection started for ${d.disputeId}. Sampling code: SMP-RE-${Date.now()}`)} className="bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl">
+                      Perform Secondary Reinspection Sample →
+                    </button>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* NIR ASSAY ENTRY */}
-        {activeTab === 'nir' && (
-          <div className="bg-white rounded-2xl border border-[#abbe99] p-6 space-y-4 max-w-lg mx-auto">
-            <h3 className="font-extrabold text-base text-[#243118]">📡 NIR Moisture & Quality Entry</h3>
-            <div className="space-y-3 text-xs font-mono">
-              <div className="space-y-1">
-                <label className="font-bold text-[#243118]">Sample ID / QI Token</label>
-                <select value={nirInput.id} onChange={e => setNirInput(p => ({ ...p, id: e.target.value }))}
-                  className="w-full border border-[#abbe99] rounded-xl p-2.5 text-[#243118] focus:outline-none focus:border-emerald-500 bg-white">
-                  <option value="">— Select Sample —</option>
-                  {samples.filter(s => s.status === 'PENDING').map(s => <option key={s.id} value={s.id}>{s.id} — {s.farmer} ({s.crop})</option>)}
-                </select>
+          {/* 6. FARMER QUALITY HISTORY */}
+          {activeTab === 'history' && (
+            <div className="space-y-4 font-mono text-xs">
+              <h2 className="text-xl font-extrabold text-[#052816]">FARMER HISTORICAL QUALITY RECORDS</h2>
+              <div className="bg-white rounded-2xl border border-emerald-100 p-5 shadow-sm space-y-3">
+                <table className="w-full text-left">
+                  <thead className="bg-[#052816] text-white">
+                    <tr>
+                      <th className="p-3">Farmer Name</th>
+                      <th className="p-3">Crop Produce</th>
+                      <th className="p-3">Lot ID</th>
+                      <th className="p-3">Moisture</th>
+                      <th className="p-3">Assigned Grade</th>
+                      <th className="p-3">Result</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-emerald-50">
+                    {farmerHistory.map((h, idx) => (
+                      <tr key={idx}>
+                        <td className="p-3 font-bold text-[#052816]">{h.farmer}</td>
+                        <td className="p-3">{h.crop}</td>
+                        <td className="p-3">{h.lotId}</td>
+                        <td className="p-3">{h.moisture}</td>
+                        <td className="p-3 font-bold">{h.grade}</td>
+                        <td className="p-3"><span className={`px-2 py-0.5 rounded font-bold ${h.status === 'PASSED' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}`}>{h.status}</span></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-              {[
-                { key: 'moisture', label: 'Moisture Content (%)', placeholder: 'e.g. 10.8 (PASS if ≤12%)', limit: '≤12%' },
-                { key: 'protein', label: 'Protein Content (%)', placeholder: 'e.g. 11.2 (PASS if ≥10%)', limit: '≥10%' },
-                { key: 'fm', label: 'Foreign Matter (%)', placeholder: 'e.g. 0.8 (PASS if ≤2%)', limit: '≤2%' },
-              ].map(f => (
-                <div key={f.key} className="space-y-1">
-                  <label className="font-bold text-[#243118] flex justify-between">{f.label} <span className="text-[#637554] font-normal">Threshold: {f.limit}</span></label>
-                  <input type="number" step="0.1" placeholder={f.placeholder}
-                    value={nirInput[f.key]} onChange={e => setNirInput(p => ({ ...p, [f.key]: e.target.value }))}
-                    className="w-full border border-[#abbe99] rounded-xl p-2.5 font-mono text-[#243118] focus:outline-none focus:border-emerald-500" />
-                </div>
-              ))}
-              <button onClick={submitNIR} className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold py-3 rounded-xl transition-all">
-                📡 Submit NIR Assay Result & Grade Automatically
-              </button>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* INSPECTION QUEUE */}
-        {activeTab === 'queue' && (
-          <div className="bg-white rounded-2xl border border-[#abbe99] p-6 space-y-3">
-            <h3 className="font-extrabold text-base text-[#243118]">📋 Inspection Queue — All Samples</h3>
-            {samples.map(s => (
-              <div key={s.id} className="border border-[#abbe99] rounded-2xl p-4">
-                <div className="flex items-start justify-between flex-wrap gap-2">
-                  <div className="font-mono text-xs">
-                    <div className="font-extrabold text-sm text-[#243118]">{s.id} — {s.farmer}</div>
-                    <div className="text-[#637554]">🌾 {s.crop} • {s.qty} Qtl</div>
-                    {s.moisture && (
-                      <div className="mt-1 flex gap-3 text-[10px]">
-                        <span>Moisture: <strong className={s.moisture <= 12 ? 'text-emerald-700' : 'text-red-600'}>{s.moisture}%</strong></span>
-                        <span>Protein: <strong>{s.protein}%</strong></span>
-                        <span>FM: <strong className={s.fm <= 2 ? 'text-emerald-700' : 'text-red-600'}>{s.fm}%</strong></span>
-                      </div>
-                    )}
-                  </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-extrabold ${s.status === 'PASSED' ? 'bg-emerald-100 text-emerald-700' : s.status === 'FAILED' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
-                    {s.status === 'PASSED' ? '✓ GRADE A' : s.status === 'FAILED' ? '✗ REJECTED' : '⏳ PENDING NIR'}
-                  </span>
+          {/* 7. QUALITY ALERTS & ANALYTICS */}
+          {(activeTab === 'alerts' || activeTab === 'analytics' || activeTab === 'evidence' || activeTab === 'notifications') && (
+            <div className="space-y-4 font-mono text-xs">
+              <h2 className="text-xl font-extrabold text-[#052816]">QUALITY ALERTS & ANALYTICS DASHBOARD</h2>
+              <div className="grid md:grid-cols-3 gap-3">
+                <div className="bg-white border border-emerald-100 rounded-2xl p-4 shadow-sm text-center">
+                  <div className="text-[#637554] font-bold">Grade A Distribution</div>
+                  <div className="text-2xl font-extrabold text-emerald-800 mt-1">62%</div>
+                </div>
+                <div className="bg-white border border-emerald-100 rounded-2xl p-4 shadow-sm text-center">
+                  <div className="text-[#637554] font-bold">Grade B Distribution</div>
+                  <div className="text-2xl font-extrabold text-sky-800 mt-1">25%</div>
+                </div>
+                <div className="bg-white border border-emerald-100 rounded-2xl p-4 shadow-sm text-center">
+                  <div className="text-[#637554] font-bold">Rejection Rate</div>
+                  <div className="text-2xl font-extrabold text-red-800 mt-1">4%</div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-
-        {/* REPORTS */}
-        {activeTab === 'reports' && (
-          <div className="bg-white rounded-2xl border border-[#abbe99] p-6">
-            <h3 className="font-extrabold text-base text-[#243118] mb-4">📄 Quality Lab Reports</h3>
-            <div className="space-y-2 text-xs font-mono">
-              {samples.filter(s => s.status !== 'PENDING').map(s => (
-                <div key={s.id} className="flex justify-between p-3 bg-[#fcfaf7] rounded-xl border border-[#abbe99]/60">
-                  <div>
-                    <div className="font-bold text-[#243118]">Report {s.id} — {s.farmer} ({s.crop})</div>
-                    <div className="text-[#637554]">Moisture: {s.moisture}% • Protein: {s.protein}% • FM: {s.fm}%</div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${s.status === 'PASSED' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>{s.status}</span>
-                    <button className="bg-emerald-600 text-white px-3 py-1 rounded-lg text-[10px] font-bold">⬇ PDF</button>
-                  </div>
-                </div>
-              ))}
             </div>
-          </div>
-        )}
+          )}
 
-        {/* AI VS MANUAL */}
-        {activeTab === 'deviation' && (
-          <div className="bg-white rounded-2xl border border-[#abbe99] p-6 space-y-4">
-            <h3 className="font-extrabold text-base text-[#243118]">📊 AI AgriVision vs Manual Inspector Agreement</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs font-mono">
-              {[
-                { label: 'Total Samples Compared', val: '1,240', color: 'sky' },
-                { label: 'AI-Manual Agreement', val: '1,224 (98.7%)', color: 'emerald' },
-                { label: 'Deviations Flagged', val: '16 Lots', color: 'amber' },
-                { label: 'Manual Override Used', val: '16 Times', color: 'purple' },
-                { label: 'Avg Moisture Delta', val: '0.28%', color: 'emerald' },
-                { label: 'AI Model Accuracy', val: '99.1% ICAR', color: 'sky' },
-              ].map(c => (
-                <div key={c.label} className={`bg-${c.color}-50 border border-${c.color}-200 p-3 rounded-xl text-center`}>
-                  <div className={`text-base font-extrabold text-${c.color}-900`}>{c.val}</div>
-                  <div className={`text-[10px] text-${c.color}-700 font-bold uppercase`}>{c.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        </main>
       </div>
-    </section>
+    </div>
   );
 }

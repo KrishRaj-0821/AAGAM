@@ -109,6 +109,16 @@ export default function LoginPage({
       mandi: 'CWC Silo Complex #4',
       state: 'Haryana',
       token: 'GOI-SSO-WH-11029'
+    },
+    Admin: {
+      name: 'Vikramaditya Rao, Admin',
+      role: 'Admin',
+      id: 'GOI-ADMIN-001',
+      mobile: '+91 99999 00001',
+      email: 'admin.aagam@gov.in',
+      mandi: 'Ministry HQ (New Delhi)',
+      state: 'National Root',
+      token: 'GOI-SSO-ADMIN-001'
     }
   };
 
@@ -217,12 +227,9 @@ export default function LoginPage({
               <Sparkles className="w-4 h-4 text-[#a36627]" />
               <span>{t('⚡ Quick 1-Click Persona Instant Login (For Immediate Access):', '⚡ त्वरित 1-क्लिक प्रवेश (तत्काल पोर्टल पहुंच के लिए):')}</span>
             </div>
-            <span className="text-[11px] font-mono text-[#71873f] font-bold">
-              {t('Select any persona to enter directly', 'सीधे प्रवेश के लिए कोई भी भूमिका चुनें')}
-            </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 pt-1">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 pt-1">
             {[
               { role: 'Farmer', labelEn: 'Farmer (Kisan)', labelHi: 'किसान', icon: Sprout },
               { role: 'Trader', labelEn: 'Trader / Buyer', labelHi: 'व्यापारी', icon: Coins },
@@ -230,7 +237,8 @@ export default function LoginPage({
               { role: 'Operator', labelEn: 'Mandi Operator', labelHi: 'संचालक', icon: QrCode },
               { role: 'Quality', labelEn: 'Quality Lab', labelHi: 'लैब निरीक्षक', icon: Microscope },
               { role: 'Logistics', labelEn: 'Transporter', labelHi: 'ट्रांसपोर्टर', icon: Truck },
-              { role: 'Warehouse', labelEn: 'Godam Silo', labelHi: 'गोदाम', icon: Warehouse }
+              { role: 'Warehouse', labelEn: 'Godam Silo', labelHi: 'गोदाम', icon: Warehouse },
+              { role: 'Admin', labelEn: 'System Admin', labelHi: 'एडमिन', icon: ShieldCheck }
             ].map((item) => {
               const IconC = item.icon;
               return (
@@ -271,7 +279,7 @@ export default function LoginPage({
                 {t('AAGAM PORTAL SSO v2.0', 'आगामी पोर्टल साइन इन v2.0')}
               </span>
               <h2 className="text-2xl md:text-3xl font-extrabold text-white leading-tight">
-                {t('Unified Portal Sign-In for 7 Core Stakeholders', '7 प्रमुख वर्गों के लिए एकीकृत राष्ट्रीय साइन-इन')}
+                {t('Unified Portal Sign-In for 8 Core Stakeholders', '8 प्रमुख वर्गों के लिए एकीकृत राष्ट्रीय साइन-इन')}
               </h2>
               <p className="text-xs text-slate-200 leading-relaxed font-medium">
                 {t(
@@ -336,7 +344,8 @@ export default function LoginPage({
                   { role: 'Operator', labelEn: 'Mandi Operator', labelHi: 'मंडी संचालक', icon: QrCode },
                   { role: 'Quality', labelEn: 'Quality Assayer', labelHi: 'गुणवत्ता निरीक्षक', icon: Microscope },
                   { role: 'Logistics', labelEn: 'Transporter', labelHi: 'परिवहनकर्ता', icon: Truck },
-                  { role: 'Warehouse', labelEn: 'Godam Manager', labelHi: 'गोदाम प्रबंधक', icon: Warehouse }
+                  { role: 'Warehouse', labelEn: 'Godam Manager', labelHi: 'गोदाम प्रबंधक', icon: Warehouse },
+                  { role: 'Admin', labelEn: 'System Admin', labelHi: 'सिस्टम एडमिन', icon: ShieldCheck }
                 ].map((item) => {
                   const IconC = item.icon;
                   const isSel = loginRole === item.role;

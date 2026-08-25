@@ -392,7 +392,13 @@ export default function App() {
               ].map(r => (
                 <button
                   key={r.key}
-                  onClick={() => setActiveRole(r.key)}
+                  onClick={() => {
+                    if (isAuthenticated && currentUser?.role && currentUser.role !== r.key && r.key !== 'Navigator') {
+                      alert(`🔒 Role Locked: You are signed in as "${currentUser.role}".\n\nYour role cannot be changed while logged in. To switch to the "${r.key}" portal, please Sign Out first and log in as ${r.key}.`);
+                      return;
+                    }
+                    setActiveRole(r.key);
+                  }}
                   className={`px-2.5 py-1 rounded-lg transition-all ${activeRole === r.key ? 'bg-amber-600 text-white font-bold' : 'bg-white/10 hover:bg-white/20 text-slate-200'}`}
                 >
                   {r.label}

@@ -1,190 +1,257 @@
 import React, { useState } from 'react';
-import { ChevronLeft, CheckCircle2, XCircle, ScanLine } from 'lucide-react';
-
-const QUEUE = [
-  { pos: 1, token: 'HR-KRN-4829', farmer: 'Gurpreet Singh', crop: 'Wheat 180 Qtl', vehicle: 'HR-10-AB-1234', arrived: '09:58 AM', lane: '4A' },
-  { pos: 2, token: 'HR-KRN-4830', farmer: 'Sukhwinder Singh', crop: 'Mustard 80 Qtl', vehicle: 'PB-10-ZZ-9921', arrived: '10:02 AM', lane: '4A' },
-  { pos: 3, token: 'HR-KRN-4831', farmer: 'Amarjit Kaur', crop: 'Wheat 220 Qtl', vehicle: 'HR-14-BB-4821', arrived: '10:08 AM', lane: '4B' },
-];
+import { 
+  ChevronLeft, QrCode, Truck, UserCheck, Scale, Microscope, Gavel, 
+  FileText, ArrowRight, Building2, Bell, Search, Filter, Plus, CheckCircle2, 
+  RefreshCw, Clock, Layers, Lock, Download, DollarSign
+} from 'lucide-react';
 
 export default function OperatorPortalPage({ setCurrentView, currentUser, t }) {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [queue, setQueue] = useState(QUEUE);
-  const [scanInput, setScanInput] = useState('');
-  const [scanResult, setScanResult] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const scan = () => {
-    const found = QUEUE.find(q => q.token.toLowerCase().includes(scanInput.toLowerCase()) || q.farmer.toLowerCase().includes(scanInput.toLowerCase()));
-    setScanResult(found ? { ...found, valid: true } : { valid: false });
-    setScanInput('');
+  // 1. Mandi Metrics
+  const metrics = {
+    farmersArrived: 126,
+    vehiclesInside: 42,
+    pendingWeighment: 18,
+    pendingInspection: 27,
+    lotsProcessed: 84,
+    qtyReceived: '428 MT',
   };
 
-  const advance = (token) => setQueue(q => q.filter(x => x.token !== token));
+  // 2. Farmer Arrival & Tokens
+  const [arrivals, setArrivals] = useState([
+    { token: 'MND-184', farmer: 'Raj Kumar', farmerId: 'FRM-10245', crop: 'Wheat', qty: '5,000 KG', vehicle: 'BR-XX-1234', time: '09:42 AM', status: 'WAITING FOR WEIGHMENT' },
+    { token: 'MND-185', farmer: 'Gurpreet Singh', farmerId: 'PB-99482', crop: 'Paddy Basmati', qty: '18,000 KG', vehicle: 'HR-10-AB-9981', time: '10:15 AM', status: 'WEIGHMENT COMPLETED' },
+    { token: 'MND-186', farmer: 'Amarjit Kaur', farmerId: 'PB-99483', crop: 'Mustard', qty: '8,000 KG', vehicle: 'PB-12-CD-4421', time: '10:50 AM', status: 'INSIDE MANDI' },
+  ]);
 
-  const tabs = [
-    { key: 'dashboard', label: '🏪 Dashboard', hi: 'डैशबोर्ड' },
-    { key: 'scanner', label: '📷 QR Scanner', hi: 'QR स्कैनर' },
-    { key: 'queue', label: '🚦 Live Queue', hi: 'लाइव कतार' },
-    { key: 'weighment', label: '⚖️ Weighment Entry', hi: 'तौल प्रविष्टि' },
-    { key: 'summary', label: '📊 Day Summary', hi: 'दिवसीय सारांश' },
+  // 3. Weighment Calculations (Gross - Tare = Net)
+  const [weighments, setWeighments] = useState([
+    { weighId: 'WGH-9901', lotId: 'LOT-2026-00452', farmer: 'Raj Kumar', crop: 'Wheat', gross: 5850, tare: 850, net: 5000, unit: 'KG', machine: 'Weighbridge #01', time: '09:55 AM', receiptNo: 'RCP-WGH-001' },
+    { weighId: 'WGH-9902', lotId: 'LOT-2026-00453', farmer: 'Gurpreet Singh', crop: 'Paddy Basmati', gross: 20200, tare: 2200, net: 18000, unit: 'KG', machine: 'Weighbridge #02', time: '10:25 AM', receiptNo: 'RCP-WGH-002' },
+  ]);
+
+  // 4. Mandi Auction Bidding Sessions
+  const [auctions, setAuctions] = useState([
+    { auctionId: 'AUC-301', lotId: 'LOT-2026-00452', crop: 'Wheat (Grade A)', qty: '5,000 KG', startPrice: '₹2,400 / Qtl', bids: [{ buyer: 'Buyer A', bid: '₹2,430' }, { buyer: 'Buyer B', bid: '₹2,450' }, { buyer: 'Buyer C', bid: '₹2,470' }], winner: 'Buyer C', finalPrice: '₹2,470 / Qtl', status: 'COMPLETED' },
+  ]);
+
+  // Handlers
+  const registerNewArrival = () => {
+    alert(`🎫 New Arrival Token Generated: MND-${Math.floor(200+Math.random()*100)}. Added to Weighment Queue.`);
+  };
+
+  // Nav Items list matching user specification (17 items)
+  const navItems = [
+    { key: 'dashboard', label: '📊 Dashboard', icon: QrCode },
+    { key: 'arrivals', label: '🌾 Farmer Arrivals & Tokens', icon: UserCheck },
+    { key: 'vehicles', label: '🚚 Vehicle Entry Control', icon: Truck },
+    { key: 'queue', label: '⏳ Queue Management', icon: Clock },
+    { key: 'registration', label: '🏷️ Lot Registration', icon: Layers },
+    { key: 'weighment', label: '⚖️ Physical Weighment (Gross/Tare/Net)', icon: Scale },
+    { key: 'inspection', label: '🔬 Quality Inspection Coordination', icon: Microscope },
+    { key: 'auction', label: '🔨 Auction & Bidding', icon: Gavel },
+    { key: 'buyer', label: '🏪 Buyer Coordination', icon: Building2 },
+    { key: 'status', label: '📋 Procurement Status Tracking', icon: FileText },
+    { key: 'receipts', label: '🧾 Digital Receipts', icon: Download },
+    { key: 'dispatch', label: '🚚 Mandi Yard Dispatch', icon: Truck },
+    { key: 'inventory', label: '📦 Mandi Yard Stock View', icon: Layers },
+    { key: 'reports', label: '📊 Reports & Analytics', icon: FileText },
+    { key: 'notifications', label: '🔔 Notifications', icon: Bell },
   ];
 
   return (
-    <section className="min-h-screen bg-[#f4f8f0] py-8 px-4">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div className="min-h-screen bg-[#fcfaf7] flex flex-col font-sans text-[#243118]">
 
-        <div className="bg-gradient-to-r from-[#1a3010] to-[#2d5018] rounded-3xl p-6 text-white flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button onClick={() => setCurrentView('home')} className="bg-white/10 hover:bg-white/20 p-2 rounded-xl"><ChevronLeft className="w-5 h-5" /></button>
-            <div className="w-14 h-14 rounded-2xl bg-[#71873f] flex items-center justify-center text-2xl shadow-lg">🏪</div>
-            <div>
-              <h1 className="text-2xl font-extrabold">Mandi Center Operator</h1>
-              <p className="text-sm text-emerald-300">{currentUser?.name || 'Operator Rakesh Kumar'} • Karnal Central Grain Yard • Haryana</p>
-            </div>
-          </div>
-          <div className="text-right hidden md:block font-mono text-sm">
-            <div className="text-emerald-200">Queue: <span className="text-white font-bold">{queue.length} Trucks Waiting</span></div>
-            <div className="text-emerald-200">Weighments Done: <span className="text-white font-bold">1,280 Today</span></div>
-          </div>
+      {/* Top Banner Notice */}
+      <div className="bg-[#243118] text-white px-4 py-2 text-xs font-mono flex items-center justify-between border-b border-[#abbe99]/40">
+        <div className="flex items-center gap-2">
+          <span className="bg-[#71873f] text-white font-extrabold px-2 py-0.5 rounded text-[10px]">APMC MANDI GATE</span>
+          <span>AAGAM Mandi Terminal • Karnal Central Yard (Haryana APMC #HR-10-MND)</span>
         </div>
+        <div className="flex items-center gap-4 text-[11px]">
+          <span>Operator: <strong className="text-amber-400">{currentUser?.name || 'Rakesh Verma'}</strong></span>
+          <span className="text-emerald-400">Gate #02 Active ✓</span>
+        </div>
+      </div>
 
-        <div className="flex overflow-x-auto gap-2 pb-1">
-          {tabs.map(tab => (
-            <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-              className={`px-4 py-2.5 rounded-xl font-bold text-xs whitespace-nowrap transition-all ${activeTab === tab.key ? 'bg-[#71873f] text-white shadow-md' : 'bg-white text-[#243118] border border-[#abbe99] hover:bg-[#f0f4ea]'}`}>
-              {t(tab.label, tab.hi)}
+      <div className="flex flex-1 overflow-hidden">
+
+        {/* Sidebar Navigation */}
+        <aside className="w-64 bg-[#1b2612] text-slate-200 p-4 space-y-1 overflow-y-auto shrink-0 border-r border-[#abbe99]/40 shadow-xl">
+          <div className="px-3 py-2 text-[10px] font-mono font-bold text-amber-400 uppercase tracking-wider border-b border-[#abbe99]/30 mb-2">
+            MANDI OPERATOR DIRECTORY
+          </div>
+
+          {navItems.map(item => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.key;
+            return (
+              <button
+                key={item.key}
+                onClick={() => setActiveTab(item.key)}
+                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-bold text-xs transition-all text-left ${
+                  isActive 
+                    ? 'bg-[#71873f] text-white shadow-lg shadow-[#71873f]/30' 
+                    : 'hover:bg-white/10 text-slate-300 hover:text-white'
+                }`}
+              >
+                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-amber-400'}`} />
+                <span className="truncate">{item.label}</span>
+              </button>
+            );
+          })}
+
+          <div className="pt-4 border-t border-[#abbe99]/30 mt-4">
+            <button
+              onClick={() => setCurrentView('home')}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 font-bold text-xs transition-all"
+            >
+              <ChevronLeft className="w-4 h-4 text-amber-400" />
+              <span>Back to Portal Home</span>
             </button>
-          ))}
-        </div>
-
-        {/* DASHBOARD */}
-        {activeTab === 'dashboard' && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { label: 'QR Scans Today', val: '1,276', sub: '99.4% valid', color: 'emerald', icon: '📷' },
-              { label: 'Weighments Done', val: '1,280', sub: 'Avg 2.4 min/truck', color: 'amber', icon: '⚖️' },
-              { label: 'Tola Parchis Issued', val: '1,280', sub: '100% Digital', color: 'sky', icon: '🧾' },
-              { label: 'Current Queue', val: `${queue.length} Trucks`, sub: 'Avg wait 42 min', color: 'red', icon: '🚦' },
-            ].map(c => (
-              <div key={c.label} className={`bg-${c.color}-50 border border-${c.color}-200 p-4 rounded-2xl`}>
-                <div className="text-2xl mb-1">{c.icon}</div>
-                <div className={`text-xl font-extrabold text-${c.color}-900`}>{c.val}</div>
-                <div className={`text-[11px] font-bold text-${c.color}-700`}>{c.label}</div>
-                <div className={`text-[10px] text-${c.color}-600 mt-0.5`}>{c.sub}</div>
-              </div>
-            ))}
           </div>
-        )}
+        </aside>
 
-        {/* QR SCANNER */}
-        {activeTab === 'scanner' && (
-          <div className="bg-white rounded-2xl border border-[#abbe99] p-6 space-y-4 max-w-lg mx-auto">
-            <h3 className="font-extrabold text-base text-[#243118]">📷 QR Token Scanner Terminal</h3>
-            <div className="bg-[#1a3010] rounded-2xl flex items-center justify-center h-36">
-              <div className="text-center text-white">
-                <ScanLine className="w-12 h-12 mx-auto mb-2 animate-pulse" />
-                <div className="text-xs font-bold">Camera QR Scanner Active</div>
-                <div className="text-[10px] text-emerald-300">Point at farmer's Gate Pass QR code</div>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <input
-                placeholder="Or type Token # / Farmer Name..."
-                value={scanInput}
-                onChange={e => setScanInput(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && scan()}
-                className="flex-1 border border-[#abbe99] rounded-xl p-2.5 text-xs font-mono text-[#243118] focus:outline-none focus:border-[#71873f]"
-              />
-              <button onClick={scan} className="bg-[#71873f] hover:bg-[#688557] text-white font-bold px-4 py-2.5 rounded-xl text-xs">Scan</button>
-            </div>
-            {scanResult && (
-              <div className={`p-4 rounded-2xl border-2 text-xs font-mono space-y-1 ${scanResult.valid ? 'bg-emerald-50 border-emerald-400' : 'bg-red-50 border-red-400'}`}>
-                {scanResult.valid ? (
-                  <>
-                    <div className="flex items-center gap-2 text-emerald-700 font-extrabold text-sm"><CheckCircle2 className="w-5 h-5" /> TOKEN VALID — GATE OPEN</div>
-                    <div>Farmer: <strong>{scanResult.farmer}</strong></div>
-                    <div>Token: <strong>{scanResult.token}</strong> • Vehicle: {scanResult.vehicle}</div>
-                    <div>Crop: <strong>{scanResult.crop}</strong> • Lane: {scanResult.lane}</div>
-                    <button onClick={() => advance(scanResult.token)} className="mt-2 bg-emerald-600 text-white px-4 py-1.5 rounded-xl font-bold">Mark Entered → Send to Weighbridge</button>
-                  </>
-                ) : (
-                  <div className="flex items-center gap-2 text-red-700 font-extrabold"><XCircle className="w-5 h-5" /> INVALID TOKEN — DENY ENTRY</div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
+        {/* Main Content Workspace */}
+        <main className="flex-1 p-6 overflow-y-auto bg-[#fcfaf7]">
 
-        {/* LIVE QUEUE */}
-        {activeTab === 'queue' && (
-          <div className="bg-white rounded-2xl border border-[#abbe99] p-6 space-y-3">
-            <h3 className="font-extrabold text-base text-[#243118]">🚦 Live Yard Queue — {queue.length} Trucks Waiting</h3>
-            {queue.length === 0 ? (
-              <div className="text-center py-8 text-[#71873f] font-bold">✓ Queue Clear — No trucks waiting</div>
-            ) : queue.map((t, i) => (
-              <div key={t.token} className="flex items-center justify-between p-4 border border-[#abbe99] rounded-2xl">
-                <div className="flex items-center gap-3 font-mono text-xs">
-                  <div className="w-8 h-8 rounded-full bg-[#71873f] text-white flex items-center justify-center font-extrabold text-sm">{t.pos}</div>
-                  <div>
-                    <div className="font-extrabold text-[#243118]">#{t.token} — {t.farmer}</div>
-                    <div className="text-[#637554]">{t.crop} • {t.vehicle} • Lane {t.lane}</div>
-                    <div className="text-[10px] text-[#637554]">Arrived: {t.arrived}</div>
-                  </div>
+          {/* 1. DASHBOARD */}
+          {activeTab === 'dashboard' && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center border-b border-[#abbe99]/60 pb-4">
+                <div>
+                  <h2 className="text-xl font-extrabold text-[#243118]">MANDI CENTER OPERATOR DASHBOARD</h2>
+                  <p className="text-xs text-[#637554]">Real-time vehicle arrivals, weighbridge operations, and auction coordination</p>
                 </div>
-                <button onClick={() => advance(t.token)} className="bg-[#71873f] hover:bg-[#688557] text-white text-xs font-bold px-3 py-1.5 rounded-xl transition-all">
-                  Advance →
+                <button onClick={registerNewArrival} className="bg-[#71873f] hover:bg-[#5c7031] text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2">
+                  <Plus className="w-4 h-4" /> Register Farmer Arrival Token
                 </button>
               </div>
-            ))}
-          </div>
-        )}
 
-        {/* WEIGHMENT */}
-        {activeTab === 'weighment' && (
-          <div className="bg-white rounded-2xl border border-[#abbe99] p-6 space-y-4 max-w-lg mx-auto">
-            <h3 className="font-extrabold text-base text-[#243118]">⚖️ Digital Weighment Entry Terminal</h3>
-            <div className="space-y-3 text-xs font-mono">
-              {[
-                { label: 'Token / Tola Parchi No.', placeholder: 'e.g. HR-KRN-4829' },
-                { label: 'Gross Weight (kg)', placeholder: 'e.g. 12600' },
-                { label: 'Tare Weight (kg)', placeholder: 'e.g. 6800' },
-              ].map(f => (
-                <div key={f.label} className="space-y-1">
-                  <label className="font-bold text-[#243118]">{f.label}</label>
-                  <input placeholder={f.placeholder} className="w-full border border-[#abbe99] rounded-xl p-2.5 font-mono text-[#243118] focus:outline-none focus:border-[#71873f]" />
-                </div>
-              ))}
-              <div className="bg-[#f0f4ea] border border-[#71873f] p-3 rounded-xl">
-                <div className="font-bold text-[#243118]">Calculated Net Weight:</div>
-                <div className="text-2xl font-extrabold text-[#a36627]">5,800 kg = <span className="text-[#71873f]">58 Quintals</span></div>
+              {/* Mandi Metric Cards */}
+              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 font-mono text-xs">
+                {[
+                  { label: 'Farmers Arrived', val: `${metrics.farmersArrived}`, sub: '126 Today', icon: UserCheck },
+                  { label: 'Vehicles Inside', val: `${metrics.vehiclesInside}`, sub: '42 Active Trucks', icon: Truck },
+                  { label: 'Pending Weighment', val: `${metrics.pendingWeighment}`, sub: 'In Queue', icon: Scale },
+                  { label: 'Pending Inspection', val: `${metrics.pendingInspection}`, sub: 'Assay Requested', icon: Microscope },
+                  { label: 'Lots Processed', val: `${metrics.lotsProcessed}`, sub: '84 Completed', icon: CheckCircle2 },
+                  { label: 'Quantity Received', val: metrics.qtyReceived, sub: '428 MT Total', icon: Layers },
+                ].map(card => {
+                  const CIcon = card.icon;
+                  return (
+                    <div key={card.label} className="bg-white border border-[#abbe99]/60 rounded-2xl p-4 shadow-sm">
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="text-[10px] font-extrabold uppercase text-[#637554]">{card.label}</span>
+                        <CIcon className="w-4 h-4 text-[#71873f]" />
+                      </div>
+                      <div className="text-lg font-extrabold text-[#243118]">{card.val}</div>
+                      <div className="text-[10px] text-[#637554] mt-1">{card.sub}</div>
+                    </div>
+                  );
+                })}
               </div>
-              <button className="w-full bg-[#71873f] hover:bg-[#688557] text-white font-extrabold py-3 rounded-xl transition-all">
-                🧾 Issue Digital Tola Parchi & Blockchain Hash
-              </button>
-            </div>
-          </div>
-        )}
 
-        {/* SUMMARY */}
-        {activeTab === 'summary' && (
-          <div className="bg-white rounded-2xl border border-[#abbe99] p-6 space-y-4">
-            <h3 className="font-extrabold text-base text-[#243118]">📊 Day Summary — 25 Aug 2025</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs font-mono">
-              {[
-                { label: 'Total Arrivals', val: '14,800 MT', color: 'emerald' },
-                { label: 'Wheat', val: '8,200 MT (55%)', color: 'amber' },
-                { label: 'Paddy', val: '4,200 MT (28%)', color: 'sky' },
-                { label: 'Revenue Booked', val: '₹42.8 Cr', color: 'purple' },
-              ].map(c => (
-                <div key={c.label} className={`bg-${c.color}-50 border border-${c.color}-200 p-3 rounded-xl text-center`}>
-                  <div className={`text-base font-extrabold text-${c.color}-900`}>{c.val}</div>
-                  <div className={`text-[10px] text-${c.color}-700 font-bold uppercase`}>{c.label}</div>
+              {/* Mandi Arrivals Queue Preview */}
+              <div className="bg-white rounded-2xl border border-[#abbe99]/60 p-5 shadow-sm space-y-3 font-mono text-xs">
+                <h3 className="font-extrabold text-sm text-[#243118] flex items-center justify-between">
+                  <span>LIVE MANDI ARRIVALS & WEIGHMENT QUEUE</span>
+                  <button onClick={() => setActiveTab('arrivals')} className="text-[#71873f] underline font-bold">View Full Queue →</button>
+                </h3>
+                <div className="space-y-2">
+                  {arrivals.map(a => (
+                    <div key={a.token} className="p-3 bg-[#f0f4ea] border border-[#abbe99]/40 rounded-xl flex justify-between items-center">
+                      <div>
+                        <div className="font-extrabold text-[#243118]">{a.token} — {a.farmer} ({a.farmerId})</div>
+                        <div className="text-[#637554]">Crop: <strong>{a.crop}</strong> • Qty: {a.qty} • Vehicle: {a.vehicle}</div>
+                      </div>
+                      <span className="bg-[#71873f] text-white font-extrabold px-3 py-1 rounded-lg text-[10px]">{a.status}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+
+          {/* 2. FARMER ARRIVALS & WEIGHMENT */}
+          {(activeTab === 'arrivals' || activeTab === 'vehicles' || activeTab === 'weighment') && (
+            <div className="space-y-4 font-mono text-xs">
+              <h2 className="text-xl font-extrabold text-[#243118]">PHYSICAL WEIGHMENT (GROSS - TARE = NET WEIGHT)</h2>
+              <div className="bg-white rounded-2xl border border-[#abbe99]/60 p-5 shadow-sm space-y-3">
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 font-bold">
+                  🔒 Restriction Rule: Net Weight is calculated automatically. Re-weighment requests preserve historical records.
+                </div>
+                <table className="w-full text-left">
+                  <thead className="bg-[#243118] text-white">
+                    <tr>
+                      <th className="p-3">Weighment ID & Lot</th>
+                      <th className="p-3">Farmer & Crop</th>
+                      <th className="p-3">Gross Weight</th>
+                      <th className="p-3">Tare Weight</th>
+                      <th className="p-3">Calculated Net Weight</th>
+                      <th className="p-3 text-right">Receipt</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#abbe99]/30">
+                    {weighments.map(w => (
+                      <tr key={w.weighId}>
+                        <td className="p-3 font-bold text-[#243118]">{w.weighId}<br/><span className="text-[#637554]">{w.lotId}</span></td>
+                        <td className="p-3">{w.farmer}<br/><span className="text-[#637554]">{w.crop}</span></td>
+                        <td className="p-3">{w.gross} KG</td>
+                        <td className="p-3">{w.tare} KG</td>
+                        <td className="p-3 font-extrabold text-emerald-800">{w.net} KG</td>
+                        <td className="p-3 text-right">
+                          <button onClick={() => alert(`Printing receipt ${w.receiptNo}...`)} className="bg-[#71873f] text-white font-bold px-3 py-1 rounded text-[10px]">Print Receipt</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* 3. AUCTION / SALE MANAGEMENT */}
+          {activeTab === 'auction' && (
+            <div className="space-y-4 font-mono text-xs">
+              <h2 className="text-xl font-extrabold text-[#243118]">AUCTION & BIDDING SESSIONS</h2>
+              <div className="bg-white rounded-2xl border border-[#abbe99]/60 p-5 shadow-sm space-y-3">
+                {auctions.map(auc => (
+                  <div key={auc.auctionId} className="border border-[#abbe99]/60 rounded-xl p-4 space-y-3">
+                    <div className="flex justify-between items-center">
+                      <div className="font-extrabold text-[#243118]">{auc.auctionId} — {auc.crop} ({auc.qty})</div>
+                      <span className="bg-emerald-100 text-emerald-800 font-bold px-3 py-1 rounded">{auc.status}</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 bg-[#f0f4ea] p-3 rounded-lg">
+                      {auc.bids.map((b, i) => (
+                        <div key={i} className="text-center">
+                          <div className="text-[#637554]">{b.buyer}</div>
+                          <div className="font-extrabold text-sm text-[#243118]">{b.bid}</div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="font-extrabold text-emerald-800">
+                      🏆 Winning Buyer: {auc.winner} @ {auc.finalPrice}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* FALLBACK FOR OTHER TABS */}
+          {!['dashboard', 'arrivals', 'vehicles', 'weighment', 'auction'].includes(activeTab) && (
+            <div className="bg-white rounded-2xl border border-[#abbe99]/60 p-8 text-center space-y-3 shadow-sm font-mono">
+              <div className="w-12 h-12 bg-[#f0f4ea] text-[#71873f] rounded-full flex items-center justify-center mx-auto text-xl font-bold">🏪</div>
+              <h3 className="text-base font-extrabold text-[#243118] uppercase">{activeTab.replace('_', ' ')} Mandi Terminal</h3>
+              <p className="text-xs text-[#637554]">Mandi Operator physical arrival, weighbridge receipt, and auction coordination active.</p>
+            </div>
+          )}
+
+        </main>
       </div>
-    </section>
+    </div>
   );
 }

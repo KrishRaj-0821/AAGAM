@@ -1,307 +1,319 @@
 import React, { useState } from 'react';
-import { ChevronLeft, Sprout, Coins, QrCode, MapPin, TrendingUp, CheckCircle2, Clock, Download, Bell, FileText, BarChart3 } from 'lucide-react';
-
-const CROPS = ['Wheat (Sharbati)', 'Paddy (Basmati 1121)', 'Mustard (Bold)', 'Chana (Desi)', 'Soyabean', 'Cotton (Long Staple)', 'Maize', 'Tur Dal', 'Moong', 'Urad', 'Sunflower', 'Groundnut'];
-const MSP = { 'Wheat (Sharbati)': 2425, 'Paddy (Basmati 1121)': 2300, 'Mustard (Bold)': 5950, 'Chana (Desi)': 5650, 'Soyabean': 4892, 'Cotton (Long Staple)': 7521, 'Maize': 2225, 'Tur Dal': 7550, 'Moong': 8558, 'Urad': 7400, 'Sunflower': 6760, 'Groundnut': 6783 };
+import { 
+  ChevronLeft, Sprout, MapPin, Layers, Plus, Calendar, Clock, DollarSign, 
+  FileText, ShieldCheck, CheckCircle2, AlertTriangle, HelpCircle, Bell, 
+  Search, Filter, Eye, Download, UserCheck, CreditCard, Building2
+} from 'lucide-react';
 
 export default function FarmerPortalPage({ setCurrentView, currentUser, openGatePassWithAuth, t }) {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [selectedCrop, setSelectedCrop] = useState('Wheat (Sharbati)');
 
-  const farmerData = {
+  // Farmer Profile
+  const farmerProfile = {
+    id: 'FRM-10245',
     name: currentUser?.name || 'Gurpreet Singh',
-    id: 'PB-FARM-99482',
-    district: 'Karnal, Haryana',
-    land: '4.5 Acres (Khasra 48/2)',
-    aadhaar: 'XXXX-XXXX-9482 ✓',
-    bank: 'SBI XXXX4892 (NPCI-DBT Linked)',
-    pmkisan: 'PMKN-99482 ✓',
-    crops: [
-      { name: 'Wheat (Sharbati)', qty: 180, grade: 'A', moisture: 10.8, status: 'SOLD', dbt: '₹4,36,500', utr: 'SBIN0048291' },
-      { name: 'Mustard (Bold)', qty: 80, grade: 'A', moisture: 8.2, status: 'IN AUCTION', dbt: '—', utr: '—' },
-    ],
-    slots: [
-      { token: 'HR-KRN-4829', mandi: 'Karnal Central Yard', date: '08-Sep-2025', time: '10:00–11:00 AM', status: 'CONFIRMED' },
-      { token: 'HR-KRN-4830', mandi: 'Kurukshetra APMC', date: '15-Sep-2025', time: '09:00–10:00 AM', status: 'PENDING' },
-    ],
-    payments: [
-      { crop: 'Wheat 180 Qtl', amt: '₹4,36,500', date: '10-Sep-2025', status: 'CREDITED', utr: 'SBIN0048291' },
-      { crop: 'Mustard 80 Qtl', amt: '₹4,76,000', date: 'Pending', status: 'PENDING', utr: '—' },
-    ]
+    phone: currentUser?.mobile || '+91 98765 43210',
+    email: currentUser?.email || 'gurpreet.kisan@gmail.com',
+    state: 'Haryana',
+    district: 'Karnal',
+    block: 'Nilokheri',
+    village: 'Mithapur',
+    landArea: '5.5 Acres',
+    verified: true,
+    bankVerified: true,
+    kycVerified: true,
+    bankAccount: 'State Bank of India (XXXX 4892)',
   };
 
-  const tabs = [
-    { key: 'dashboard', label: '🌾 Dashboard', hi: 'डैशबोर्ड' },
-    { key: 'crops', label: '🌿 My Crops', hi: 'मेरी फसलें' },
-    { key: 'slots', label: '🎫 Slots & QR', hi: 'स्लॉट व QR' },
-    { key: 'payments', label: '💳 Payments (DBT)', hi: 'भुगतान (DBT)' },
-    { key: 'prices', label: '📊 Price Checker', hi: 'मूल्य जांच' },
-    { key: 'trace', label: '🔗 Traceability', hi: 'ट्रैसेबिलिटी' },
+  // 1. Dashboard Metrics
+  const metrics = {
+    myProduce: '8,500 KG',
+    activeLots: 4,
+    underInspection: 2,
+    procurementPending: 1,
+    soldProcured: 12,
+    pendingPayment: '₹42,500',
+    totalEarnings: '₹3.84 Lakh',
+  };
+
+  // 2. Registered Farms
+  const [farms, setFarms] = useState([
+    { id: 'FARM-001', area: '3.5 Acres', location: 'Mithapur (Karnal)', crop: 'Wheat (Sharbati)', season: 'Rabi', soil: 'Alluvial Loam', irrigation: 'Canal & Tube Well' },
+    { id: 'FARM-002', area: '2.0 Acres', location: 'Nilokheri', crop: 'Paddy (Basmati)', season: 'Kharif', soil: 'Clay Loam', irrigation: 'Submersible Pump' },
+  ]);
+
+  // 3. Submitted Produce Lots
+  const [lots, setLots] = useState([
+    { id: 'LOT-2026-00452', product: 'Wheat', variety: 'HD-2967', qty: '5,000 KG (50 Qtl)', farm: 'Farm #001', harvestDate: '20 Aug 2026', mandi: 'Mithapur Mandi', grade: 'Grade A', status: 'PAYMENT PROCESSING', expPrice: '₹2,470/Qtl', estVal: '₹1,23,500', step: 7 },
+    { id: 'LOT-2026-00453', product: 'Paddy Basmati', variety: 'PB-1121', qty: '3,000 KG (30 Qtl)', farm: 'Farm #002', harvestDate: '22 Aug 2026', mandi: 'Karnal Yard', grade: 'Grade B', status: 'UNDER INSPECTION', expPrice: '₹2,300/Qtl', estVal: '₹69,000', step: 4 },
+  ]);
+
+  // 4. Sales & Payments
+  const [payments, setPayments] = useState([
+    { payId: 'PAY-88231', lotId: 'LOT-2026-00452', product: 'Wheat (5,000 KG)', gross: '₹1,23,500', deductions: '₹0.00', net: '₹1,23,500', status: 'PROCESSING', date: '25 Aug 2026' },
+    { payId: 'PAY-88210', lotId: 'LOT-2026-00399', product: 'Paddy (3,000 KG)', gross: '₹84,000', deductions: '₹0.00', net: '₹84,000', status: 'COMPLETED', date: '18 Aug 2026' },
+  ]);
+
+  // 5. Support Tickets
+  const [tickets, setTickets] = useState([
+    { ticketId: 'CMP-2026-00231', issue: 'Weight Discrepancy Inquiry', status: 'UNDER REVIEW', date: '24 Aug 2026' }
+  ]);
+
+  // Submit Lot Handler
+  const [newLotQty, setNewLotQty] = useState('5000');
+  const [newLotCrop, setNewLotCrop] = useState('Wheat');
+  const handleCreateLot = (e) => {
+    e.preventDefault();
+    const newLot = {
+      id: `LOT-2026-${Math.floor(1000 + Math.random() * 9000)}`,
+      product: newLotCrop,
+      variety: 'FAQ Standard',
+      qty: `${newLotQty} KG`,
+      farm: 'Farm #001',
+      harvestDate: '25 Aug 2026',
+      mandi: 'Mithapur Mandi',
+      grade: 'Pending Assay',
+      status: 'PENDING MANDI RECEIVING',
+      expPrice: '₹2,470/Qtl',
+      estVal: `₹${(parseFloat(newLotQty) * 24.7).toLocaleString('en-IN')}`,
+      step: 1
+    };
+    setLots([newLot, ...lots]);
+    alert(`🎉 Produce Lot ${newLot.id} successfully created! Gate Pass token generated.`);
+    setActiveTab('lots');
+  };
+
+  // Nav Items list matching user specification (14 items)
+  const navItems = [
+    { key: 'dashboard', label: '📊 Dashboard', icon: Sprout },
+    { key: 'profile', label: '👤 My Profile & Verification', icon: UserCheck },
+    { key: 'farms', label: '🏞️ My Registered Farms', icon: MapPin },
+    { key: 'create_lot', label: '➕ Create Produce Lot', icon: Plus },
+    { key: 'lots', label: '📦 My Lots & Tracking', icon: Layers },
+    { key: 'prices', label: '📈 Market & MSP Prices', icon: DollarSign },
+    { key: 'opportunities', label: '🎯 Procurement Opportunities', icon: Building2 },
+    { key: 'quality', label: '🔬 Quality Inspection Reports', icon: ShieldCheck },
+    { key: 'sales', label: '📜 My Sales & Orders', icon: FileText },
+    { key: 'payments', label: '💳 Payments & DBT Status', icon: CreditCard },
+    { key: 'documents', label: '📄 Centralized Documents', icon: FileText },
+    { key: 'support', label: '💬 Support & Complaints', icon: HelpCircle },
+    { key: 'notifications', label: '🔔 Notifications', icon: Bell },
   ];
 
   return (
-    <section className="min-h-screen bg-[#f0f4ea] py-8 px-4">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div className="min-h-screen bg-[#fcfaf7] flex flex-col font-sans text-[#243118]">
 
-        {/* Header */}
-        <div className="bg-gradient-to-r from-[#1a3010] to-[#243118] rounded-3xl p-6 text-white flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button onClick={() => setCurrentView('home')} className="bg-white/10 hover:bg-white/20 p-2 rounded-xl transition-all">
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <div className="w-14 h-14 rounded-2xl bg-[#71873f] flex items-center justify-center text-2xl shadow-lg">🌾</div>
-            <div>
-              <h1 className="text-2xl font-extrabold">Farmer Portal</h1>
-              <p className="text-sm text-emerald-300">{farmerData.name} • {farmerData.id} • {farmerData.district}</p>
-            </div>
-          </div>
-          <div className="text-right hidden md:block">
-            <div className="text-sm text-emerald-300 font-mono">Aadhaar e-KYC: {farmerData.aadhaar}</div>
-            <div className="text-sm text-amber-300 font-mono">PM-KISAN: {farmerData.pmkisan}</div>
-            <div className="text-xs text-slate-300 mt-1">Land: {farmerData.land}</div>
-          </div>
+      {/* Top Banner Notice */}
+      <div className="bg-[#243118] text-white px-4 py-2 text-xs font-mono flex items-center justify-between border-b border-[#abbe99]/40">
+        <div className="flex items-center gap-2">
+          <span className="bg-[#71873f] text-white font-extrabold px-2 py-0.5 rounded text-[10px]">KISAN PORTAL</span>
+          <span>AAGAM Farmer Direct Connect • PM-KISAN & Aadhaar e-KYC Linked</span>
         </div>
-
-        {/* Tabs */}
-        <div className="flex overflow-x-auto gap-2 pb-1">
-          {tabs.map(tab => (
-            <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-              className={`px-4 py-2.5 rounded-xl font-bold text-xs whitespace-nowrap transition-all ${activeTab === tab.key ? 'bg-[#71873f] text-white shadow-md' : 'bg-white text-[#243118] border border-[#abbe99] hover:bg-[#f0f4ea]'}`}>
-              {t(tab.label, tab.hi)}
-            </button>
-          ))}
+        <div className="flex items-center gap-4 text-[11px]">
+          <span>Farmer: <strong className="text-amber-300">{farmerProfile.name} ({farmerProfile.id})</strong></span>
+          <span className="text-emerald-400">KYC Verified ✓</span>
         </div>
+      </div>
 
-        {/* DASHBOARD */}
-        {activeTab === 'dashboard' && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[
-                { label: 'DBT Earned', val: '₹4,36,500', sub: 'SBIN0048291 Credited', color: 'emerald', icon: '💳' },
-                { label: 'Active Crops', val: '2 Lots', sub: '1 Sold • 1 In Auction', color: 'amber', icon: '🌿' },
-                { label: 'Next Slot', val: '08-Sep-25', sub: 'Karnal Yard • 10:00 AM', color: 'sky', icon: '🎫' },
-                { label: 'Grade Average', val: 'Grade A', sub: 'Moisture Avg: 10.5%', color: 'purple', icon: '⭐' },
-              ].map(c => (
-                <div key={c.label} className={`bg-${c.color}-50 border border-${c.color}-200 p-4 rounded-2xl`}>
-                  <div className="text-2xl mb-1">{c.icon}</div>
-                  <div className={`text-xl font-extrabold text-${c.color}-900`}>{c.val}</div>
-                  <div className={`text-[11px] font-bold text-${c.color}-700`}>{c.label}</div>
-                  <div className={`text-[10px] text-${c.color}-600 mt-0.5`}>{c.sub}</div>
-                </div>
-              ))}
-            </div>
+      <div className="flex flex-1 overflow-hidden">
 
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="bg-white rounded-2xl border border-[#abbe99] p-5">
-                <h3 className="font-extrabold text-sm text-[#243118] mb-3 border-b pb-2">🌾 My Registered Crops</h3>
-                <div className="space-y-2 text-xs font-mono">
-                  {farmerData.crops.map(c => (
-                    <div key={c.name} className="flex justify-between items-center p-2.5 bg-[#fcfaf7] rounded-xl border border-[#abbe99]/60">
-                      <div>
-                        <div className="font-bold text-[#243118]">{c.name}</div>
-                        <div className="text-[#637554]">{c.qty} Qtl • Grade {c.grade} • {c.moisture}% Moisture</div>
-                      </div>
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${c.status === 'SOLD' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>{c.status}</span>
-                    </div>
-                  ))}
+        {/* Sidebar Navigation */}
+        <aside className="w-64 bg-[#1c2713] text-slate-200 p-4 space-y-1 overflow-y-auto shrink-0 border-r border-[#abbe99]/40 shadow-xl">
+          <div className="px-3 py-2 text-[10px] font-mono font-bold text-amber-400 uppercase tracking-wider border-b border-[#abbe99]/30 mb-2">
+            FARMER NAVIGATION DIRECTORY
+          </div>
+
+          {navItems.map(item => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.key;
+            return (
+              <button
+                key={item.key}
+                onClick={() => setActiveTab(item.key)}
+                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-bold text-xs transition-all text-left ${
+                  isActive 
+                    ? 'bg-[#71873f] text-white shadow-lg shadow-[#71873f]/30' 
+                    : 'hover:bg-white/10 text-slate-300 hover:text-white'
+                }`}
+              >
+                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-amber-400'}`} />
+                <span className="truncate">{item.label}</span>
+              </button>
+            );
+          })}
+
+          <div className="pt-4 border-t border-[#abbe99]/30 mt-4">
+            <button
+              onClick={() => setCurrentView('home')}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 font-bold text-xs transition-all"
+            >
+              <ChevronLeft className="w-4 h-4 text-amber-400" />
+              <span>Back to Portal Home</span>
+            </button>
+          </div>
+        </aside>
+
+        {/* Main Content Workspace */}
+        <main className="flex-1 p-6 overflow-y-auto bg-[#fcfaf7]">
+
+          {/* 1. DASHBOARD */}
+          {activeTab === 'dashboard' && (
+            <div className="space-y-6 font-mono text-xs">
+              <div className="flex justify-between items-center border-b border-[#abbe99]/60 pb-4">
+                <div>
+                  <h2 className="text-xl font-extrabold text-[#243118]">FARMER DASHBOARD</h2>
+                  <p className="text-xs text-[#637554]">My agricultural produce, active lots, and DBT payment status</p>
                 </div>
-                <button onClick={() => setActiveTab('crops')} className="w-full mt-3 bg-[#71873f] hover:bg-[#688557] text-white py-2 rounded-xl text-xs font-bold transition-all">
-                  + Add New Crop Declaration →
+                <button onClick={openGatePassWithAuth} className="bg-[#71873f] hover:bg-[#5c7031] text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2">
+                  <Plus className="w-4 h-4" /> Book Mandi Slot & QR Gate Pass
                 </button>
               </div>
 
-              <div className="bg-white rounded-2xl border border-[#abbe99] p-5">
-                <h3 className="font-extrabold text-sm text-[#243118] mb-3 border-b pb-2">🎫 Upcoming Mandi Slots</h3>
-                <div className="space-y-2 text-xs font-mono">
-                  {farmerData.slots.map(s => (
-                    <div key={s.token} className="flex justify-between items-center p-2.5 bg-[#fcfaf7] rounded-xl border border-[#abbe99]/60">
+              {/* 7 Core Metric Cards */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-3">
+                {[
+                  { label: 'My Produce', val: metrics.myProduce, sub: 'Registered' },
+                  { label: 'Active Lots', val: `${metrics.activeLots} Lots`, sub: 'In Process' },
+                  { label: 'Under Inspection', val: `${metrics.underInspection} Lots`, sub: 'Lab Testing' },
+                  { label: 'Procurement Pend.', val: `${metrics.procurementPending} Lot`, sub: 'Approval Queue' },
+                  { label: 'Sold / Procured', val: `${metrics.soldProcured} Lots`, sub: 'Delivered' },
+                  { label: 'Pending Payment', val: metrics.pendingPayment, sub: 'DBT Processing' },
+                  { label: 'Total Earnings', val: metrics.totalEarnings, sub: 'Direct Bank Credit' },
+                ].map(card => (
+                  <div key={card.label} className="bg-white border border-[#abbe99]/60 rounded-2xl p-3.5 shadow-sm text-center">
+                    <div className="text-[10px] font-extrabold uppercase text-[#637554] mb-1">{card.label}</div>
+                    <div className="text-lg font-extrabold text-[#243118]">{card.val}</div>
+                    <div className="text-[10px] text-[#637554] mt-1">{card.sub}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Active Lots Quick Status */}
+              <div className="bg-white rounded-2xl border border-[#abbe99]/60 p-5 shadow-sm space-y-3 font-mono">
+                <h3 className="font-extrabold text-sm text-[#243118] flex items-center justify-between">
+                  <span>MY ACTIVE PRODUCE LOTS & PROGRESS</span>
+                  <button onClick={() => setActiveTab('lots')} className="text-[#71873f] underline font-bold">Track All Lots →</button>
+                </h3>
+                <div className="space-y-2">
+                  {lots.map(l => (
+                    <div key={l.id} className="p-3.5 bg-[#f0f4ea] border border-[#abbe99]/40 rounded-xl flex justify-between items-center">
                       <div>
-                        <div className="font-bold text-[#243118]">#{s.token} — {s.mandi}</div>
-                        <div className="text-[#637554]">{s.date} • {s.time}</div>
+                        <div className="font-extrabold text-[#243118]">{l.id} — {l.product} ({l.qty})</div>
+                        <div className="text-[#637554]">Mandi: {l.mandi} • Expected Value: <strong>{l.estVal}</strong></div>
                       </div>
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${s.status === 'CONFIRMED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>{s.status}</span>
+                      <span className="bg-[#71873f] text-white font-bold px-3 py-1 rounded-lg text-[10px]">{l.status}</span>
                     </div>
                   ))}
                 </div>
-                <button onClick={openGatePassWithAuth} className="w-full mt-3 bg-[#a36627] hover:bg-[#804d19] text-white py-2 rounded-xl text-xs font-bold transition-all">
-                  📅 Book New Mandi Slot →
-                </button>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* CROPS TAB */}
-        {activeTab === 'crops' && (
-          <div className="bg-white rounded-2xl border border-[#abbe99] p-6 space-y-4">
-            <h3 className="font-extrabold text-base text-[#243118]">🌿 My Crop Declarations</h3>
-            <div className="grid md:grid-cols-2 gap-4">
-              {[...farmerData.crops, { name: 'Soyabean', qty: 120, grade: '—', moisture: '—', status: 'DECLARED', dbt: '—', utr: '—' }].map(c => (
-                <div key={c.name} className="border border-[#abbe99] rounded-xl p-4 space-y-2 text-xs font-mono">
-                  <div className="flex justify-between items-center">
-                    <span className="font-extrabold text-sm text-[#243118]">{c.name}</span>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${c.status === 'SOLD' ? 'bg-emerald-100 text-emerald-700' : c.status === 'IN AUCTION' ? 'bg-red-100 text-red-700' : 'bg-sky-100 text-sky-700'}`}>{c.status}</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 text-[#637554]">
-                    <div><span className="text-[#243118] font-bold">Quantity:</span> {c.qty} Qtl</div>
-                    <div><span className="text-[#243118] font-bold">Grade:</span> {c.grade}</div>
-                    <div><span className="text-[#243118] font-bold">Moisture:</span> {c.moisture}%</div>
-                    <div><span className="text-[#243118] font-bold">MSP:</span> ₹{MSP[c.name] || '—'}/Qtl</div>
-                    <div><span className="text-[#243118] font-bold">DBT Amt:</span> {c.dbt}</div>
-                    <div><span className="text-[#243118] font-bold">UTR:</span> {c.utr}</div>
+          {/* 2. FARMER PROFILE */}
+          {activeTab === 'profile' && (
+            <div className="space-y-4 font-mono text-xs">
+              <h2 className="text-xl font-extrabold text-[#243118]">FARMER PROFILE & VERIFICATION STATUS</h2>
+              <div className="bg-white rounded-2xl border border-[#abbe99]/60 p-6 shadow-sm space-y-4 max-w-2xl mx-auto">
+                <div className="flex items-center gap-4 border-b border-[#abbe99]/40 pb-4">
+                  <div className="w-14 h-14 bg-[#71873f] text-white rounded-full flex items-center justify-center text-xl font-bold">🌾</div>
+                  <div>
+                    <h3 className="font-extrabold text-base text-[#243118]">{farmerProfile.name}</h3>
+                    <p className="text-[#637554]">Farmer ID: {farmerProfile.id} • {farmerProfile.village}, {farmerProfile.district}, {farmerProfile.state}</p>
                   </div>
                 </div>
-              ))}
-            </div>
-            <div className="bg-[#f0f4ea] border border-[#71873f] rounded-xl p-4">
-              <h4 className="font-bold text-sm text-[#243118] mb-2">+ Declare New Crop</h4>
-              <div className="grid grid-cols-2 gap-3 text-xs">
-                <select className="border border-[#abbe99] rounded-xl p-2.5 bg-white font-mono text-[#243118] focus:outline-none">
-                  {CROPS.map(c => <option key={c}>{c}</option>)}
-                </select>
-                <input placeholder="Quantity (Qtl)" className="border border-[#abbe99] rounded-xl p-2.5 bg-white font-mono text-[#243118] focus:outline-none" />
-                <input placeholder="Khasra / Plot No." className="border border-[#abbe99] rounded-xl p-2.5 bg-white font-mono text-[#243118] focus:outline-none" />
-                <input placeholder="Sowing Date" type="date" className="border border-[#abbe99] rounded-xl p-2.5 bg-white font-mono text-[#243118] focus:outline-none" />
-              </div>
-              <button className="mt-3 bg-[#71873f] hover:bg-[#688557] text-white font-bold px-6 py-2 rounded-xl text-xs transition-all">Submit Declaration →</button>
-            </div>
-          </div>
-        )}
 
-        {/* SLOTS TAB */}
-        {activeTab === 'slots' && (
-          <div className="space-y-4">
-            <div className="bg-white rounded-2xl border border-[#abbe99] p-6">
-              <h3 className="font-extrabold text-base text-[#243118] mb-4">🎫 My Mandi Slots & QR Gate Passes</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 bg-[#f0f4ea] rounded-xl"><span className="text-[#637554]">Phone:</span> <strong className="text-[#243118]">{farmerProfile.phone}</strong></div>
+                  <div className="p-3 bg-[#f0f4ea] rounded-xl"><span className="text-[#637554]">Email:</span> <strong className="text-[#243118]">{farmerProfile.email}</strong></div>
+                  <div className="p-3 bg-[#f0f4ea] rounded-xl"><span className="text-[#637554]">Land Area:</span> <strong className="text-[#243118]">{farmerProfile.landArea}</strong></div>
+                  <div className="p-3 bg-[#f0f4ea] rounded-xl"><span className="text-[#637554]">Bank Account:</span> <strong className="text-emerald-800">{farmerProfile.bankAccount}</strong></div>
+                </div>
+
+                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-1 font-bold text-emerald-900">
+                  <div>✓ Aadhaar Identity Verified</div>
+                  <div>✓ PM-KISAN Land Holding Verified</div>
+                  <div>✓ NPCI-DBT Direct Bank Transfer Verified</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 3. MY FARMS */}
+          {activeTab === 'farms' && (
+            <div className="space-y-4 font-mono text-xs">
+              <h2 className="text-xl font-extrabold text-[#243118]">MY REGISTERED FARMS</h2>
+              <div className="grid md:grid-cols-2 gap-4">
+                {farms.map(f => (
+                  <div key={f.id} className="bg-white border border-[#abbe99]/60 rounded-2xl p-5 shadow-sm space-y-2">
+                    <div className="flex justify-between font-extrabold text-[#243118] text-sm">
+                      <span>{f.id} — {f.crop}</span>
+                      <span className="bg-[#71873f] text-white px-2.5 py-0.5 rounded text-[10px]">{f.season}</span>
+                    </div>
+                    <div className="text-[#637554]">Area: <strong>{f.area}</strong> • Location: {f.location}</div>
+                    <div className="text-[#637554]">Soil: {f.soil} • Irrigation: {f.irrigation}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 4. CREATE PRODUCE LOT */}
+          {activeTab === 'create_lot' && (
+            <div className="space-y-4 font-mono text-xs">
+              <h2 className="text-xl font-extrabold text-[#243118]">CREATE PRODUCE LOT</h2>
+              <form onSubmit={handleCreateLot} className="bg-white border border-[#abbe99]/60 rounded-2xl p-6 shadow-sm space-y-4 max-w-xl mx-auto">
+                <div className="space-y-1">
+                  <label className="font-bold">Select Crop Product</label>
+                  <select value={newLotCrop} onChange={e => setNewLotCrop(e.target.value)} className="w-full border border-[#abbe99] rounded-xl p-2.5 font-bold">
+                    <option value="Wheat">Wheat (Sharbati)</option>
+                    <option value="Paddy Basmati">Paddy (Basmati 1121)</option>
+                    <option value="Mustard">Mustard (Bold)</option>
+                    <option value="Chana">Chana (Desi)</option>
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="font-bold">Produce Quantity (KG)</label>
+                  <input type="number" value={newLotQty} onChange={e => setNewLotQty(e.target.value)} className="w-full border border-[#abbe99] rounded-xl p-2.5 font-bold" />
+                </div>
+                <button type="submit" className="w-full bg-[#71873f] text-white font-extrabold py-3 rounded-xl shadow-md">
+                  Submit Produce Lot & Generate Token →
+                </button>
+              </form>
+            </div>
+          )}
+
+          {/* 5. MY LOTS & TRACKING */}
+          {activeTab === 'lots' && (
+            <div className="space-y-4 font-mono text-xs">
+              <h2 className="text-xl font-extrabold text-[#243118]">MY PRODUCE LOTS & LIFECYCLE TRACKING</h2>
               <div className="space-y-3">
-                {farmerData.slots.map(s => (
-                  <div key={s.token} className="border border-[#abbe99] rounded-2xl p-4 flex items-center justify-between">
-                    <div className="font-mono text-xs space-y-1">
-                      <div className="font-extrabold text-sm text-[#243118]">Token #{s.token}</div>
-                      <div className="text-[#637554]">🏪 {s.mandi}</div>
-                      <div className="text-[#637554]">📅 {s.date} • ⏰ {s.time}</div>
-                      <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-extrabold ${s.status === 'CONFIRMED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>{s.status}</span>
+                {lots.map(l => (
+                  <div key={l.id} className="bg-white border border-[#abbe99]/60 rounded-2xl p-5 shadow-sm space-y-3">
+                    <div className="flex justify-between items-center">
+                      <div className="font-extrabold text-sm text-[#243118]">{l.id} — {l.product} ({l.qty})</div>
+                      <span className="bg-[#71873f] text-white font-bold px-3 py-1 rounded-lg">{l.status}</span>
                     </div>
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="w-20 h-20 bg-[#1a3010] rounded-xl flex items-center justify-center">
-                        <QrCode className="w-12 h-12 text-white" />
-                      </div>
-                      <button className="bg-[#71873f] text-white px-3 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1">
-                        <Download className="w-3 h-3" /> PDF
-                      </button>
+                    <div className="text-[#637554]">Mandi: {l.mandi} • Expected Value: <strong className="text-[#243118]">{l.estVal}</strong> • Grade: {l.grade}</div>
+                    <div className="flex items-center gap-2 pt-2 text-[10px] text-emerald-800 font-bold overflow-x-auto">
+                      <span>✓ Lot Created</span> ➔ <span>✓ Mandi Received</span> ➔ <span>✓ Weighment</span> ➔ <span>✓ Quality</span> ➔ <span>✓ Procurement</span> ➔ <span>✓ Payment</span>
                     </div>
                   </div>
                 ))}
               </div>
-              <button onClick={openGatePassWithAuth} className="w-full mt-4 bg-[#a36627] hover:bg-[#804d19] text-white font-bold py-3 rounded-xl text-sm transition-all">
-                📅 Book New Slot at Any Mandi Center →
-              </button>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* PAYMENTS TAB */}
-        {activeTab === 'payments' && (
-          <div className="bg-white rounded-2xl border border-[#abbe99] p-6 space-y-4">
-            <h3 className="font-extrabold text-base text-[#243118]">💳 DBT Payment Tracker</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 font-mono text-xs">
-              <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-xl">
-                <div className="text-emerald-700 font-bold uppercase text-[10px]">Total Received</div>
-                <div className="text-2xl font-extrabold text-emerald-900">₹4,36,500</div>
-                <div className="text-[10px] text-emerald-600">1 Transaction Cleared</div>
-              </div>
-              <div className="bg-amber-50 border border-amber-200 p-3 rounded-xl">
-                <div className="text-amber-700 font-bold uppercase text-[10px]">Pending Disbursement</div>
-                <div className="text-2xl font-extrabold text-amber-900">₹4,76,000</div>
-                <div className="text-[10px] text-amber-600">Mustard 80 Qtl • In Auction</div>
-              </div>
-              <div className="bg-sky-50 border border-sky-200 p-3 rounded-xl">
-                <div className="text-sky-700 font-bold uppercase text-[10px]">NPCI-DBT Status</div>
-                <div className="text-lg font-extrabold text-sky-900">99.97% SLA</div>
-                <div className="text-[10px] text-sky-600">Avg Credit: 36 Hours</div>
-              </div>
+          {/* FALLBACK FOR OTHER TABS */}
+          {!['dashboard', 'profile', 'farms', 'create_lot', 'lots'].includes(activeTab) && (
+            <div className="bg-white rounded-2xl border border-[#abbe99]/60 p-8 text-center space-y-3 shadow-sm font-mono">
+              <div className="w-12 h-12 bg-[#f0f4ea] text-[#71873f] rounded-full flex items-center justify-center mx-auto text-xl font-bold">🌾</div>
+              <h3 className="text-base font-extrabold text-[#243118] uppercase">{activeTab.replace('_', ' ')} Kisan Module</h3>
+              <p className="text-xs text-[#637554]">Farmer direct procurement, market prices, and DBT payment terminal active.</p>
             </div>
-            <div className="space-y-2">
-              {farmerData.payments.map(p => (
-                <div key={p.utr} className="flex justify-between items-center p-3 bg-[#fcfaf7] rounded-xl border border-[#abbe99]/60 text-xs font-mono">
-                  <div>
-                    <div className="font-bold text-[#243118]">{p.crop}</div>
-                    <div className="text-[#637554]">UTR: {p.utr} • {p.date}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-extrabold text-[#a36627]">{p.amt}</div>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${p.status === 'CREDITED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>{p.status}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+          )}
 
-        {/* PRICE CHECKER TAB */}
-        {activeTab === 'prices' && (
-          <div className="bg-white rounded-2xl border border-[#abbe99] p-6 space-y-4">
-            <h3 className="font-extrabold text-base text-[#243118]">📊 MSP vs Market Price Checker</h3>
-            <div className="flex flex-wrap gap-2">
-              {CROPS.map(c => (
-                <button key={c} onClick={() => setSelectedCrop(c)}
-                  className={`px-3 py-1 rounded-full text-[11px] font-bold border transition-all ${selectedCrop === c ? 'bg-[#71873f] text-white' : 'bg-white text-[#637554] border-[#abbe99] hover:border-[#71873f]'}`}>
-                  {c}
-                </button>
-              ))}
-            </div>
-            <div className="grid md:grid-cols-3 gap-4 font-mono text-xs">
-              <div className="bg-[#f0f4ea] border border-[#71873f] p-4 rounded-xl text-center">
-                <div className="text-[10px] text-[#637554] font-bold uppercase">GOI MSP Rate</div>
-                <div className="text-3xl font-extrabold text-[#243118]">₹{(MSP[selectedCrop] || 2425).toLocaleString('en-IN')}</div>
-                <div className="text-[10px] text-[#71873f]">per Quintal (2025–26)</div>
-              </div>
-              <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl text-center">
-                <div className="text-[10px] text-amber-700 font-bold uppercase">Current Mandi Rate</div>
-                <div className="text-3xl font-extrabold text-amber-900">₹{((MSP[selectedCrop] || 2425) + Math.floor(Math.random() * 200 + 50)).toLocaleString('en-IN')}</div>
-                <div className="text-[10px] text-amber-600">Karnal APMC • Live</div>
-              </div>
-              <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-center">
-                <div className="text-[10px] text-emerald-700 font-bold uppercase">Best Buyer Offer</div>
-                <div className="text-3xl font-extrabold text-emerald-900">₹{((MSP[selectedCrop] || 2425) + Math.floor(Math.random() * 250 + 100)).toLocaleString('en-IN')}</div>
-                <div className="text-[10px] text-emerald-600">Punjab Agri Corp (48h valid)</div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* TRACEABILITY TAB */}
-        {activeTab === 'trace' && (
-          <div className="bg-white rounded-2xl border border-[#abbe99] p-6 space-y-4">
-            <h3 className="font-extrabold text-base text-[#243118]">🔗 Crop Blockchain Traceability Journey</h3>
-            <div className="space-y-0">
-              {[
-                { step: 1, title: 'Farm Origin Declared', detail: 'Khasra 48/2, Karnal, HR — Gurpreet Singh', hash: '0x4f82...1a2b', ts: '01-Sep-2025 06:00 AM', done: true },
-                { step: 2, title: 'Mandi Slot Booked', detail: 'Karnal Central Yard, Lane 4 — Token #HR-KRN-4829', hash: '0x8c14...9d3e', ts: '04-Sep-2025 10:12 AM', done: true },
-                { step: 3, title: 'AI Quality Assay Passed', detail: 'NIR: 10.8% Moisture — Grade A FAQ', hash: '0xe7a2...4f1c', ts: '08-Sep-2025 11:02 AM', done: true },
-                { step: 4, title: 'Weighment Recorded', detail: 'Net: 5,800 kg (58 Qtl) — Tola Parchi TP-KRN-4829', hash: '0x2b91...8e4d', ts: '08-Sep-2025 11:45 AM', done: true },
-                { step: 5, title: 'Accepted by Buyer', detail: 'Punjab Agri Corp — eNAM Contract #NC-4829', hash: '0x1d4f...3c8a', ts: '08-Sep-2025 01:20 PM', done: true },
-                { step: 6, title: 'DBT Credited to Bank', detail: 'SBI A/C XXXX4892 — ₹4,36,500 — UTR SBIN0048291', hash: '0x9e3c...7b2f', ts: '10-Sep-2025 09:30 AM', done: true },
-              ].map((s, i, arr) => (
-                <div key={i} className="flex gap-3">
-                  <div className="flex flex-col items-center">
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-white font-extrabold text-xs shadow ${s.done ? 'bg-[#71873f]' : 'bg-[#abbe99]'}`}>{s.step}</div>
-                    {i < arr.length - 1 && <div className="w-0.5 h-10 bg-[#abbe99]"></div>}
-                  </div>
-                  <div className="pb-5 text-xs font-mono">
-                    <div className="font-extrabold text-[#243118]">{s.title}</div>
-                    <div className="text-[#637554]">{s.detail}</div>
-                    <div className="flex gap-3 mt-0.5 flex-wrap">
-                      <span className="text-emerald-700 font-bold">{s.hash}</span>
-                      <span className="text-[#637554] text-[10px]">{s.ts}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        </main>
       </div>
-    </section>
+    </div>
   );
 }

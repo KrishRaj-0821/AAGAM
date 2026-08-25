@@ -1,256 +1,504 @@
 import React, { useState } from 'react';
-import { ChevronLeft, Users, ShieldCheck, Database, Activity, Server, Bell } from 'lucide-react';
+import { 
+  ChevronLeft, Users, ShieldCheck, Database, Activity, Server, Bell, 
+  Settings, Lock, MapPin, Building2, Warehouse, Sprout, Gavel, FileText, 
+  AlertTriangle, RefreshCw, CheckCircle2, XCircle, Search, Filter, Plus, 
+  Edit3, Trash2, Eye, ShieldAlert, Key, Download, Upload, Zap, Globe, DollarSign
+} from 'lucide-react';
 
 export default function AdminPortalPage({ setCurrentView, currentUser, t }) {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRoleFilter, setSelectedRoleFilter] = useState('All');
+  const [selectedStateFilter, setSelectedStateFilter] = useState('All');
 
-  const tabs = [
-    { key: 'dashboard', label: '⚙️ Admin Dashboard', hi: 'एडमिन डैशबोर्ड' },
-    { key: 'users', label: '👥 User Management', hi: 'उपयोगकर्ता प्रबंधन' },
-    { key: 'msp', label: '📋 MSP Policy', hi: 'एमएसपी नीति' },
-    { key: 'system', label: '🖥️ System Health', hi: 'सिस्टम स्वास्थ्य' },
-    { key: 'security', label: '🔐 Security & Audit', hi: 'सुरक्षा ऑडिट' },
-    { key: 'notifications', label: '🔔 Notifications', hi: 'अधिसूचनाएं' },
-  ];
+  // Interactive mock state for Users
+  const [users, setUsers] = useState([
+    { id: 'USR-1001', name: 'Gurpreet Singh', role: 'Farmer', state: 'Haryana', district: 'Karnal', status: 'ACTIVE', verified: true, phone: '+91 98765 43210', email: 'gurpreet@kisan.in', lastActive: '10 mins ago' },
+    { id: 'USR-1002', name: 'Punjab Agri Corp', role: 'Buyer', state: 'Punjab', district: 'Ludhiana', status: 'ACTIVE', verified: true, phone: '+91 98123 45678', email: 'trade@punjabagri.com', lastActive: '2 mins ago' },
+    { id: 'USR-1003', name: 'Rajesh Kumar', role: 'Officer', state: 'Haryana', district: 'Karnal', status: 'ACTIVE', verified: true, phone: '+91 94160 12345', email: 'rajesh.dpo@gov.in', lastActive: '1 hour ago' },
+    { id: 'USR-1004', name: 'Rakesh Verma', role: 'Operator', state: 'Haryana', district: 'Karnal', status: 'ACTIVE', verified: true, phone: '+91 98960 54321', email: 'rakesh.op@apmc.gov.in', lastActive: '5 mins ago' },
+    { id: 'USR-1005', name: 'Dr. Anita Roy', role: 'Quality Inspector', state: 'Punjab', district: 'Khanna', status: 'ACTIVE', verified: true, phone: '+91 97110 98765', email: 'anita.icar@gov.in', lastActive: '25 mins ago' },
+    { id: 'USR-1006', name: 'Deepak Sharma', role: 'Warehouse Manager', state: 'Haryana', district: 'Karnal', status: 'ACTIVE', verified: true, phone: '+91 98100 11223', email: 'deepak.fci@gov.in', lastActive: '12 mins ago' },
+    { id: 'USR-1007', name: 'Vikramaditya Rao', role: 'Farmer', state: 'Rajasthan', district: 'Bharatpur', status: 'SUSPENDED', verified: false, phone: '+91 99880 77665', email: 'vikram@yahoo.com', lastActive: '3 days ago' },
+    { id: 'USR-1008', name: 'Maneesh Traders', role: 'Buyer', state: 'Maharashtra', district: 'Latur', status: 'PENDING_APPROVAL', verified: false, phone: '+91 98220 33445', email: 'maneeshtraders@gmail.com', lastActive: 'Just registered' },
+  ]);
 
-  const MSP_DATA = [
-    { crop: 'Wheat (Common)', msp: 2425, prev: 2275, season: 'Rabi 2025-26' },
-    { crop: 'Mustard (Bold)', msp: 5950, prev: 5650, season: 'Rabi 2025-26' },
-    { crop: 'Chana (Desi)', msp: 5650, prev: 5440, season: 'Rabi 2025-26' },
-    { crop: 'Paddy (Common)', msp: 2300, prev: 2183, season: 'Kharif 2025' },
-    { crop: 'Soyabean (Yellow)', msp: 4892, prev: 4600, season: 'Kharif 2025' },
-    { crop: 'Cotton (Long)', msp: 7521, prev: 7020, season: 'Kharif 2025' },
-    { crop: 'Maize', msp: 2225, prev: 2090, season: 'Kharif 2025' },
-    { crop: 'Tur (Arhar)', msp: 7550, prev: 7000, season: 'Kharif 2025' },
-  ];
+  // Interactive mock state for Crop Master
+  const [crops, setCrops] = useState([
+    { code: 'CRP-WHT', name: 'Wheat', category: 'Cereals', variety: 'Sharbati / FAQ', msp: 2425, unit: 'Quintal', active: true, season: 'Rabi' },
+    { code: 'CRP-RCE', name: 'Rice / Paddy', category: 'Cereals', variety: 'Basmati 1121', msp: 2300, unit: 'Quintal', active: true, season: 'Kharif' },
+    { code: 'CRP-MZE', name: 'Maize', category: 'Coarse Grains', variety: 'Yellow Hybrid', msp: 2225, unit: 'Quintal', active: true, season: 'Kharif' },
+    { code: 'CRP-POT', name: 'Potato', category: 'Vegetables', variety: 'Kufri Jyoti', msp: 1250, unit: 'Quintal', active: true, season: 'Rabi' },
+    { code: 'CRP-ONN', name: 'Onion', category: 'Vegetables', variety: 'Nashik Red', msp: 1650, unit: 'Quintal', active: true, season: 'Rabi' },
+    { code: 'CRP-PLS', name: 'Pulses (Chana)', category: 'Pulses', variety: 'Desi Bold', msp: 5650, unit: 'Quintal', active: true, season: 'Rabi' },
+  ]);
 
-  const SERVICES = [
-    { name: 'AAGAM Core API Gateway', uptime: '99.99%', status: 'HEALTHY', latency: '82ms' },
-    { name: 'NPCI DBT Bridge', uptime: '99.97%', status: 'HEALTHY', latency: '142ms' },
-    { name: 'AgriStack Aadhaar e-KYC', uptime: '99.95%', status: 'HEALTHY', latency: '210ms' },
-    { name: 'Agmarknet Price Feed', uptime: '99.80%', status: 'HEALTHY', latency: '55ms' },
-    { name: 'SMS/WhatsApp Gateway', uptime: '99.94%', status: 'HEALTHY', latency: '95ms' },
-    { name: 'PostgreSQL DB Cluster', uptime: '100%', status: 'HEALTHY', latency: '12ms' },
-    { name: 'Redis Cache Layer', uptime: '99.99%', status: 'HEALTHY', latency: '4ms' },
-    { name: 'NIC Cloud CDN (Akamai)', uptime: '99.99%', status: 'HEALTHY', latency: '28ms' },
+  // Interactive mock state for Mandis
+  const [mandis, setMandis] = useState([
+    { id: 'MND-HR-01', name: 'Karnal Central Yard', state: 'Haryana', district: 'Karnal', operator: 'Rakesh Verma', status: 'OPERATIONAL', cap: '2,000 MT' },
+    { id: 'MND-PB-04', name: 'Khanna APMC Mandi', state: 'Punjab', district: 'Ludhiana', operator: 'Sardar Harpreet Singh', status: 'OPERATIONAL', cap: '3,500 MT' },
+    { id: 'MND-RJ-08', name: 'Bharatpur APMC Yard', state: 'Rajasthan', district: 'Bharatpur', operator: 'Mohan Lal Saini', status: 'OPERATIONAL', cap: '1,800 MT' },
+    { id: 'MND-MH-12', name: 'Latur Grain Yard', state: 'Maharashtra', district: 'Latur', operator: 'Sanjay Deshmukh', status: 'MAINTENANCE', cap: '2,200 MT' },
+  ]);
+
+  // Interactive Audit Trail Logs (Tamper-Resistant)
+  const [auditLogs, setAuditLogs] = useState([
+    { id: 'AUD-9982', user: 'Admin_001', role: 'System Admin', action: 'Changed Procurement Price', record: 'Wheat (CRP-WHT)', oldVal: '₹2,400', newVal: '₹2,425', time: '25 Aug 2026, 10:42 PM', ip: '10.0.4.12 (GOI NIC Net)' },
+    { id: 'AUD-9981', user: 'Admin_001', role: 'System Admin', action: 'Approved Buyer Account', record: 'Punjab Agri Corp', oldVal: 'PENDING_APPROVAL', newVal: 'ACTIVE', time: '25 Aug 2026, 09:15 PM', ip: '10.0.4.12 (GOI NIC Net)' },
+    { id: 'AUD-9980', user: 'Admin_002', role: 'System Admin', action: 'Suspended Account', record: 'Vikramaditya Rao (USR-1007)', oldVal: 'ACTIVE', newVal: 'SUSPENDED', time: '25 Aug 2026, 06:30 PM', ip: '10.0.4.18 (GOI NIC Net)' },
+    { id: 'AUD-9979', user: 'System Auto', role: 'Security Bot', action: 'Failed Login Threshold Exceeded', record: 'IP 103.21.44.12', oldVal: 'Allowed', newVal: 'Blocked IP', time: '25 Aug 2026, 04:12 PM', ip: '103.21.44.12 (External)' },
+  ]);
+
+  // Handlers for user state manipulation
+  const toggleUserStatus = (userId) => {
+    setUsers(prev => prev.map(u => {
+      if (u.id === userId) {
+        const nextStatus = u.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
+        // Append to audit log
+        setAuditLogs(logs => [{
+          id: `AUD-${Math.floor(1000 + Math.random() * 9000)}`,
+          user: currentUser?.name || 'Admin_001',
+          role: 'System Admin',
+          action: nextStatus === 'ACTIVE' ? 'Activated User' : 'Suspended User',
+          record: `${u.name} (${u.id})`,
+          oldVal: u.status,
+          newVal: nextStatus,
+          time: new Date().toLocaleString('en-IN'),
+          ip: '10.0.4.12 (GOI NIC Net)'
+        }, ...logs]);
+        return { ...u, status: nextStatus };
+      }
+      return u;
+    }));
+  };
+
+  const resetUserPassword = (userName) => {
+    alert(`🔑 Password reset link dispatched to ${userName}'s registered email & mobile!`);
+  };
+
+  // Nav Items list matching user requirement
+  const navItems = [
+    { key: 'dashboard', label: '📊 Dashboard', icon: Activity },
+    { key: 'users', label: '👥 User Management', icon: Users },
+    { key: 'rbac', label: '🔑 Roles & Permissions', icon: Key },
+    { key: 'staff', label: '🏛️ Staff & Org Management', icon: ShieldCheck },
+    { key: 'farmer_verify', label: '🌾 Farmer Verification', icon: CheckCircle2 },
+    { key: 'buyer_verify', label: '💼 Buyer Verification', icon: Gavel },
+    { key: 'mandi', label: '🏪 Mandi Management', icon: Building2 },
+    { key: 'warehouse', label: '🏭 Warehouse Management', icon: Warehouse },
+    { key: 'crops', label: '🌱 Product & Crop Master', icon: Sprout },
+    { key: 'geo', label: '🗺️ Geographic Master Data', icon: MapPin },
+    { key: 'pricing', label: '💰 Price Config & Rules', icon: DollarSign },
+    { key: 'notifications', label: '🔔 Notification Center', icon: Bell },
+    { key: 'system_config', label: '⚙️ System Configuration', icon: Settings },
+    { key: 'security', label: '🔐 Security & Access Control', icon: Lock },
+    { key: 'audit', label: '📜 Tamper-Proof Audit Logs', icon: FileText },
+    { key: 'data', label: '💾 Data & Backup Control', icon: Database },
+    { key: 'analytics', label: '📈 Global Analytics', icon: Zap },
   ];
 
   return (
-    <section className="min-h-screen bg-[#f3f0fb] py-8 px-4">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div className="min-h-screen bg-[#f3f0fb] flex flex-col font-sans text-[#243118]">
 
-        <div className="bg-gradient-to-r from-[#1c1464] to-[#2c1e82] rounded-3xl p-6 text-white flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button onClick={() => setCurrentView('home')} className="bg-white/10 hover:bg-white/20 p-2 rounded-xl"><ChevronLeft className="w-5 h-5" /></button>
-            <div className="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center text-2xl shadow-lg">⚙️</div>
-            <div>
-              <h1 className="text-2xl font-extrabold">System Admin Portal</h1>
-              <p className="text-sm text-indigo-200">{currentUser?.name || 'Sysadmin'} • GOI AAGAM Root Access • NIC MeitY Tier-4</p>
-            </div>
-          </div>
-          <div className="text-right hidden md:block font-mono text-sm">
-            <div className="text-indigo-200">Platform: <span className="text-white font-bold">99.99% Uptime</span></div>
-            <div className="text-indigo-200">Users: <span className="text-white font-bold">4.2 Cr Registered</span></div>
-          </div>
+      {/* Top Banner Notice */}
+      <div className="bg-[#1c1464] text-white px-4 py-2 text-xs font-mono flex items-center justify-between border-b border-indigo-900">
+        <div className="flex items-center gap-2">
+          <span className="bg-red-600 text-white font-extrabold px-2 py-0.5 rounded text-[10px] animate-pulse">RESTRICTED ACCESS</span>
+          <span>AAGAM GOI System Administrator Governance Control Panel • Tier-4 MeitY Security</span>
         </div>
+        <div className="flex items-center gap-4 text-[11px]">
+          <span>Logged in as: <strong className="text-amber-300">{currentUser?.name || 'System Admin'}</strong></span>
+          <span className="text-emerald-400">MFA Enforced ✓</span>
+        </div>
+      </div>
 
-        <div className="flex overflow-x-auto gap-2 pb-1">
-          {tabs.map(tab => (
-            <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-              className={`px-4 py-2.5 rounded-xl font-bold text-xs whitespace-nowrap transition-all ${activeTab === tab.key ? 'bg-indigo-700 text-white shadow-md' : 'bg-white text-[#243118] border border-[#abbe99] hover:bg-indigo-50'}`}>
-              {t(tab.label, tab.hi)}
+      <div className="flex flex-1 overflow-hidden">
+
+        {/* Sidebar Navigation */}
+        <aside className="w-64 bg-[#140e48] text-slate-200 p-4 space-y-1 overflow-y-auto shrink-0 border-r border-indigo-900 shadow-xl">
+          <div className="px-3 py-2 text-[10px] font-mono font-bold text-amber-400 uppercase tracking-wider border-b border-indigo-800/80 mb-2">
+            ADMIN NAVIGATION DIRECTORY
+          </div>
+
+          {navItems.map(item => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.key;
+            return (
+              <button
+                key={item.key}
+                onClick={() => setActiveTab(item.key)}
+                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-bold text-xs transition-all text-left ${
+                  isActive 
+                    ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/30' 
+                    : 'hover:bg-indigo-900/60 text-slate-300 hover:text-white'
+                }`}
+              >
+                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-indigo-400'}`} />
+                <span className="truncate">{item.label}</span>
+              </button>
+            );
+          })}
+
+          <div className="pt-4 border-t border-indigo-800/80 mt-4">
+            <button
+              onClick={() => setCurrentView('home')}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 font-bold text-xs transition-all"
+            >
+              <ChevronLeft className="w-4 h-4 text-amber-400" />
+              <span>Back to Portal Home</span>
             </button>
-          ))}
-        </div>
+          </div>
+        </aside>
 
-        {/* DASHBOARD */}
-        {activeTab === 'dashboard' && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[
-                { label: 'Total Users', val: '4.2 Cr', sub: '1.28L active today', color: 'indigo', icon: '👥' },
-                { label: 'Procurement Today', val: '14,800 MT', sub: '82.4% of national target', color: 'emerald', icon: '🌾' },
-                { label: 'DBT Disbursed', val: '₹42.8 Cr', sub: '0 SLA breaches', color: 'amber', icon: '💳' },
-                { label: 'System Security', val: '0 Breaches', sub: '4,820 logins monitored', color: 'sky', icon: '🔐' },
-              ].map(c => (
-                <div key={c.label} className={`bg-${c.color}-50 border border-${c.color}-200 p-4 rounded-2xl`}>
-                  <div className="text-2xl mb-1">{c.icon}</div>
-                  <div className={`text-xl font-extrabold text-${c.color}-900`}>{c.val}</div>
-                  <div className={`text-[11px] font-bold text-${c.color}-700`}>{c.label}</div>
-                  <div className={`text-[10px] text-${c.color}-600 mt-0.5`}>{c.sub}</div>
+        {/* Main Content Workspace */}
+        <main className="flex-1 p-6 overflow-y-auto bg-[#f8f6fc]">
+
+          {/* 1. DASHBOARD */}
+          {activeTab === 'dashboard' && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center border-b border-indigo-200 pb-4">
+                <div>
+                  <h2 className="text-xl font-extrabold text-[#140e48]">SYSTEM ADMIN DASHBOARD</h2>
+                  <p className="text-xs text-[#637554]">Global platform governance & high-level system overview</p>
                 </div>
-              ))}
-            </div>
-            <div className="grid md:grid-cols-2 gap-4 text-xs font-mono">
-              <div className="bg-white rounded-2xl border border-[#abbe99] p-4">
-                <h4 className="font-extrabold text-[#243118] mb-2">Quick Stats</h4>
+                <span className="bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-mono font-bold px-3 py-1 rounded-full">
+                  All 8 Core Microservices Operational
+                </span>
+              </div>
+
+              {/* 6 Key Overview Metric Cards */}
+              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                 {[
-                  ['Total Farmers Registered', '4.2 Crore'],
-                  ['Buyers Licensed (eNAM)', '48,200'],
-                  ['Procurement Centers', '2,840 Active'],
-                  ['Warehouses (WDRA)', '1,480 Certified'],
-                  ['API Request Rate', '12,480/min'],
-                  ['DB Transactions/sec', '2,840 TPS'],
-                ].map(([k, v]) => (
-                  <div key={k} className="flex justify-between py-1.5 border-b border-[#abbe99]/40">
-                    <span className="text-[#637554]">{k}:</span>
-                    <span className="font-bold text-[#243118]">{v}</span>
+                  { label: 'Total Farmers', val: '1,25,420', sub: '100% Aadhaar Verified', color: 'indigo', icon: Users },
+                  { label: 'Total Buyers', val: '8,542', sub: 'eNAM Licensed', color: 'amber', icon: Gavel },
+                  { label: 'Total Procurement', val: '₹245 Cr', sub: 'Current Season', color: 'emerald', icon: DollarSign },
+                  { label: 'Active Mandis', val: '342', sub: 'Across 36 States/UTs', color: 'sky', icon: Building2 },
+                  { label: 'Warehouses', val: '186', sub: 'WDRA Registered', color: 'purple', icon: Warehouse },
+                  { label: 'Active Staff', val: '2,450', sub: 'Officers & Inspectors', color: 'rose', icon: ShieldCheck },
+                ].map(card => {
+                  const CIcon = card.icon;
+                  return (
+                    <div key={card.label} className="bg-white border border-indigo-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="text-[10px] font-extrabold uppercase text-[#637554] font-mono">{card.label}</span>
+                        <CIcon className="w-4 h-4 text-indigo-600" />
+                      </div>
+                      <div className="text-xl font-extrabold text-[#140e48]">{card.val}</div>
+                      <div className="text-[10px] text-[#637554] mt-1 font-mono">{card.sub}</div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* System Alerts & Notifications */}
+              <div className="bg-white rounded-2xl border border-indigo-100 p-5 shadow-sm space-y-3">
+                <h3 className="font-extrabold text-sm text-[#140e48] flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-500" />
+                  <span>SYSTEM ALERTS & REQUIRING ATTENTION</span>
+                </h3>
+                <div className="grid md:grid-cols-2 gap-3 text-xs font-mono">
+                  <div className="bg-amber-50 border border-amber-200 p-3.5 rounded-xl space-y-1">
+                    <div className="font-bold text-amber-900 flex justify-between">
+                      <span>⚠️ Pending Verifications</span>
+                      <span className="bg-amber-200 text-amber-800 px-2 py-0.5 rounded text-[10px]">142 Pending</span>
+                    </div>
+                    <p className="text-amber-800 text-[11px]">84 Farmers & 58 Buyers awaiting document verification approval.</p>
+                    <button onClick={() => setActiveTab('farmer_verify')} className="text-amber-900 font-extrabold underline text-[11px] mt-1 inline-block">Review Pending Queue →</button>
+                  </div>
+
+                  <div className="bg-red-50 border border-red-200 p-3.5 rounded-xl space-y-1">
+                    <div className="font-bold text-red-900 flex justify-between">
+                      <span>🚨 Suspicious Accounts</span>
+                      <span className="bg-red-200 text-red-800 px-2 py-0.5 rounded text-[10px]">3 Flagged</span>
+                    </div>
+                    <p className="text-red-800 text-[11px]">Multiple failed login attempts detected from unrecognized IP ranges.</p>
+                    <button onClick={() => setActiveTab('security')} className="text-red-900 font-extrabold underline text-[11px] mt-1 inline-block">Inspect Security Logs →</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 2. USER MANAGEMENT */}
+          {activeTab === 'users' && (
+            <div className="space-y-4">
+              <div className="flex flex-wrap justify-between items-center gap-3 border-b border-indigo-200 pb-4">
+                <div>
+                  <h2 className="text-xl font-extrabold text-[#140e48]">USER MANAGEMENT CONTROL</h2>
+                  <p className="text-xs text-[#637554]">View, search, filter, activate, suspend or reset all platform user accounts</p>
+                </div>
+                <button className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2 shadow-sm">
+                  <Plus className="w-4 h-4" /> Create New User Account
+                </button>
+              </div>
+
+              {/* Filters & Search */}
+              <div className="bg-white p-3.5 rounded-2xl border border-indigo-100 flex flex-wrap items-center gap-3 text-xs font-mono shadow-sm">
+                <div className="flex items-center gap-2 bg-[#f4f6fb] px-3 py-1.5 rounded-xl border border-indigo-200 flex-1 min-w-[200px]">
+                  <Search className="w-3.5 h-3.5 text-indigo-600" />
+                  <input
+                    type="text"
+                    placeholder="Search name, phone, email, ID..."
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                    className="bg-transparent text-[#140e48] focus:outline-none w-full font-bold"
+                  />
+                </div>
+                <select
+                  value={selectedRoleFilter}
+                  onChange={e => setSelectedRoleFilter(e.target.value)}
+                  className="bg-[#f4f6fb] border border-indigo-200 rounded-xl px-3 py-1.5 font-bold text-[#140e48]"
+                >
+                  <option value="All">All Roles</option>
+                  <option value="Farmer">Farmer</option>
+                  <option value="Buyer">Buyer</option>
+                  <option value="Officer">Officer</option>
+                  <option value="Operator">Operator</option>
+                  <option value="Quality Inspector">Quality Inspector</option>
+                  <option value="Warehouse Manager">Warehouse Manager</option>
+                </select>
+              </div>
+
+              {/* Users Table */}
+              <div className="bg-white rounded-2xl border border-indigo-100 overflow-hidden shadow-sm">
+                <table className="w-full text-left text-xs font-mono">
+                  <thead className="bg-[#140e48] text-white">
+                    <tr>
+                      <th className="p-3">User ID & Name</th>
+                      <th className="p-3">Role</th>
+                      <th className="p-3">Location</th>
+                      <th className="p-3">Status</th>
+                      <th className="p-3">Verification</th>
+                      <th className="p-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-indigo-50">
+                    {users
+                      .filter(u => selectedRoleFilter === 'All' || u.role === selectedRoleFilter)
+                      .filter(u => u.name.toLowerCase().includes(searchTerm.toLowerCase()) || u.id.toLowerCase().includes(searchTerm.toLowerCase()))
+                      .map(u => (
+                        <tr key={u.id} className="hover:bg-indigo-50/40">
+                          <td className="p-3">
+                            <div className="font-extrabold text-[#140e48]">{u.name}</div>
+                            <div className="text-[10px] text-[#637554]">{u.id} • {u.email}</div>
+                          </td>
+                          <td className="p-3 font-bold text-indigo-900">{u.role}</td>
+                          <td className="p-3 text-[#637554]">{u.district}, {u.state}</td>
+                          <td className="p-3">
+                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${u.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-800' : u.status === 'SUSPENDED' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'}`}>
+                              {u.status}
+                            </span>
+                          </td>
+                          <td className="p-3">
+                            {u.verified ? <span className="text-emerald-700 font-bold">✓ Verified</span> : <span className="text-amber-700 font-bold">⏳ Pending</span>}
+                          </td>
+                          <td className="p-3 text-right space-x-2">
+                            <button onClick={() => toggleUserStatus(u.id)} className={`px-2.5 py-1 rounded-lg text-[10px] font-bold ${u.status === 'ACTIVE' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
+                              {u.status === 'ACTIVE' ? 'Suspend' : 'Activate'}
+                            </button>
+                            <button onClick={() => resetUserPassword(u.name)} className="bg-indigo-50 text-indigo-700 border border-indigo-200 px-2.5 py-1 rounded-lg text-[10px] font-bold">
+                              Reset Pwd
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* 3. ROLES & PERMISSIONS (RBAC) */}
+          {activeTab === 'rbac' && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-extrabold text-[#140e48]">ROLE-BASED ACCESS CONTROL (RBAC) MATRIX</h2>
+              <div className="bg-white rounded-2xl border border-indigo-100 p-4 shadow-sm overflow-x-auto">
+                <table className="w-full text-xs font-mono border-collapse">
+                  <thead>
+                    <tr className="bg-[#140e48] text-white text-left">
+                      <th className="p-3">Portal Feature / Resource</th>
+                      <th className="p-3">Farmer</th>
+                      <th className="p-3">Buyer</th>
+                      <th className="p-3">Officer</th>
+                      <th className="p-3">Operator</th>
+                      <th className="p-3">Inspector</th>
+                      <th className="p-3">Warehouse</th>
+                      <th className="p-3 bg-amber-600 text-white">System Admin</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-indigo-100">
+                    {[
+                      { res: 'Own Produce & Gate Pass Booking', f: 'Read/Write', b: 'No', o: 'Read', op: 'Read', i: 'No', w: 'No', a: 'Full Access' },
+                      { res: 'E-Auction Bidding & Bids', f: 'Read', b: 'Read/Write', o: 'Read', op: 'No', i: 'No', w: 'No', a: 'Full Access' },
+                      { res: 'Farmer KYC Approval Queue', f: 'No', b: 'No', o: 'Approve/Reject', op: 'No', i: 'No', w: 'No', a: 'Full Access' },
+                      { res: 'Weighment & Gate Entry', f: 'No', b: 'No', o: 'Read', op: 'Read/Write', i: 'No', w: 'No', a: 'Full Access' },
+                      { res: 'NIR Quality Assay Entry', f: 'No', b: 'No', o: 'Read', op: 'No', i: 'Read/Write', w: 'No', a: 'Full Access' },
+                      { res: 'Stock Inward & e-NWR', f: 'No', b: 'No', o: 'Read', op: 'No', i: 'No', w: 'Read/Write', a: 'Full Access' },
+                      { res: 'System Config & Master Data', f: 'DENIED', b: 'DENIED', o: 'DENIED', op: 'DENIED', i: 'DENIED', w: 'DENIED', a: 'EXCLUSIVE CONTROL' },
+                      { res: 'Tamper-Proof Audit Logs', f: 'DENIED', b: 'DENIED', o: 'DENIED', op: 'DENIED', i: 'DENIED', w: 'DENIED', a: 'READ ONLY (LOCKED)' },
+                    ].map((row, idx) => (
+                      <tr key={idx} className="hover:bg-indigo-50/50">
+                        <td className="p-3 font-bold text-[#140e48]">{row.res}</td>
+                        <td className="p-3">{row.f}</td>
+                        <td className="p-3">{row.b}</td>
+                        <td className="p-3">{row.o}</td>
+                        <td className="p-3">{row.op}</td>
+                        <td className="p-3">{row.i}</td>
+                        <td className="p-3">{row.w}</td>
+                        <td className="p-3 font-extrabold text-amber-700 bg-amber-50">{row.a}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* 4. FARMER & BUYER VERIFICATION */}
+          {(activeTab === 'farmer_verify' || activeTab === 'buyer_verify') && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-extrabold text-[#140e48]">
+                {activeTab === 'farmer_verify' ? '🌾 FARMER ACCOUNT VERIFICATION QUEUE' : '💼 BUYER & TRADER LICENSE VERIFICATION'}
+              </h2>
+              <div className="space-y-3">
+                {users.filter(u => u.status === 'PENDING_APPROVAL' || !u.verified).map(u => (
+                  <div key={u.id} className="bg-white border border-indigo-100 rounded-2xl p-4 flex flex-wrap justify-between items-center gap-3 shadow-sm font-mono text-xs">
+                    <div>
+                      <div className="font-extrabold text-sm text-[#140e48]">{u.name} ({u.id})</div>
+                      <div className="text-[#637554]">Role: {u.role} • Location: {u.district}, {u.state}</div>
+                      <div className="text-[#637554]">Contact: {u.phone} • {u.email}</div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={() => { alert(`✓ Account ${u.id} Verified & Approved!`); toggleUserStatus(u.id); }} className="bg-emerald-600 text-white font-bold px-4 py-2 rounded-xl">Approve</button>
+                      <button onClick={() => alert(`✗ Account ${u.id} Rejected.`)} className="bg-red-50 text-red-700 border border-red-200 font-bold px-4 py-2 rounded-xl">Reject</button>
+                    </div>
                   </div>
                 ))}
               </div>
-              <div className="bg-white rounded-2xl border border-[#abbe99] p-4">
-                <h4 className="font-extrabold text-[#243118] mb-2">Recent Admin Actions</h4>
-                <div className="space-y-2">
-                  {[
-                    { action: 'MSP Updated — Wheat ₹2,425 effective', time: '1h ago', type: 'policy' },
-                    { action: 'New Center Added — Vijayawada APMC, AP', time: '2h ago', type: 'center' },
-                    { action: 'Farmer Account Deactivated (Fraud) — ID: RJ-88210', time: '3h ago', type: 'security' },
-                    { action: 'SMS Gateway Failover Test — All 36 States', time: '5h ago', type: 'system' },
-                  ].map(a => (
-                    <div key={a.action} className="flex justify-between p-2 bg-[#fcfaf7] rounded-xl border border-[#abbe99]/60">
-                      <span className="text-[#243118] font-bold truncate max-w-[200px]">{a.action}</span>
-                      <span className="text-[#637554] text-[10px] shrink-0 ml-2">{a.time}</span>
+            </div>
+          )}
+
+          {/* 5. CROP MASTER DATA */}
+          {activeTab === 'crops' && (
+            <div className="space-y-4">
+              <div className="flex justify-between items-center border-b border-indigo-200 pb-4">
+                <h2 className="text-xl font-extrabold text-[#140e48]">PRODUCT & CROP MASTER DATA</h2>
+                <button className="bg-indigo-700 text-white font-bold px-4 py-2 rounded-xl text-xs">+ Add New Crop</button>
+              </div>
+              <div className="bg-white rounded-2xl border border-indigo-100 p-4 shadow-sm font-mono text-xs">
+                <table className="w-full text-left">
+                  <thead className="bg-[#140e48] text-white">
+                    <tr>
+                      <th className="p-3">Code & Name</th>
+                      <th className="p-3">Category</th>
+                      <th className="p-3">Variety</th>
+                      <th className="p-3">Official MSP</th>
+                      <th className="p-3">Season</th>
+                      <th className="p-3">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-indigo-100">
+                    {crops.map(c => (
+                      <tr key={c.code}>
+                        <td className="p-3 font-bold">{c.name} ({c.code})</td>
+                        <td className="p-3">{c.category}</td>
+                        <td className="p-3">{c.variety}</td>
+                        <td className="p-3 font-extrabold text-amber-700">₹{c.msp}/Qtl</td>
+                        <td className="p-3">{c.season}</td>
+                        <td className="p-3"><span className="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">Active</span></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* 6. PRICE CONFIGURATION & RULES */}
+          {activeTab === 'pricing' && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-extrabold text-[#140e48]">SYSTEM PRICE CONFIGURATION & RULES</h2>
+              <div className="bg-white rounded-2xl border border-indigo-100 p-5 font-mono text-xs space-y-3 shadow-sm">
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 font-bold">
+                  ⚠️ System-wide MSP price changes require cabinet approval authorization & generate immutable audit log entries.
+                </div>
+                <div className="grid md:grid-cols-2 gap-3">
+                  {crops.map(c => (
+                    <div key={c.code} className="p-3 bg-[#f8f6fc] border border-indigo-100 rounded-xl flex justify-between items-center">
+                      <div>
+                        <div className="font-extrabold">{c.name}</div>
+                        <div className="text-[#637554]">Effective: 2025-26 Season</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-extrabold text-[#140e48] text-sm">₹{c.msp}/Qtl</div>
+                        <button onClick={() => alert(`Edit MSP for ${c.name}`)} className="text-indigo-600 underline font-bold text-[10px]">Edit Config</button>
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* USER MANAGEMENT */}
-        {activeTab === 'users' && (
-          <div className="bg-white rounded-2xl border border-[#abbe99] p-6 space-y-4">
-            <h3 className="font-extrabold text-base text-[#243118]">👥 User Management — Role-wise Registry</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs font-mono">
-              {[
-                { role: '🌾 Farmers', count: '4.2 Crore', kyc: '100% Aadhaar', color: 'emerald' },
-                { role: '💼 Buyers/Traders', count: '48,200', kyc: '100% eNAM', color: 'amber' },
-                { role: '🏛️ Govt Officers', count: '12,400', kyc: 'GOI SSO', color: 'blue' },
-                { role: '🏪 Operators', count: '8,840', kyc: 'Mandi ID', color: 'purple' },
-                { role: '🔬 Quality Insp.', count: '4,200', kyc: 'ICAR Cert.', color: 'emerald' },
-                { role: '🏭 Warehouse Mgr.', count: '2,960', kyc: 'WDRA Cert.', color: 'sky' },
-                { role: '🚚 Logistics', count: '28,400', kyc: 'VAHAN Linked', color: 'amber' },
-                { role: '⚙️ System Admins', count: '42', kyc: '2FA + MFA', color: 'red' },
-              ].map(c => (
-                <div key={c.role} className={`bg-${c.color}-50 border border-${c.color}-200 p-3 rounded-xl`}>
-                  <div className="font-extrabold text-[#243118]">{c.role}</div>
-                  <div className={`text-base font-extrabold text-${c.color}-900`}>{c.count}</div>
-                  <div className={`text-[10px] text-${c.color}-600`}>{c.kyc} Verified</div>
+          {/* 7. TAMPER-PROOF AUDIT LOGS */}
+          {activeTab === 'audit' && (
+            <div className="space-y-4">
+              <div className="flex justify-between items-center border-b border-indigo-200 pb-4">
+                <div>
+                  <h2 className="text-xl font-extrabold text-[#140e48]">SYSTEM AUDIT LOGS (TAMPER-PROOF)</h2>
+                  <p className="text-xs text-[#637554]">Read-only immutable log of every administrative and security action</p>
                 </div>
-              ))}
+                <span className="bg-emerald-100 text-emerald-800 text-xs font-mono font-bold px-3 py-1 rounded-full">SHA256 Hash Locked ✓</span>
+              </div>
+              <div className="bg-white rounded-2xl border border-indigo-100 overflow-hidden shadow-sm font-mono text-xs">
+                <table className="w-full text-left">
+                  <thead className="bg-[#140e48] text-white">
+                    <tr>
+                      <th className="p-3">Log ID & Time</th>
+                      <th className="p-3">User & Role</th>
+                      <th className="p-3">Action Performed</th>
+                      <th className="p-3">Record Modified</th>
+                      <th className="p-3">Old → New Value</th>
+                      <th className="p-3">IP / Location</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-indigo-100">
+                    {auditLogs.map(l => (
+                      <tr key={l.id} className="hover:bg-indigo-50/50">
+                        <td className="p-3">
+                          <div className="font-bold text-[#140e48]">{l.id}</div>
+                          <div className="text-[10px] text-[#637554]">{l.time}</div>
+                        </td>
+                        <td className="p-3">
+                          <div className="font-bold">{l.user}</div>
+                          <div className="text-[10px] text-indigo-600">{l.role}</div>
+                        </td>
+                        <td className="p-3 font-bold text-amber-800">{l.action}</td>
+                        <td className="p-3">{l.record}</td>
+                        <td className="p-3">
+                          <span className="text-red-600 font-bold">{l.oldVal}</span> → <span className="text-emerald-700 font-bold">{l.newVal}</span>
+                        </td>
+                        <td className="p-3 text-[10px] text-[#637554]">{l.ip}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* MSP POLICY */}
-        {activeTab === 'msp' && (
-          <div className="bg-white rounded-2xl border border-[#abbe99] p-6">
-            <h3 className="font-extrabold text-base text-[#243118] mb-4">📋 Government MSP Policy Master — 2025–26</h3>
-            <div className="space-y-2 text-xs font-mono">
-              {MSP_DATA.map(m => {
-                const inc = m.msp - m.prev;
-                const pct = ((inc / m.prev) * 100).toFixed(1);
-                return (
-                  <div key={m.crop} className="flex items-center justify-between p-3 bg-[#fcfaf7] rounded-xl border border-[#abbe99]/60">
-                    <div>
-                      <div className="font-bold text-[#243118]">{m.crop}</div>
-                      <div className="text-[#637554] text-[10px]">{m.season}</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-extrabold text-[#243118]">₹{m.msp.toLocaleString('en-IN')}/Qtl</div>
-                      <div className="text-emerald-700 text-[10px] font-bold">↑ ₹{inc} (+{pct}%) from prev year</div>
-                    </div>
-                  </div>
-                );
-              })}
+          {/* FALLBACK FOR OTHER TABS */}
+          {!['dashboard', 'users', 'rbac', 'farmer_verify', 'buyer_verify', 'crops', 'pricing', 'audit'].includes(activeTab) && (
+            <div className="bg-white rounded-2xl border border-indigo-100 p-8 text-center space-y-3 shadow-sm font-mono">
+              <div className="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center mx-auto text-xl font-bold">⚙️</div>
+              <h3 className="text-base font-extrabold text-[#140e48] uppercase">{activeTab.replace('_', ' ')} Management Terminal</h3>
+              <p className="text-xs text-[#637554]">Full system administrative control & configuration module active for System Administrators.</p>
             </div>
-            <button className="mt-4 bg-indigo-700 hover:bg-indigo-800 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition-all">
-              ✏️ Update MSP Rates (Cabinet Approval Required)
-            </button>
-          </div>
-        )}
+          )}
 
-        {/* SYSTEM HEALTH */}
-        {activeTab === 'system' && (
-          <div className="bg-white rounded-2xl border border-[#abbe99] p-6 space-y-4">
-            <h3 className="font-extrabold text-base text-[#243118]">🖥️ Microservices Health Monitor</h3>
-            <div className="space-y-2 text-xs font-mono">
-              {SERVICES.map(s => (
-                <div key={s.name} className="flex items-center justify-between p-3 bg-emerald-50 rounded-xl border border-emerald-200">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                    <div>
-                      <div className="font-bold text-[#243118]">{s.name}</div>
-                      <div className="text-[#637554] text-[10px]">Latency: {s.latency}</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-extrabold text-emerald-700">{s.status}</div>
-                    <div className="text-[10px] text-[#637554]">{s.uptime} uptime</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* SECURITY */}
-        {activeTab === 'security' && (
-          <div className="bg-white rounded-2xl border border-[#abbe99] p-6 space-y-4">
-            <h3 className="font-extrabold text-base text-[#243118]">🔐 Security & Audit Log</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs font-mono">
-              {[
-                { label: 'Security Breaches', val: '0 Today', color: 'emerald' },
-                { label: 'Login Attempts', val: '4,820', color: 'sky' },
-                { label: 'Blocked IPs', val: '42 Blocked', color: 'red' },
-                { label: 'MFA Enforced', val: '100% Users', color: 'emerald' },
-                { label: 'Session Timeout', val: '30 Minutes', color: 'amber' },
-                { label: 'Last Audit', val: 'Today 02:12 AM', color: 'purple' },
-              ].map(c => (
-                <div key={c.label} className={`bg-${c.color}-50 border border-${c.color}-200 p-3 rounded-xl text-center`}>
-                  <div className={`text-base font-extrabold text-${c.color}-900`}>{c.val}</div>
-                  <div className={`text-[10px] text-${c.color}-700 font-bold uppercase`}>{c.label}</div>
-                </div>
-              ))}
-            </div>
-            <div className="space-y-2">
-              {[
-                { event: 'SUSPICIOUS: 12 failed logins from IP 103.21.xx.xx (Blocked)', time: '2h ago', level: 'HIGH' },
-                { event: 'AUDIT: MSP rates updated by Admin #AAGAM-ADMIN-001', time: '1h ago', level: 'INFO' },
-                { event: 'AUDIT: Farmer deactivated (fraud) — ID RJ-88210', time: '3h ago', level: 'HIGH' },
-              ].map(e => (
-                <div key={e.event} className={`p-3 rounded-xl text-xs font-mono border ${e.level === 'HIGH' ? 'bg-red-50 border-red-200' : 'bg-sky-50 border-sky-200'}`}>
-                  <div className={`font-bold ${e.level === 'HIGH' ? 'text-red-700' : 'text-sky-700'}`}>[{e.level}] {e.event}</div>
-                  <div className="text-[#637554] text-[10px]">{e.time}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* NOTIFICATIONS */}
-        {activeTab === 'notifications' && (
-          <div className="bg-white rounded-2xl border border-[#abbe99] p-6 space-y-4">
-            <h3 className="font-extrabold text-base text-[#243118]">🔔 SMS & WhatsApp Gateway Status</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs font-mono">
-              {[
-                { label: 'SMS Sent Today', val: '2.48 Lakh', color: 'sky' },
-                { label: 'WhatsApp Msgs', val: '84,200', color: 'emerald' },
-                { label: 'Email Sent', val: '48,200', color: 'amber' },
-                { label: 'SMS Delivery Rate', val: '99.4%', color: 'emerald' },
-                { label: 'Email Delivery Rate', val: '99.8%', color: 'emerald' },
-                { label: '1-Hr Pre Alerts Sent', val: '1,280', color: 'purple' },
-              ].map(c => (
-                <div key={c.label} className={`bg-${c.color}-50 border border-${c.color}-200 p-3 rounded-xl text-center`}>
-                  <div className={`text-base font-extrabold text-${c.color}-900`}>{c.val}</div>
-                  <div className={`text-[10px] text-${c.color}-700 font-bold uppercase`}>{c.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        </main>
       </div>
-    </section>
+    </div>
   );
 }
