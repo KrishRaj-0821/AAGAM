@@ -12,6 +12,13 @@ import ProcurementPage from './pages/ProcurementPage';
 import LogisticsPage from './pages/LogisticsPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import PersonaPortalPage from './pages/PersonaPortalPage';
+import FarmerPortalPage from './pages/portals/FarmerPortalPage';
+import BuyerPortalPage from './pages/portals/BuyerPortalPage';
+import OfficerPortalPage from './pages/portals/OfficerPortalPage';
+import OperatorPortalPage from './pages/portals/OperatorPortalPage';
+import QualityPortalPage from './pages/portals/QualityPortalPage';
+import WarehousePortalPage from './pages/portals/WarehousePortalPage';
+import AdminPortalPage from './pages/portals/AdminPortalPage';
 import GatePassModal from './components/modals/GatePassModal';
 import PaymentDbtModal from './components/modals/PaymentDbtModal';
 import QuickSearchModal from './components/modals/QuickSearchModal';
@@ -358,14 +365,99 @@ export default function App() {
         />
       )}
 
+
+
+// In portal view render block:
       {currentView === 'portal' && (
-        <PersonaPortalPage
-          activeRole={activeRole}
-          setActiveRole={setActiveRole}
-          setCurrentView={setCurrentView}
-          currentUser={currentUser}
-          t={t}
-        />
+        <div>
+          {/* Persona Role Switcher Header Bar */}
+          <div className="bg-[#243118] text-white py-2 px-4 border-b border-[#abbe99]/40 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+            <div className="flex items-center gap-2">
+              <span className="text-amber-400 font-bold">Active Role Portal:</span>
+              <span className="bg-[#71873f] text-white font-extrabold px-2.5 py-0.5 rounded-md">{activeRole}</span>
+            </div>
+            <div className="flex items-center gap-1 overflow-x-auto">
+              {[
+                { key: 'Farmer', label: '🌾 Farmer' },
+                { key: 'Buyer', label: '💼 Buyer' },
+                { key: 'Officer', label: '🏛️ Officer' },
+                { key: 'Operator', label: '🏪 Operator' },
+                { key: 'Quality', label: '🔬 Quality' },
+                { key: 'Warehouse', label: '🏭 Warehouse' },
+                { key: 'Admin', label: '⚙️ Admin' },
+                { key: 'Navigator', label: '📑 171 Navigator' },
+              ].map(r => (
+                <button
+                  key={r.key}
+                  onClick={() => setActiveRole(r.key)}
+                  className={`px-2.5 py-1 rounded-lg transition-all ${activeRole === r.key ? 'bg-amber-600 text-white font-bold' : 'bg-white/10 hover:bg-white/20 text-slate-200'}`}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {activeRole === 'Farmer' && (
+            <FarmerPortalPage
+              setCurrentView={setCurrentView}
+              currentUser={currentUser}
+              openGatePassWithAuth={openGatePassWithAuth}
+              t={t}
+            />
+          )}
+          {activeRole === 'Buyer' && (
+            <BuyerPortalPage
+              setCurrentView={setCurrentView}
+              currentUser={currentUser}
+              t={t}
+            />
+          )}
+          {activeRole === 'Officer' && (
+            <OfficerPortalPage
+              setCurrentView={setCurrentView}
+              currentUser={currentUser}
+              t={t}
+            />
+          )}
+          {activeRole === 'Operator' && (
+            <OperatorPortalPage
+              setCurrentView={setCurrentView}
+              currentUser={currentUser}
+              t={t}
+            />
+          )}
+          {activeRole === 'Quality' && (
+            <QualityPortalPage
+              setCurrentView={setCurrentView}
+              currentUser={currentUser}
+              t={t}
+            />
+          )}
+          {activeRole === 'Warehouse' && (
+            <WarehousePortalPage
+              setCurrentView={setCurrentView}
+              currentUser={currentUser}
+              t={t}
+            />
+          )}
+          {activeRole === 'Admin' && (
+            <AdminPortalPage
+              setCurrentView={setCurrentView}
+              currentUser={currentUser}
+              t={t}
+            />
+          )}
+          {activeRole === 'Navigator' && (
+            <PersonaPortalPage
+              activeRole={activeRole}
+              setActiveRole={setActiveRole}
+              setCurrentView={setCurrentView}
+              currentUser={currentUser}
+              t={t}
+            />
+          )}
+        </div>
       )}
 
       {currentView === 'login' && (

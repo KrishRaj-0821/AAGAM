@@ -383,37 +383,7 @@ export default function GatePassModal({
     <!-- HEADER with GOI Emblem -->
     <div class="bill-header">
       <div class="emblem-box">
-        <!-- Ashoka Stambha SVG Emblem -->
-        <svg width="60" height="64" viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg">
-          <!-- Base & platform -->
-          <rect x="28" y="200" width="144" height="10" rx="2" fill="#1a3010"/>
-          <rect x="42" y="190" width="116" height="12" rx="2" fill="#1a3010"/>
-          <!-- Dharma Chakra with spokes -->
-          <circle cx="100" cy="176" r="13" fill="none" stroke="#1a3010" stroke-width="3"/>
-          <circle cx="100" cy="176" r="3.5" fill="#1a3010"/>
-          <line x1="100" y1="163" x2="100" y2="189" stroke="#1a3010" stroke-width="1.5"/>
-          <line x1="87" y1="176" x2="113" y2="176" stroke="#1a3010" stroke-width="1.5"/>
-          <line x1="91" y1="167" x2="109" y2="185" stroke="#1a3010" stroke-width="1.2"/>
-          <line x1="109" y1="167" x2="91" y2="185" stroke="#1a3010" stroke-width="1.2"/>
-          <!-- Pillar -->
-          <rect x="88" y="100" width="24" height="88" rx="2" fill="#1a3010"/>
-          <!-- Capital abacus block -->
-          <rect x="70" y="92" width="60" height="10" rx="2" fill="#1a3010"/>
-          <!-- Left lion -->
-          <ellipse cx="77" cy="75" rx="15" ry="17" fill="#1a3010"/>
-          <ellipse cx="71" cy="61" rx="11" ry="11" fill="#1a3010"/>
-          <circle cx="71" cy="58" r="13" fill="none" stroke="#1a3010" stroke-width="3.5"/>
-          <!-- Right lion -->
-          <ellipse cx="123" cy="75" rx="15" ry="17" fill="#1a3010"/>
-          <ellipse cx="129" cy="61" rx="11" ry="11" fill="#1a3010"/>
-          <circle cx="129" cy="58" r="13" fill="none" stroke="#1a3010" stroke-width="3.5"/>
-          <!-- Front center lion -->
-          <ellipse cx="100" cy="70" rx="14" ry="17" fill="#1a3010"/>
-          <ellipse cx="100" cy="56" rx="11" ry="11" fill="#1a3010"/>
-          <circle cx="100" cy="53" r="13" fill="none" stroke="#1a3010" stroke-width="3.5"/>
-          <!-- Satyamev Jayate -->
-          <text x="100" y="220" text-anchor="middle" font-size="10" font-weight="bold" fill="#1a3010" font-family="serif">सत्यमेव जयते</text>
-        </svg>
+        <img src="${window.location.origin + import.meta.env.BASE_URL}images/goi_emblem.png" alt="Government of India Emblem" style="height:64px; width:auto; object-fit:contain; image-rendering:-webkit-optimize-contrast;" />
       </div>
       <div class="bill-header-text">
         <h1>Government of India — Ministry of Agriculture & Farmers Welfare</h1>
@@ -600,25 +570,7 @@ export default function GatePassModal({
       <!-- OFFICIAL GOI GOVERNMENT STAMP -->
       <div class="gov-stamp-area">
         <div class="gov-stamp-box">
-          <svg width="44" height="44" viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg">
-            <rect x="28" y="200" width="144" height="10" rx="2" fill="#1a3010"/>
-            <rect x="42" y="190" width="116" height="12" rx="2" fill="#1a3010"/>
-            <circle cx="100" cy="176" r="13" fill="none" stroke="#1a3010" stroke-width="5"/>
-            <circle cx="100" cy="176" r="4" fill="#1a3010"/>
-            <line x1="100" y1="163" x2="100" y2="189" stroke="#1a3010" stroke-width="2"/>
-            <line x1="87" y1="176" x2="113" y2="176" stroke="#1a3010" stroke-width="2"/>
-            <line x1="91" y1="167" x2="109" y2="185" stroke="#1a3010" stroke-width="1.5"/>
-            <line x1="109" y1="167" x2="91" y2="185" stroke="#1a3010" stroke-width="1.5"/>
-            <rect x="88" y="100" width="24" height="88" rx="2" fill="#1a3010"/>
-            <rect x="70" y="92" width="60" height="10" rx="2" fill="#1a3010"/>
-            <ellipse cx="77" cy="75" rx="15" ry="17" fill="#1a3010"/>
-            <ellipse cx="71" cy="61" rx="11" ry="11" fill="#1a3010"/>
-            <ellipse cx="123" cy="75" rx="15" ry="17" fill="#1a3010"/>
-            <ellipse cx="129" cy="61" rx="11" ry="11" fill="#1a3010"/>
-            <ellipse cx="100" cy="70" rx="14" ry="17" fill="#1a3010"/>
-            <ellipse cx="100" cy="56" rx="11" ry="11" fill="#1a3010"/>
-            <text x="100" y="218" text-anchor="middle" font-size="9" font-weight="bold" fill="#1a3010" font-family="serif">सत्यमेव जयते</text>
-          </svg>
+          <img src="${window.location.origin + import.meta.env.BASE_URL}images/goi_emblem.png" alt="GOI Emblem Stamp" style="height:44px; width:auto; object-fit:contain; filter: contrast(1.2);" />
           <div class="stamp-text">Ministry of Agriculture<br>Govt. of India<br>भारत सरकार</div>
           <div class="auth-line">Authorised Signatory</div>
         </div>
