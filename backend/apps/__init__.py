@@ -1,0 +1,3 @@
+"""
+AAGAM Django Apps Package
+"""
