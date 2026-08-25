@@ -27,7 +27,7 @@ import AuthRequiredModal from './components/modals/AuthRequiredModal';
 import HelpdeskModal from './components/modals/HelpdeskModal';
 import VoiceAgentModal from './components/voice/VoiceAgentModal';
 import SuccessToast from './components/common/SuccessToast';
-import { LifeBuoy, Mic, Bot } from 'lucide-react';
+import { LifeBuoy, Mic, Bot, Headphones } from 'lucide-react';
 
 export default function App() {
   // System & Accessibility States
@@ -600,39 +600,45 @@ export default function App() {
         t={t}
       />
 
-      {/* Floating 24x7 Support Dock: AI Voice Agent & Helpdesk Buttons (Positioned at bottom-left to prevent overlap with ElevenLabs widget at bottom-right) */}
-      <div className="fixed bottom-6 left-6 z-40 flex flex-row items-center gap-3">
+      {/* Floating 24x7 Support Dock: Perfect Circular Floating Action Buttons (FABs) at bottom-left */}
+      <div className="fixed bottom-6 left-6 z-40 flex flex-col items-center gap-3.5">
         
-        {/* Primary AI Voice Agent Trigger Widget */}
-        <button
-          onClick={() => setIsVoiceAgentOpen(true)}
-          className="bg-gradient-to-r from-[#71873f] via-[#5c6e33] to-[#40541d] hover:from-[#5e7033] hover:to-[#354616] text-white px-4 py-3 sm:px-5 sm:py-3.5 rounded-full shadow-2xl hover:shadow-[#71873f]/60 border-2 border-white/90 transition-all flex items-center gap-2.5 group active:scale-95 cursor-pointer backdrop-blur-md"
-          title="Talk to AAGAM AI Voice Agent (ElevenLabs 24x7)"
-        >
-          <div className="relative flex items-center justify-center">
-            <Mic className="w-5 h-5 text-[#e0b87e] group-hover:scale-110 transition-transform animate-pulse" />
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-white absolute -top-1 -right-1 animate-ping" />
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-white absolute -top-1 -right-1" />
+        {/* Primary AI Voice Agent Circle FAB */}
+        <div className="relative group">
+          <button
+            onClick={() => setIsVoiceAgentOpen(true)}
+            className="w-13 h-13 sm:w-14 sm:h-14 bg-gradient-to-br from-[#71873f] via-[#5c6e33] to-[#364719] hover:from-[#5e7033] hover:to-[#2b3913] text-white rounded-full shadow-2xl hover:shadow-[#71873f]/60 border-2 border-white/90 transition-all flex items-center justify-center group active:scale-95 cursor-pointer backdrop-blur-md relative"
+            aria-label="24x7 AI Voice Agent"
+          >
+            <div className="relative flex items-center justify-center">
+              <Mic className="w-6 h-6 text-[#e0b87e] group-hover:scale-110 transition-transform animate-pulse" />
+              <span className="w-3 h-3 rounded-full bg-emerald-400 border-2 border-white absolute -top-1.5 -right-1.5 animate-ping" />
+              <span className="w-3 h-3 rounded-full bg-emerald-400 border-2 border-white absolute -top-1.5 -right-1.5 shadow-xs" />
+            </div>
+          </button>
+          
+          {/* Responsive Tooltip Tag */}
+          <div className="absolute left-16 top-1/2 -translate-y-1/2 bg-[#1c2713] text-white text-[11px] font-extrabold px-3 py-1.5 rounded-xl shadow-xl border border-[#abbe99]/40 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none flex items-center gap-2">
+            <span>{t('24x7 AI Voice Agent (कृषि वाणी)', '24x7 किसान वॉइस एजेंट')}</span>
+            <span className="bg-[#e0b87e] text-[#1a2512] text-[9px] font-mono px-1.5 py-0.5 rounded font-black">24x7</span>
           </div>
-          <span className="inline font-extrabold text-xs tracking-wide">
-            {t('AI Voice Agent (कृषि वाणी)', 'किसान वॉइस एजेंट')}
-          </span>
-          <span className="bg-[#e0b87e] text-[#1a2512] text-[9px] font-mono font-black px-1.5 py-0.5 rounded-md hidden md:inline">
-            24x7
-          </span>
-        </button>
+        </div>
 
-        {/* Citizen Helpdesk Trigger */}
-        <button
-          onClick={() => setIsHelpdeskOpen(true)}
-          className="bg-[#a36627] hover:bg-[#804d19] text-white px-4 py-3 sm:px-4 sm:py-3.5 rounded-full shadow-xl hover:shadow-[#a36627]/50 border-2 border-white/80 transition-all flex items-center gap-2 group active:scale-95 cursor-pointer backdrop-blur-md"
-          title="Open Helpdesk & Grievance Report"
-        >
-          <LifeBuoy className="w-4 h-4 group-hover:rotate-45 transition-transform" />
-          <span className="inline font-bold text-xs tracking-wide">
-            {t('Helpdesk', 'हेल्पडेस्क')}
-          </span>
-        </button>
+        {/* Citizen Helpdesk Circle FAB */}
+        <div className="relative group">
+          <button
+            onClick={() => setIsHelpdeskOpen(true)}
+            className="w-13 h-13 sm:w-14 sm:h-14 bg-[#a36627] hover:bg-[#804d19] text-white rounded-full shadow-2xl hover:shadow-[#a36627]/60 border-2 border-white/90 transition-all flex items-center justify-center group active:scale-95 cursor-pointer backdrop-blur-md relative"
+            aria-label="AAGAM Helpdesk"
+          >
+            <Headphones className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
+          </button>
+
+          {/* Responsive Tooltip Tag */}
+          <div className="absolute left-16 top-1/2 -translate-y-1/2 bg-[#a36627] text-white text-[11px] font-extrabold px-3 py-1.5 rounded-xl shadow-xl border border-white/40 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+            {t('Helpdesk & Grievances', 'हेल्पडेस्क / शिकायत दर्ज करें')}
+          </div>
+        </div>
 
       </div>
 

@@ -115,11 +115,11 @@ export default function FarmerPortalPage({ setCurrentView, currentUser, openGate
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-col md:flex-row flex-1 overflow-y-auto md:overflow-hidden">
 
-        {/* Sidebar Navigation */}
-        <aside className="w-64 bg-[#1c2713] text-slate-200 p-4 space-y-1 overflow-y-auto shrink-0 border-r border-[#abbe99]/40 shadow-xl">
-          <div className="px-3 py-2 text-[10px] font-mono font-bold text-amber-400 uppercase tracking-wider border-b border-[#abbe99]/30 mb-2">
+        {/* Sidebar Navigation (Responsive Horizontal Scroll on Mobile, Vertical Sidebar on Desktop) */}
+        <aside className="w-full md:w-64 bg-[#1c2713] text-slate-200 p-3 md:p-4 flex md:flex-col overflow-x-auto md:overflow-y-auto shrink-0 border-b md:border-b-0 md:border-r border-[#abbe99]/40 shadow-xl gap-1 md:space-y-1">
+          <div className="hidden md:block px-3 py-2 text-[10px] font-mono font-bold text-amber-400 uppercase tracking-wider border-b border-[#abbe99]/30 mb-2">
             FARMER NAVIGATION DIRECTORY
           </div>
 
@@ -130,7 +130,7 @@ export default function FarmerPortalPage({ setCurrentView, currentUser, openGate
               <button
                 key={item.key}
                 onClick={() => setActiveTab(item.key)}
-                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-bold text-xs transition-all text-left ${
+                className={`flex md:w-full items-center gap-2 px-3 py-2 md:py-2.5 rounded-xl font-bold text-xs transition-all text-left whitespace-nowrap shrink-0 ${
                   isActive 
                     ? 'bg-[#71873f] text-white shadow-lg shadow-[#71873f]/30' 
                     : 'hover:bg-white/10 text-slate-300 hover:text-white'
@@ -142,7 +142,7 @@ export default function FarmerPortalPage({ setCurrentView, currentUser, openGate
             );
           })}
 
-          <div className="pt-4 border-t border-[#abbe99]/30 mt-4">
+          <div className="hidden md:block pt-4 border-t border-[#abbe99]/30 mt-4">
             <button
               onClick={() => setCurrentView('home')}
               className="w-full flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 font-bold text-xs transition-all"
