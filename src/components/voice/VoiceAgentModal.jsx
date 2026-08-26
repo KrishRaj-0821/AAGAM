@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 
 const AGENT_CONFIG = {
-  agent_id: "agent_6201m0wy694merctenjsx4b72fmg",
+  agent_id: "agent_5301m0yn5f0venyr26dvj8b5d7gr",
   name: "AAGAM Kisan AI Voice Agent",
   voice_id: "tnSpp4vdxKPjI9w0GnoV",
   tts_model: "eleven_v3_conversational",
@@ -317,7 +317,7 @@ export default function VoiceAgentModal({
                 </span>
               </div>
               <p className="text-[11px] text-[#abbe99] flex items-center gap-1.5 font-mono">
-                <span>ElevenLabs ConvAI • Voice Agent ID: <strong className="text-[#e0b87e]">agent_6201m0wy...</strong></span>
+                <span>ElevenLabs ConvAI • Voice Agent ID: <strong className="text-[#e0b87e]">agent_5301m0yn...</strong></span>
               </p>
             </div>
           </div>
