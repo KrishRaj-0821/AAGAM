@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   ChevronLeft, ShieldCheck, CheckCircle2, XCircle, Clock, AlertTriangle, 
   FileText, ArrowRight, Building2, Warehouse, Coins, DollarSign, Bell, 
-  Search, Filter, Plus, Eye, RefreshCw, BarChart3, Users, Lock, Download, Truck
+  Search, Filter, Plus, Eye, RefreshCw, BarChart3, Users, Lock, Download, Truck, AlertCircle
 } from 'lucide-react';
 
 export default function OfficerPortalPage({ setCurrentView, currentUser, t }) {
@@ -49,25 +49,25 @@ export default function OfficerPortalPage({ setCurrentView, currentUser, t }) {
   // Actions
   const approveProcurement = (lotId) => {
     setProcurementQueue(prev => prev.map(l => l.lotId === lotId ? { ...l, status: 'APPROVED' } : l));
-    alert(`✅ Procurement Approved for Lot ${lotId}! Unique PO PO-2026-${Math.floor(1000+Math.random()*9000)} generated.`);
+    alert(`Procurement Approved for Lot ${lotId}! Unique PO PO-2026-${Math.floor(1000+Math.random()*9000)} generated.`);
   };
 
   // Nav Items list matching user specification (14 items)
   const navItems = [
-    { key: 'dashboard', label: '📊 Dashboard', icon: ShieldCheck },
-    { key: 'queue', label: '📋 Procurement Queue', icon: FileText },
-    { key: 'verification', label: '🔍 Lot & Farmer Verification', icon: CheckCircle2 },
-    { key: 'pricing', label: '💰 Official Price Application', icon: DollarSign },
-    { key: 'approvals', label: '✅ Procurement Approvals', icon: CheckCircle2 },
-    { key: 'orders', label: '📜 Procurement Orders (PO)', icon: FileText },
-    { key: 'settlement', label: '💳 Farmer Settlement', icon: Coins },
-    { key: 'payments', label: '🏦 Payment Tracking', icon: DollarSign },
-    { key: 'warehouse', label: '🏭 Warehouse Allocation', icon: Warehouse },
-    { key: 'demand', label: '🏪 Buyer Demand Match', icon: Building2 },
-    { key: 'disputes', label: '⚠️ Procurement Disputes', icon: AlertTriangle },
-    { key: 'history', label: '📜 Farmer History', icon: Users },
-    { key: 'reports', label: '📊 Reports & Analytics', icon: BarChart3 },
-    { key: 'notifications', label: '🔔 Notifications', icon: Bell },
+    { key: 'dashboard', label: 'Dashboard', icon: ShieldCheck },
+    { key: 'queue', label: 'Procurement Queue', icon: FileText },
+    { key: 'verification', label: 'Lot & Farmer Verification', icon: CheckCircle2 },
+    { key: 'pricing', label: 'Official Price Application', icon: DollarSign },
+    { key: 'approvals', label: 'Procurement Approvals', icon: CheckCircle2 },
+    { key: 'orders', label: 'Procurement Orders (PO)', icon: FileText },
+    { key: 'settlement', label: 'Farmer Settlement', icon: Coins },
+    { key: 'payments', label: 'Payment Tracking', icon: DollarSign },
+    { key: 'warehouse', label: 'Warehouse Allocation', icon: Warehouse },
+    { key: 'demand', label: 'Buyer Demand Match', icon: Building2 },
+    { key: 'disputes', label: 'Procurement Disputes', icon: AlertTriangle },
+    { key: 'history', label: 'Farmer History', icon: Users },
+    { key: 'reports', label: 'Reports & Analytics', icon: BarChart3 },
+    { key: 'notifications', label: 'Notifications', icon: Bell },
   ];
 
   return (
@@ -171,7 +171,7 @@ export default function OfficerPortalPage({ setCurrentView, currentUser, t }) {
                     { alert: 'Payment Processing: 9 DBT transactions currently in processing queue with SBI NPCI bridge.', level: 'INFO' },
                   ].map((a, idx) => (
                     <div key={idx} className="p-3 bg-blue-50 border border-blue-200 rounded-xl flex justify-between items-center text-blue-900">
-                      <span>ℹ️ {a.alert}</span>
+                      <span className="flex items-center gap-1.5"><AlertCircle className="w-3.5 h-3.5 text-sky-600 shrink-0" /> {a.alert}</span>
                       <span className="font-bold underline cursor-pointer text-[10px]">Review →</span>
                     </div>
                   ))}
@@ -185,8 +185,9 @@ export default function OfficerPortalPage({ setCurrentView, currentUser, t }) {
             <div className="space-y-4 font-mono text-xs">
               <h2 className="text-xl font-extrabold text-[#081830]">PROCUREMENT QUEUE & LOT VERIFICATION</h2>
               <div className="bg-white rounded-2xl border border-blue-100 p-5 shadow-sm space-y-3">
-                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 font-bold">
-                  🔒 Restriction Rule: Officer applies system-configured MSP rates. Official price configuration cannot be changed here.
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 font-bold flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-amber-700 shrink-0" />
+                  <span>Restriction Rule: Officer applies system-configured MSP rates. Official price configuration cannot be changed here.</span>
                 </div>
                 <table className="w-full text-left">
                   <thead className="bg-[#081830] text-white">
@@ -207,7 +208,7 @@ export default function OfficerPortalPage({ setCurrentView, currentUser, t }) {
                         <td className="p-3 font-bold">{q.qty}<br/><span className="text-emerald-700">{q.grade}</span></td>
                         <td className="p-3 font-extrabold text-blue-900">₹{q.price}/Qtl<br/><span className="text-amber-800">{q.estValue}</span></td>
                         <td className="p-3 text-[10px]">
-                          <span className="text-emerald-700 font-bold">✓ Farmer</span> • <span className="text-emerald-700 font-bold">✓ Weight</span> • <span className="text-emerald-700 font-bold">✓ Quality</span>
+                          <span className="text-emerald-700 font-bold flex items-center gap-1 inline-flex"><CheckCircle2 className="w-3 h-3" /> Farmer</span> • <span className="text-emerald-700 font-bold flex items-center gap-1 inline-flex"><CheckCircle2 className="w-3 h-3" /> Weight</span> • <span className="text-emerald-700 font-bold flex items-center gap-1 inline-flex"><CheckCircle2 className="w-3 h-3" /> Quality</span>
                         </td>
                         <td className="p-3 text-right">
                           {q.status !== 'APPROVED' ? (
@@ -215,7 +216,10 @@ export default function OfficerPortalPage({ setCurrentView, currentUser, t }) {
                               Approve Procurement →
                             </button>
                           ) : (
-                            <span className="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded">✓ APPROVED</span>
+                            <span className="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded flex items-center gap-1 inline-flex">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+                              <span>APPROVED</span>
+                            </span>
                           )}
                         </td>
                       </tr>
@@ -266,8 +270,9 @@ export default function OfficerPortalPage({ setCurrentView, currentUser, t }) {
             <div className="space-y-4 font-mono text-xs">
               <h2 className="text-xl font-extrabold text-[#081830]">PRODUCE WAREHOUSE ALLOCATION</h2>
               <div className="bg-white rounded-2xl border border-blue-100 p-5 shadow-sm space-y-3">
-                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 font-bold">
-                  🔒 Restriction Rule: Procurement Officer selects warehouse destination & creates receiving instruction. Physical inventory cannot be altered.
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 font-bold flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-amber-700 shrink-0" />
+                  <span>Restriction Rule: Procurement Officer selects warehouse destination & creates receiving instruction. Physical inventory cannot be altered.</span>
                 </div>
                 <div className="space-y-2">
                   {warehouses.map(w => (
@@ -287,7 +292,9 @@ export default function OfficerPortalPage({ setCurrentView, currentUser, t }) {
           {/* FALLBACK FOR OTHER TABS */}
           {!['dashboard', 'queue', 'verification', 'approvals', 'orders', 'settlement', 'payments', 'warehouse'].includes(activeTab) && (
             <div className="bg-white rounded-2xl border border-blue-100 p-8 text-center space-y-3 shadow-sm font-mono">
-              <div className="w-12 h-12 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center mx-auto text-xl font-bold">🏛️</div>
+              <div className="w-12 h-12 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center mx-auto text-xl font-bold">
+                <Building2 className="w-6 h-6 text-blue-700" />
+              </div>
               <h3 className="text-base font-extrabold text-[#081830] uppercase">{activeTab.replace('_', ' ')} Officer Module</h3>
               <p className="text-xs text-[#637554]">District Procurement Officer lifecycle, price application, and settlement coordination active.</p>
             </div>

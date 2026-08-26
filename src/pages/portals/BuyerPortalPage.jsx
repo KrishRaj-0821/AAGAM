@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   ChevronLeft, Gavel, Search, Filter, ShoppingCart, Truck, CreditCard, 
   FileText, ShieldCheck, CheckCircle2, DollarSign, Bell, Layers, Building2, 
-  Heart, Download, ArrowRight, HelpCircle, BarChart3
+  Heart, Download, ArrowRight, HelpCircle, BarChart3, Coins
 } from 'lucide-react';
 
 export default function BuyerPortalPage({ setCurrentView, currentUser, t }) {
@@ -40,47 +40,44 @@ export default function BuyerPortalPage({ setCurrentView, currentUser, t }) {
     { lotId: 'LOT-2026-00455', crop: 'Chana Desi', variety: 'Yellow Hybrid', qty: '10,000 KG', grade: 'Grade B', mandi: 'Latur Yard', warehouse: 'WH-MH-001', price: '₹5,650/Qtl', total: '₹5,65,000', status: 'AVAILABLE', qualityVerified: true },
   ]);
 
-  // 3. Purchase Orders
+  // Buyer's Orders
   const [orders, setOrders] = useState([
-    { orderId: 'ORD-2026-1052', lotId: 'LOT-2026-00452', crop: 'Wheat', qty: '5,000 KG', grade: 'Grade A', price: '₹2,470/Qtl', total: '₹1,23,500', warehouse: 'WH-BR-004', delivery: 'Patna', status: 'READY FOR DISPATCH', paymentStatus: 'CONFIRMED' },
-    { orderId: 'ORD-2026-1053', lotId: 'LOT-2026-00453', crop: 'Paddy Basmati', qty: '18,000 KG', grade: 'Grade A', price: '₹2,300/Qtl', total: '₹4,14,000', warehouse: 'WH-HR-001', delivery: 'Ludhiana', status: 'DISPATCHED', paymentStatus: 'CONFIRMED' },
+    { orderId: 'ORD-BUY-9921', lotId: 'LOT-2026-00452', crop: 'Wheat (HD-2967)', qty: '5,000 KG', price: '₹2,470/Qtl', total: '₹1,23,500', status: 'ESCROW LOCKED', delivery: 'Northern Silo #04', paymentStatus: 'PAID TO ESCROW' },
+    { orderId: 'ORD-BUY-9922', lotId: 'LOT-2026-00454', crop: 'Mustard (Bold)', qty: '8,000 KG', price: '₹5,950/Qtl', total: '₹4,76,000', status: 'IN TRANSIT', delivery: 'Agri Hub #01', paymentStatus: 'ESCROW RELEASED' },
   ]);
 
-  // Submit Purchase Request
   const handlePurchaseRequest = (lot) => {
     const newOrder = {
-      orderId: `ORD-2026-${Math.floor(1000+Math.random()*9000)}`,
+      orderId: `ORD-BUY-${Math.floor(1000 + Math.random() * 9000)}`,
       lotId: lot.lotId,
-      crop: lot.crop,
+      crop: `${lot.crop} (${lot.variety})`,
       qty: lot.qty,
-      grade: lot.grade,
       price: lot.price,
-      total: lot.total,
-      warehouse: lot.warehouse,
+      total: lot.total || '₹2,50,000',
       delivery: 'Destination Hub',
       status: 'UNDER REVIEW',
       paymentStatus: 'PENDING'
     };
     setOrders([newOrder, ...orders]);
-    alert(`💼 Purchase Request Submitted for Lot ${lot.lotId}!\nOrder ${newOrder.orderId} created.`);
+    alert(`Purchase Request Submitted for Lot ${lot.lotId}!\nOrder ${newOrder.orderId} created.`);
   };
 
-  // Nav Items list matching user specification (14 items)
+  // Nav Items list matching user specification
   const navItems = [
-    { key: 'dashboard', label: '📊 Dashboard', icon: Gavel },
-    { key: 'marketplace', label: '🌾 Produce Marketplace', icon: ShoppingCart },
-    { key: 'profile', label: '🏢 Business Profile', icon: ShieldCheck },
-    { key: 'orders', label: '📋 My Purchase Orders', icon: FileText },
-    { key: 'payments', label: '💳 Payment Management', icon: CreditCard },
-    { key: 'logistics', label: '🚚 Delivery & Logistics', icon: Truck },
-    { key: 'quality', label: '🔬 Quality Certificates', icon: ShieldCheck },
-    { key: 'suppliers', label: '🤝 Saved Suppliers', icon: Building2 },
-    { key: 'saved', label: '❤️ Saved Lots', icon: Heart },
-    { key: 'prices', label: '📈 Market & MSP Trends', icon: DollarSign },
-    { key: 'documents', label: '📄 Invoices & Documents', icon: FileText },
-    { key: 'disputes', label: '⚠️ Disputes & Support', icon: HelpCircle },
-    { key: 'analytics', label: '📈 Purchase Analytics', icon: BarChart3 },
-    { key: 'notifications', label: '🔔 Notifications', icon: Bell },
+    { key: 'dashboard', label: 'Dashboard', icon: Gavel },
+    { key: 'marketplace', label: 'Produce Marketplace', icon: ShoppingCart },
+    { key: 'profile', label: 'Business Profile', icon: ShieldCheck },
+    { key: 'orders', label: 'My Purchase Orders', icon: FileText },
+    { key: 'payments', label: 'Payment Management', icon: CreditCard },
+    { key: 'logistics', label: 'Delivery & Logistics', icon: Truck },
+    { key: 'quality', label: 'Quality Certificates', icon: ShieldCheck },
+    { key: 'suppliers', label: 'Saved Suppliers', icon: Building2 },
+    { key: 'saved', label: 'Saved Lots', icon: Heart },
+    { key: 'prices', label: 'Market & MSP Trends', icon: DollarSign },
+    { key: 'documents', label: 'Invoices & Documents', icon: FileText },
+    { key: 'disputes', label: 'Disputes & Support', icon: HelpCircle },
+    { key: 'analytics', label: 'Purchase Analytics', icon: BarChart3 },
+    { key: 'notifications', label: 'Notifications', icon: Bell },
   ];
 
   return (
@@ -94,13 +91,16 @@ export default function BuyerPortalPage({ setCurrentView, currentUser, t }) {
         </div>
         <div className="flex items-center gap-4 text-[11px]">
           <span>Trader: <strong className="text-sky-300">{buyerProfile.businessName}</strong></span>
-          <span className="text-emerald-400">GST Verified ✓</span>
+          <span className="text-emerald-400 flex items-center gap-1">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            <span>GST Verified</span>
+          </span>
         </div>
       </div>
 
       <div className="flex flex-col md:flex-row flex-1 overflow-y-auto md:overflow-hidden">
 
-        {/* Sidebar Navigation (Responsive Horizontal Scroll on Mobile, Vertical Sidebar on Desktop) */}
+        {/* Sidebar Navigation */}
         <aside className="w-full md:w-64 bg-[#091b2e] text-slate-200 p-3 md:p-4 flex md:flex-col overflow-x-auto md:overflow-y-auto shrink-0 border-b md:border-b-0 md:border-r border-sky-900 shadow-xl gap-1 md:space-y-1">
           <div className="hidden md:block px-3 py-2 text-[10px] font-mono font-bold text-sky-400 uppercase tracking-wider border-b border-sky-800/80 mb-2">
             BUYER / TRADER DIRECTORY
@@ -248,7 +248,9 @@ export default function BuyerPortalPage({ setCurrentView, currentUser, t }) {
           {/* FALLBACK FOR OTHER TABS */}
           {!['dashboard', 'marketplace', 'orders'].includes(activeTab) && (
             <div className="bg-white rounded-2xl border border-sky-100 p-8 text-center space-y-3 shadow-sm font-mono">
-              <div className="w-12 h-12 bg-sky-100 text-sky-700 rounded-full flex items-center justify-center mx-auto text-xl font-bold">💼</div>
+              <div className="w-12 h-12 bg-sky-100 text-sky-700 rounded-full flex items-center justify-center mx-auto text-xl font-bold">
+                <Coins className="w-6 h-6 text-sky-700" />
+              </div>
               <h3 className="text-base font-extrabold text-[#0e2a47] uppercase">{activeTab.replace('_', ' ')} Buyer Module</h3>
               <p className="text-xs text-[#637554]">Verified trader procurement, order negotiation, and escrow logistics terminal active.</p>
             </div>

@@ -26,11 +26,11 @@ export default function OtpAuthModal({ isOpen, onClose, phoneNumber, onVerifiedS
       const res = await sendAuthOtp(phoneNumber, otp);
       if (res.success || res.data?.return) {
         setIsSent(true);
-        setSuccessMsg(`✅ OTP सफलतापूर्वक +91 ${phoneNumber} पर भेज दिया गया है।`);
+        setSuccessMsg(`OTP सफलतापूर्वक +91 ${phoneNumber} पर भेज दिया गया है।`);
       } else {
         // Fallback in case of gateway rate limit / sandbox
         setIsSent(true);
-        setSuccessMsg(`✅ OTP प्रेषित (+91 ${phoneNumber})`);
+        setSuccessMsg(`OTP प्रेषित (+91 ${phoneNumber})`);
       }
     } catch (err) {
       console.warn("SMS dispatch warning, enabling direct entry:", err);
@@ -44,7 +44,7 @@ export default function OtpAuthModal({ isOpen, onClose, phoneNumber, onVerifiedS
   // OTP Verification Check
   const handleVerifyOtp = () => {
     if (enteredOtp.trim() === generatedOtp.trim()) {
-      setSuccessMsg("✅ मोबाइल नंबर सफलतापूर्वक सत्यापित हो गया!");
+      setSuccessMsg("मोबाइल नंबर सफलतापूर्वक सत्यापित हो गया!");
       setTimeout(() => {
         if (onVerifiedSuccess) onVerifiedSuccess();
         onClose();
@@ -98,8 +98,9 @@ export default function OtpAuthModal({ isOpen, onClose, phoneNumber, onVerifiedS
         ) : (
           <div className="space-y-4">
             {successMsg && (
-              <div className="p-2.5 bg-emerald-950/80 border border-emerald-500/40 rounded-xl text-emerald-300 text-xs font-medium text-center">
-                {successMsg}
+              <div className="p-2.5 bg-emerald-950/80 border border-emerald-500/40 rounded-xl text-emerald-300 text-xs font-medium text-center flex items-center justify-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>{successMsg}</span>
               </div>
             )}
 

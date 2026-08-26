@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, Eye } from 'lucide-react';
+import { Lock, Eye, X } from 'lucide-react';
 import { blockchainTrail } from '../../data/mockData';
 
 export default function BlockchainLedger({ highContrast, t }) {
@@ -80,9 +80,9 @@ export default function BlockchainLedger({ highContrast, t }) {
               </h3>
               <button
                 onClick={() => setSelectedTx(null)}
-                className="text-[#637554] hover:text-[#243118] font-bold text-sm px-2 py-1 bg-[#f0f4ea] rounded-lg"
+                className="text-[#637554] hover:text-[#243118] font-bold text-sm p-1.5 bg-[#f0f4ea] hover:bg-[#e0e8d6] rounded-lg transition-colors"
               >
-                ✕
+                <X className="w-4 h-4" />
               </button>
             </div>
 

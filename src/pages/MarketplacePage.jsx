@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, Search, Filter, ShieldCheck, CheckCircle2, ArrowRight, Coins, MapPin, Tag } from 'lucide-react';
+import { ChevronLeft, Search, Filter, ShieldCheck, CheckCircle2, ArrowRight, Coins, MapPin, Tag, X } from 'lucide-react';
 import { marketplaceItems } from '../data/mockData';
 
 export default function MarketplacePage({ setCurrentView, setIsDbtModalOpen, t }) {
@@ -165,9 +165,9 @@ export default function MarketplacePage({ setCurrentView, setIsDbtModalOpen, t }
                 </h3>
                 <button
                   onClick={() => setSelectedListing(null)}
-                  className="text-slate-400 hover:text-slate-600 font-mono text-xl"
+                  className="text-slate-400 hover:text-slate-600 p-1"
                 >
-                  ✕
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 

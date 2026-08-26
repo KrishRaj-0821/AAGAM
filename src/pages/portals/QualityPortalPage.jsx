@@ -54,24 +54,24 @@ export default function QualityPortalPage({ setCurrentView, currentUser, t }) {
     const assignedGrade = pass ? (m <= 11.0 ? 'GRADE A' : 'GRADE B') : 'REJECTED';
 
     setInspectionQueue(prev => prev.map(item => item.id === testForm.inspId ? { ...item, status: pass ? 'PASSED' : 'FAILED', grade: assignedGrade } : item));
-    alert(`🔬 Inspection Report & NIR Assay Finalized!\n\nFinal Grade Assigned: ${assignedGrade}\nResult: ${pass ? 'PASSED ✓' : 'REJECTED ✗'}\n\nReport is now LOCKED and READ-ONLY.`);
+    alert(`Inspection Report & NIR Assay Finalized!\n\nFinal Grade Assigned: ${assignedGrade}\nResult: ${pass ? 'PASSED' : 'REJECTED'}\n\nReport is now LOCKED and READ-ONLY.`);
   };
 
   // Nav Items list matching user specification (15 items)
   const navItems = [
-    { key: 'dashboard', label: '📊 Dashboard', icon: Microscope },
-    { key: 'queue', label: '📋 Inspection Queue', icon: Layers },
-    { key: 'assigned', label: '🔍 Assigned Lots', icon: Search },
-    { key: 'sampling', label: '🧪 Sample Collection', icon: Camera },
-    { key: 'testing', label: '📡 Quality Testing (NIR)', icon: Sparkles },
-    { key: 'grading', label: '⭐ Grade Assignment', icon: CheckCircle2 },
-    { key: 'reports', label: '📄 Formal Inspection Reports', icon: FileText },
-    { key: 'disputes', label: '🔄 Reinspection & Disputes', icon: RotateCcw },
-    { key: 'history', label: '📜 Farmer Quality History', icon: History },
-    { key: 'alerts', label: '🚨 Quality Alerts', icon: AlertTriangle },
-    { key: 'evidence', label: '📷 Documents & Evidence', icon: Camera },
-    { key: 'analytics', label: '📈 Quality Analytics', icon: BarChart3 },
-    { key: 'notifications', label: '🔔 Notifications', icon: Bell },
+    { key: 'dashboard', label: 'Dashboard', icon: Microscope },
+    { key: 'queue', label: 'Inspection Queue', icon: Layers },
+    { key: 'assigned', label: 'Assigned Lots', icon: Search },
+    { key: 'sampling', label: 'Sample Collection', icon: Camera },
+    { key: 'testing', label: 'Quality Testing (NIR)', icon: Sparkles },
+    { key: 'grading', label: 'Grade Assignment', icon: CheckCircle2 },
+    { key: 'reports', label: 'Formal Inspection Reports', icon: FileText },
+    { key: 'disputes', label: 'Reinspection & Disputes', icon: RotateCcw },
+    { key: 'history', label: 'Farmer Quality History', icon: History },
+    { key: 'alerts', label: 'Quality Alerts', icon: AlertTriangle },
+    { key: 'evidence', label: 'Documents & Evidence', icon: Camera },
+    { key: 'analytics', label: 'Quality Analytics', icon: BarChart3 },
+    { key: 'notifications', label: 'Notifications', icon: Bell },
   ];
 
   return (
@@ -231,10 +231,14 @@ export default function QualityPortalPage({ setCurrentView, currentUser, t }) {
           {/* 3. QUALITY TESTING & GRADE ASSIGNMENT */}
           {(activeTab === 'testing' || activeTab === 'grading') && (
             <div className="space-y-4 font-mono text-xs">
-              <h2 className="text-xl font-extrabold text-[#052816]">📡 QUALITY TESTING & GRADE ASSIGNMENT</h2>
+              <h2 className="text-xl font-extrabold text-[#052816] flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-emerald-600 shrink-0" />
+                <span>QUALITY TESTING & GRADE ASSIGNMENT</span>
+              </h2>
               <div className="bg-white rounded-2xl border border-emerald-100 p-6 shadow-sm space-y-4 max-w-2xl mx-auto">
-                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 font-bold">
-                  🔒 Permission Rule: Quality Inspector records measured test parameters. Once finalized, reports are locked and read-only.
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 font-bold flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-amber-700 shrink-0" />
+                  <span>Permission Rule: Quality Inspector records measured test parameters. Once finalized, reports are locked and read-only.</span>
                 </div>
 
                 <div className="space-y-3">
@@ -267,8 +271,10 @@ export default function QualityPortalPage({ setCurrentView, currentUser, t }) {
                     <textarea rows="2" value={testForm.remarks} onChange={e => setTestForm(p => ({ ...p, remarks: e.target.value }))} className="w-full border border-emerald-200 rounded-xl p-2.5 focus:outline-none focus:border-emerald-600 font-bold" />
                   </div>
 
-                  <button onClick={submitQualityGrade} className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold py-3.5 rounded-xl shadow-md transition-all text-sm">
-                    🔒 Finalize Quality Assay & Assign Official Grade →
+                  <button onClick={submitQualityGrade} className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold py-3.5 rounded-xl shadow-md transition-all text-sm flex items-center justify-center gap-2">
+                    <Lock className="w-4 h-4" />
+                    <span>Finalize Quality Assay & Assign Official Grade</span>
+                    <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -317,8 +323,9 @@ export default function QualityPortalPage({ setCurrentView, currentUser, t }) {
             <div className="space-y-4 font-mono text-xs">
               <h2 className="text-xl font-extrabold text-[#052816]">REINSPECTION & DISPUTE WORKFLOW</h2>
               <div className="bg-white rounded-2xl border border-emerald-100 p-5 shadow-sm space-y-3">
-                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 font-bold">
-                  🔒 Preservation Rule: Reinspection creates a new decision record. Original inspection report is preserved permanently.
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 font-bold flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-amber-700 shrink-0" />
+                  <span>Preservation Rule: Reinspection creates a new decision record. Original inspection report is preserved permanently.</span>
                 </div>
                 {disputes.map(d => (
                   <div key={d.disputeId} className="border border-emerald-200 p-4 rounded-xl space-y-2">

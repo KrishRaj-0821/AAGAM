@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   ChevronLeft, Sprout, MapPin, Layers, Plus, Calendar, Clock, DollarSign, 
   FileText, ShieldCheck, CheckCircle2, AlertTriangle, HelpCircle, Bell, 
-  Search, Filter, Eye, Download, UserCheck, CreditCard, Building2
+  Search, Filter, Eye, Download, UserCheck, CreditCard, Building2, ArrowRight
 } from 'lucide-react';
 
 export default function FarmerPortalPage({ setCurrentView, currentUser, openGatePassWithAuth, t }) {
@@ -79,25 +79,25 @@ export default function FarmerPortalPage({ setCurrentView, currentUser, openGate
       step: 1
     };
     setLots([newLot, ...lots]);
-    alert(`🎉 Produce Lot ${newLot.id} successfully created! Gate Pass token generated.`);
+    alert(`Produce Lot ${newLot.id} successfully created! Gate Pass token generated.`);
     setActiveTab('lots');
   };
 
   // Nav Items list matching user specification (14 items)
   const navItems = [
-    { key: 'dashboard', label: '📊 Dashboard', icon: Sprout },
-    { key: 'profile', label: '👤 My Profile & Verification', icon: UserCheck },
-    { key: 'farms', label: '🏞️ My Registered Farms', icon: MapPin },
-    { key: 'create_lot', label: '➕ Create Produce Lot', icon: Plus },
-    { key: 'lots', label: '📦 My Lots & Tracking', icon: Layers },
-    { key: 'prices', label: '📈 Market & MSP Prices', icon: DollarSign },
-    { key: 'opportunities', label: '🎯 Procurement Opportunities', icon: Building2 },
-    { key: 'quality', label: '🔬 Quality Inspection Reports', icon: ShieldCheck },
-    { key: 'sales', label: '📜 My Sales & Orders', icon: FileText },
-    { key: 'payments', label: '💳 Payments & DBT Status', icon: CreditCard },
-    { key: 'documents', label: '📄 Centralized Documents', icon: FileText },
-    { key: 'support', label: '💬 Support & Complaints', icon: HelpCircle },
-    { key: 'notifications', label: '🔔 Notifications', icon: Bell },
+    { key: 'dashboard', label: 'Dashboard', icon: Sprout },
+    { key: 'profile', label: 'My Profile & Verification', icon: UserCheck },
+    { key: 'farms', label: 'My Registered Farms', icon: MapPin },
+    { key: 'create_lot', label: 'Create Produce Lot', icon: Plus },
+    { key: 'lots', label: 'My Lots & Tracking', icon: Layers },
+    { key: 'prices', label: 'Market & MSP Prices', icon: DollarSign },
+    { key: 'opportunities', label: 'Procurement Opportunities', icon: Building2 },
+    { key: 'quality', label: 'Quality Inspection Reports', icon: ShieldCheck },
+    { key: 'sales', label: 'My Sales & Orders', icon: FileText },
+    { key: 'payments', label: 'Payments & DBT Status', icon: CreditCard },
+    { key: 'documents', label: 'Centralized Documents', icon: FileText },
+    { key: 'support', label: 'Support & Complaints', icon: HelpCircle },
+    { key: 'notifications', label: 'Notifications', icon: Bell },
   ];
 
   return (
@@ -111,7 +111,10 @@ export default function FarmerPortalPage({ setCurrentView, currentUser, openGate
         </div>
         <div className="flex items-center gap-4 text-[11px]">
           <span>Farmer: <strong className="text-amber-300">{farmerProfile.name} ({farmerProfile.id})</strong></span>
-          <span className="text-emerald-400">KYC Verified ✓</span>
+          <span className="text-emerald-400 flex items-center gap-1">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            <span>KYC Verified</span>
+          </span>
         </div>
       </div>
 
@@ -215,7 +218,9 @@ export default function FarmerPortalPage({ setCurrentView, currentUser, openGate
               <h2 className="text-xl font-extrabold text-[#243118]">FARMER PROFILE & VERIFICATION STATUS</h2>
               <div className="bg-white rounded-2xl border border-[#abbe99]/60 p-6 shadow-sm space-y-4 max-w-2xl mx-auto">
                 <div className="flex items-center gap-4 border-b border-[#abbe99]/40 pb-4">
-                  <div className="w-14 h-14 bg-[#71873f] text-white rounded-full flex items-center justify-center text-xl font-bold">🌾</div>
+                  <div className="w-14 h-14 bg-[#71873f] text-white rounded-full flex items-center justify-center shadow-sm">
+                    <Sprout className="w-7 h-7 text-white" />
+                  </div>
                   <div>
                     <h3 className="font-extrabold text-base text-[#243118]">{farmerProfile.name}</h3>
                     <p className="text-[#637554]">Farmer ID: {farmerProfile.id} • {farmerProfile.village}, {farmerProfile.district}, {farmerProfile.state}</p>
@@ -229,10 +234,19 @@ export default function FarmerPortalPage({ setCurrentView, currentUser, openGate
                   <div className="p-3 bg-[#f0f4ea] rounded-xl"><span className="text-[#637554]">Bank Account:</span> <strong className="text-emerald-800">{farmerProfile.bankAccount}</strong></div>
                 </div>
 
-                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-1 font-bold text-emerald-900">
-                  <div>✓ Aadhaar Identity Verified</div>
-                  <div>✓ PM-KISAN Land Holding Verified</div>
-                  <div>✓ NPCI-DBT Direct Bank Transfer Verified</div>
+                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-1.5 font-bold text-emerald-900">
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span>Aadhaar Identity Verified</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span>PM-KISAN Land Holding Verified</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span>NPCI-DBT Direct Bank Transfer Verified</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -294,8 +308,13 @@ export default function FarmerPortalPage({ setCurrentView, currentUser, openGate
                       <span className="bg-[#71873f] text-white font-bold px-3 py-1 rounded-lg">{l.status}</span>
                     </div>
                     <div className="text-[#637554]">Mandi: {l.mandi} • Expected Value: <strong className="text-[#243118]">{l.estVal}</strong> • Grade: {l.grade}</div>
-                    <div className="flex items-center gap-2 pt-2 text-[10px] text-emerald-800 font-bold overflow-x-auto">
-                      <span>✓ Lot Created</span> ➔ <span>✓ Mandi Received</span> ➔ <span>✓ Weighment</span> ➔ <span>✓ Quality</span> ➔ <span>✓ Procurement</span> ➔ <span>✓ Payment</span>
+                    <div className="flex items-center gap-1.5 pt-2 text-[10px] text-emerald-800 font-bold overflow-x-auto">
+                      <span>Lot Created</span> <ArrowRight className="w-3 h-3 text-emerald-600 shrink-0" /> 
+                      <span>Mandi Received</span> <ArrowRight className="w-3 h-3 text-emerald-600 shrink-0" /> 
+                      <span>Weighment</span> <ArrowRight className="w-3 h-3 text-emerald-600 shrink-0" /> 
+                      <span>Quality</span> <ArrowRight className="w-3 h-3 text-emerald-600 shrink-0" /> 
+                      <span>Procurement</span> <ArrowRight className="w-3 h-3 text-emerald-600 shrink-0" /> 
+                      <span>Payment</span>
                     </div>
                   </div>
                 ))}
@@ -306,7 +325,9 @@ export default function FarmerPortalPage({ setCurrentView, currentUser, openGate
           {/* FALLBACK FOR OTHER TABS */}
           {!['dashboard', 'profile', 'farms', 'create_lot', 'lots'].includes(activeTab) && (
             <div className="bg-white rounded-2xl border border-[#abbe99]/60 p-8 text-center space-y-3 shadow-sm font-mono">
-              <div className="w-12 h-12 bg-[#f0f4ea] text-[#71873f] rounded-full flex items-center justify-center mx-auto text-xl font-bold">🌾</div>
+              <div className="w-12 h-12 bg-[#f0f4ea] text-[#71873f] rounded-full flex items-center justify-center mx-auto text-xl font-bold">
+                <Sprout className="w-6 h-6 text-[#71873f]" />
+              </div>
               <h3 className="text-base font-extrabold text-[#243118] uppercase">{activeTab.replace('_', ' ')} Kisan Module</h3>
               <p className="text-xs text-[#637554]">Farmer direct procurement, market prices, and DBT payment terminal active.</p>
             </div>

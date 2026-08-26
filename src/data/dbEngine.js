@@ -324,7 +324,7 @@ class CentralDatabaseEngine {
   }
 
   // ───────────────────────────────────────────────────────────────────────────
-  // TRANSACTIONAL MUTATIONS & SYNCHRONIZATION (All Portals ➔ Central DB)
+  // TRANSACTIONAL MUTATIONS & SYNCHRONIZATION (All Portals -> Central DB)
   // ───────────────────────────────────────────────────────────────────────────
   
   // 1. Farmer Creates Produce Lot

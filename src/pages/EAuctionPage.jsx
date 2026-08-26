@@ -21,7 +21,9 @@ import {
   ArrowUpRight,
   Filter,
   Search,
-  Check
+  Check,
+  AlertTriangle,
+  X
 } from 'lucide-react';
 import { auctionItems } from '../data/mockData';
 
@@ -313,8 +315,18 @@ export default function EAuctionPage({ setCurrentView, currentUser, triggerSucce
                         <div className="text-xs font-mono font-bold text-emerald-400 uppercase tracking-wider">
                           LIVE PARTICIPATION STATUS
                         </div>
-                        <h3 className="text-lg md:text-xl font-extrabold text-white">
-                          {isLeadingBidder ? '🏆 RANK #1 — YOU ARE CURRENTLY WINNING THIS LOT' : '⚠️ OUTBID BY COMPETITOR — RANK #2'}
+                        <h3 className="text-lg md:text-xl font-extrabold text-white flex items-center gap-2">
+                          {isLeadingBidder ? (
+                            <>
+                              <Trophy className="w-5 h-5 text-amber-400 shrink-0" />
+                              <span>RANK #1 — YOU ARE CURRENTLY WINNING THIS LOT</span>
+                            </>
+                          ) : (
+                            <>
+                              <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
+                              <span>OUTBID BY COMPETITOR — RANK #2</span>
+                            </>
+                          )}
                         </h3>
                       </div>
                     </div>
@@ -358,8 +370,9 @@ export default function EAuctionPage({ setCurrentView, currentUser, triggerSucce
                       <div className="text-2xl font-extrabold text-[#243118]">
                         {activeLiveLot.mspFloor} <span className="text-xs font-sans text-[#637554]">/ Qtl</span>
                       </div>
-                      <span className="text-[10px] text-[#71873f] font-bold block">
-                        ✓ 100% Minimum Floor Protected
+                      <span className="text-[10px] text-[#71873f] font-bold flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3 text-[#71873f] shrink-0" />
+                        <span>100% Minimum Floor Protected</span>
                       </span>
                     </div>
 
@@ -381,7 +394,10 @@ export default function EAuctionPage({ setCurrentView, currentUser, triggerSucce
                     </div>
                     <div className="flex justify-between">
                       <span className="text-[#637554]">Settlement Security:</span>
-                      <span className="text-emerald-700 font-bold">✓ 48-Hour PFMS Escrow Guaranteed</span>
+                      <span className="text-emerald-700 font-bold flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        <span>48-Hour PFMS Escrow Guaranteed</span>
+                      </span>
                     </div>
                   </div>
 
@@ -452,7 +468,10 @@ export default function EAuctionPage({ setCurrentView, currentUser, triggerSucce
                         <div className="flex items-center justify-between text-[10px] text-[#637554] mt-1">
                           <span>{bid.time}</span>
                           {bid.isYou && (
-                            <span className="text-emerald-700 font-bold">✓ Your Active Bid</span>
+                            <span className="text-emerald-700 font-bold flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
+                              <span>Your Active Bid</span>
+                            </span>
                           )}
                         </div>
                       </div>
@@ -633,9 +652,9 @@ export default function EAuctionPage({ setCurrentView, currentUser, triggerSucce
                 </div>
                 <button
                   onClick={() => setDetailsModalLot(null)}
-                  className="text-slate-400 hover:text-slate-700 font-mono text-xl"
+                  className="text-slate-400 hover:text-slate-700 p-1"
                 >
-                  ✕
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 

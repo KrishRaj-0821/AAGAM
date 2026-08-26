@@ -14,7 +14,8 @@ import {
   Sparkles, 
   UserPlus, 
   LogIn,
-  Mic
+  Mic,
+  Zap
 } from 'lucide-react';
 
 export default function AuthRequiredModal({
@@ -139,8 +140,8 @@ export default function AuthRequiredModal({
         <div className="bg-[#f0f4ea] p-4 rounded-2xl border border-[#abbe99] space-y-2.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5 text-xs font-extrabold text-[#243118]">
-              <Sparkles className="w-4 h-4 text-[#a36627]" />
-              <span>{t('⚡ Quick 1-Click Persona Login:', '⚡ त्वरित 1-क्लिक भूमिका प्रवेश:')}</span>
+              <Zap className="w-4 h-4 text-[#a36627]" />
+              <span>{t('Quick 1-Click Persona Login:', 'त्वरित 1-क्लिक भूमिका प्रवेश:')}</span>
             </div>
             <span className="text-[10px] font-mono text-[#71873f] font-bold">
               {t('Instant Direct Entry', 'तत्काल प्रवेश')}
@@ -149,21 +150,25 @@ export default function AuthRequiredModal({
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {[
-              { role: 'Farmer', label: '🌾 Farmer (Kisan)' },
-              { role: 'Trader', label: '💰 Trader / Buyer' },
-              { role: 'Officer', label: '🏛️ Govt Officer' },
-              { role: 'Operator', label: '📋 Mandi Operator' },
-              { role: 'Quality', label: '🔬 Quality Lab' },
-              { role: 'Logistics', label: '🚛 Transporter' }
-            ].map((item) => (
-              <button
-                key={item.role}
-                onClick={() => handleFastLogin(item.role)}
-                className="py-2 px-2.5 rounded-xl bg-white hover:bg-[#71873f] hover:text-white text-[#243118] border border-[#abbe99]/70 text-xs font-extrabold transition-all text-left truncate shadow-xs"
-              >
-                {item.label}
-              </button>
-            ))}
+              { role: 'Farmer', labelEn: 'Farmer (Kisan)', labelHi: 'किसान', icon: Sprout },
+              { role: 'Trader', labelEn: 'Trader / Buyer', labelHi: 'व्यापारी', icon: Coins },
+              { role: 'Officer', labelEn: 'Govt Officer', labelHi: 'अधिकारी', icon: Building2 },
+              { role: 'Operator', labelEn: 'Mandi Operator', labelHi: 'संचालक', icon: QrCode },
+              { role: 'Quality', labelEn: 'Quality Lab', labelHi: 'गुणवत्ता लैब', icon: Microscope },
+              { role: 'Logistics', labelEn: 'Transporter', labelHi: 'ट्रांसपोर्टर', icon: Truck }
+            ].map((item) => {
+              const IconC = item.icon;
+              return (
+                <button
+                  key={item.role}
+                  onClick={() => handleFastLogin(item.role)}
+                  className="py-2 px-2.5 rounded-xl bg-white hover:bg-[#71873f] hover:text-white text-[#243118] border border-[#abbe99]/70 text-xs font-extrabold transition-all text-left truncate shadow-xs flex items-center gap-1.5 group"
+                >
+                  <IconC className="w-3.5 h-3.5 text-[#a36627] group-hover:text-white shrink-0" />
+                  <span className="truncate">{t(item.labelEn, item.labelHi)}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 

@@ -4,7 +4,8 @@ import {
   ChevronLeft, Users, ShieldCheck, Database, Activity, Server, Bell, 
   Settings, Lock, MapPin, Building2, Warehouse, Sprout, Gavel, FileText, 
   AlertTriangle, RefreshCw, CheckCircle2, XCircle, Search, Filter, Plus, 
-  Edit3, Trash2, Eye, ShieldAlert, Key, Download, Upload, Zap, Globe, DollarSign, ArrowRight
+  Edit3, Trash2, Eye, ShieldAlert, Key, Download, Upload, Zap, Globe, DollarSign, ArrowRight,
+  AlertCircle, Clock
 } from 'lucide-react';
 
 export default function AdminPortalPage({ setCurrentView, currentUser, t }) {
@@ -92,28 +93,28 @@ export default function AdminPortalPage({ setCurrentView, currentUser, t }) {
   };
 
   const resetUserPassword = (userName) => {
-    alert(`🔑 Password reset link dispatched to ${userName}'s registered email & mobile!`);
+    alert(`Password reset link dispatched to ${userName}'s registered email & mobile!`);
   };
 
   // Nav Items list matching user requirement
   const navItems = [
-    { key: 'dashboard', label: '📊 Dashboard', icon: Activity },
-    { key: 'users', label: '👥 User Management', icon: Users },
-    { key: 'rbac', label: '🔑 Roles & Permissions', icon: Key },
-    { key: 'staff', label: '🏛️ Staff & Org Management', icon: ShieldCheck },
-    { key: 'farmer_verify', label: '🌾 Farmer Verification', icon: CheckCircle2 },
-    { key: 'buyer_verify', label: '💼 Buyer Verification', icon: Gavel },
-    { key: 'mandi', label: '🏪 Mandi Management', icon: Building2 },
-    { key: 'warehouse', label: '🏭 Warehouse Management', icon: Warehouse },
-    { key: 'crops', label: '🌱 Product & Crop Master', icon: Sprout },
-    { key: 'geo', label: '🗺️ Geographic Master Data', icon: MapPin },
-    { key: 'pricing', label: '💰 Price Config & Rules', icon: DollarSign },
-    { key: 'notifications', label: '🔔 Notification Center', icon: Bell },
-    { key: 'system_config', label: '⚙️ System Configuration', icon: Settings },
-    { key: 'security', label: '🔐 Security & Access Control', icon: Lock },
-    { key: 'audit', label: '📜 Tamper-Proof Audit Logs', icon: FileText },
-    { key: 'data', label: '💾 Data & Backup Control', icon: Database },
-    { key: 'analytics', label: '📈 Global Analytics', icon: Zap },
+    { key: 'dashboard', label: 'Dashboard', icon: Activity },
+    { key: 'users', label: 'User Management', icon: Users },
+    { key: 'rbac', label: 'Roles & Permissions', icon: Key },
+    { key: 'staff', label: 'Staff & Org Management', icon: ShieldCheck },
+    { key: 'farmer_verify', label: 'Farmer Verification', icon: CheckCircle2 },
+    { key: 'buyer_verify', label: 'Buyer Verification', icon: Gavel },
+    { key: 'mandi', label: 'Mandi Management', icon: Building2 },
+    { key: 'warehouse', label: 'Warehouse Management', icon: Warehouse },
+    { key: 'crops', label: 'Product & Crop Master', icon: Sprout },
+    { key: 'geo', label: 'Geographic Master Data', icon: MapPin },
+    { key: 'pricing', label: 'Price Config & Rules', icon: DollarSign },
+    { key: 'notifications', label: 'Notification Center', icon: Bell },
+    { key: 'system_config', label: 'System Configuration', icon: Settings },
+    { key: 'security', label: 'Security & Access Control', icon: Lock },
+    { key: 'audit', label: 'Tamper-Proof Audit Logs', icon: FileText },
+    { key: 'data', label: 'Data & Backup Control', icon: Database },
+    { key: 'analytics', label: 'Global Analytics', icon: Zap },
   ];
 
   return (
@@ -127,7 +128,10 @@ export default function AdminPortalPage({ setCurrentView, currentUser, t }) {
         </div>
         <div className="flex items-center gap-4 text-[11px]">
           <span>Logged in as: <strong className="text-amber-300">{currentUser?.name || 'System Admin'}</strong></span>
-          <span className="text-emerald-400">MFA Enforced ✓</span>
+          <span className="text-emerald-400 flex items-center gap-1">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            <span>MFA Enforced</span>
+          </span>
         </div>
       </div>
 
@@ -291,8 +295,8 @@ export default function AdminPortalPage({ setCurrentView, currentUser, t }) {
                 </h3>
                 <div className="grid md:grid-cols-2 gap-3 text-xs font-mono">
                   <div className="bg-amber-50 border border-amber-200 p-3.5 rounded-xl space-y-1">
-                    <div className="font-bold text-amber-900 flex justify-between">
-                      <span>⚠️ Pending Verifications</span>
+                    <div className="font-bold text-amber-900 flex justify-between items-center">
+                      <span className="flex items-center gap-1.5"><AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" /> <span>Pending Verifications</span></span>
                       <span className="bg-amber-200 text-amber-800 px-2 py-0.5 rounded text-[10px]">142 Pending</span>
                     </div>
                     <p className="text-amber-800 text-[11px]">84 Farmers & 58 Buyers awaiting document verification approval.</p>
@@ -300,8 +304,8 @@ export default function AdminPortalPage({ setCurrentView, currentUser, t }) {
                   </div>
 
                   <div className="bg-red-50 border border-red-200 p-3.5 rounded-xl space-y-1">
-                    <div className="font-bold text-red-900 flex justify-between">
-                      <span>🚨 Suspicious Accounts</span>
+                    <div className="font-bold text-red-900 flex justify-between items-center">
+                      <span className="flex items-center gap-1.5"><AlertCircle className="w-3.5 h-3.5 text-red-600 shrink-0" /> <span>Suspicious Accounts</span></span>
                       <span className="bg-red-200 text-red-800 px-2 py-0.5 rounded text-[10px]">3 Flagged</span>
                     </div>
                     <p className="text-red-800 text-[11px]">Multiple failed login attempts detected from unrecognized IP ranges.</p>
@@ -383,7 +387,17 @@ export default function AdminPortalPage({ setCurrentView, currentUser, t }) {
                             </span>
                           </td>
                           <td className="p-3">
-                            {u.verified ? <span className="text-emerald-700 font-bold">✓ Verified</span> : <span className="text-amber-700 font-bold">⏳ Pending</span>}
+                            {u.verified ? (
+                              <span className="text-emerald-700 font-bold flex items-center gap-1">
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                <span>Verified</span>
+                              </span>
+                            ) : (
+                              <span className="text-amber-700 font-bold flex items-center gap-1">
+                                <Clock className="w-3.5 h-3.5" />
+                                <span>Pending</span>
+                              </span>
+                            )}
                           </td>
                           <td className="p-3 text-right space-x-2">
                             <button onClick={() => toggleUserStatus(u.id)} className={`px-2.5 py-1 rounded-lg text-[10px] font-bold ${u.status === 'ACTIVE' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
@@ -451,7 +465,7 @@ export default function AdminPortalPage({ setCurrentView, currentUser, t }) {
           {(activeTab === 'farmer_verify' || activeTab === 'buyer_verify') && (
             <div className="space-y-4">
               <h2 className="text-xl font-extrabold text-[#140e48]">
-                {activeTab === 'farmer_verify' ? '🌾 FARMER ACCOUNT VERIFICATION QUEUE' : '💼 BUYER & TRADER LICENSE VERIFICATION'}
+                {activeTab === 'farmer_verify' ? 'FARMER ACCOUNT VERIFICATION QUEUE' : 'BUYER & TRADER LICENSE VERIFICATION'}
               </h2>
               <div className="space-y-3">
                 {users.filter(u => u.status === 'PENDING_APPROVAL' || !u.verified).map(u => (
@@ -462,8 +476,8 @@ export default function AdminPortalPage({ setCurrentView, currentUser, t }) {
                       <div className="text-[#637554]">Contact: {u.phone} • {u.email}</div>
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => { alert(`✓ Account ${u.id} Verified & Approved!`); toggleUserStatus(u.id); }} className="bg-emerald-600 text-white font-bold px-4 py-2 rounded-xl">Approve</button>
-                      <button onClick={() => alert(`✗ Account ${u.id} Rejected.`)} className="bg-red-50 text-red-700 border border-red-200 font-bold px-4 py-2 rounded-xl">Reject</button>
+                      <button onClick={() => { alert(`Account ${u.id} Verified & Approved!`); toggleUserStatus(u.id); }} className="bg-emerald-600 text-white font-bold px-4 py-2 rounded-xl">Approve</button>
+                      <button onClick={() => alert(`Account ${u.id} Rejected.`)} className="bg-red-50 text-red-700 border border-red-200 font-bold px-4 py-2 rounded-xl">Reject</button>
                     </div>
                   </div>
                 ))}
@@ -512,8 +526,9 @@ export default function AdminPortalPage({ setCurrentView, currentUser, t }) {
             <div className="space-y-4">
               <h2 className="text-xl font-extrabold text-[#140e48]">SYSTEM PRICE CONFIGURATION & RULES</h2>
               <div className="bg-white rounded-2xl border border-indigo-100 p-5 font-mono text-xs space-y-3 shadow-sm">
-                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 font-bold">
-                  ⚠️ System-wide MSP price changes require cabinet approval authorization & generate immutable audit log entries.
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 font-bold flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0" />
+                  <span>System-wide MSP price changes require cabinet approval authorization & generate immutable audit log entries.</span>
                 </div>
                 <div className="grid md:grid-cols-2 gap-3">
                   {crops.map(c => (
@@ -541,7 +556,10 @@ export default function AdminPortalPage({ setCurrentView, currentUser, t }) {
                   <h2 className="text-xl font-extrabold text-[#140e48]">SYSTEM AUDIT LOGS (TAMPER-PROOF)</h2>
                   <p className="text-xs text-[#637554]">Read-only immutable log of every administrative and security action</p>
                 </div>
-                <span className="bg-emerald-100 text-emerald-800 text-xs font-mono font-bold px-3 py-1 rounded-full">SHA256 Hash Locked ✓</span>
+                <span className="bg-emerald-100 text-emerald-800 text-xs font-mono font-bold px-3 py-1 rounded-full flex items-center gap-1">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>SHA256 Hash Locked</span>
+                </span>
               </div>
               <div className="bg-white rounded-2xl border border-indigo-100 overflow-hidden shadow-sm font-mono text-xs">
                 <table className="w-full text-left">
@@ -583,7 +601,9 @@ export default function AdminPortalPage({ setCurrentView, currentUser, t }) {
           {/* FALLBACK FOR OTHER TABS */}
           {!['dashboard', 'users', 'rbac', 'farmer_verify', 'buyer_verify', 'crops', 'pricing', 'audit'].includes(activeTab) && (
             <div className="bg-white rounded-2xl border border-indigo-100 p-8 text-center space-y-3 shadow-sm font-mono">
-              <div className="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center mx-auto text-xl font-bold">⚙️</div>
+              <div className="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center mx-auto text-xl font-bold">
+                <Settings className="w-6 h-6 text-indigo-700" />
+              </div>
               <h3 className="text-base font-extrabold text-[#140e48] uppercase">{activeTab.replace('_', ' ')} Management Terminal</h3>
               <p className="text-xs text-[#637554]">Full system administrative control & configuration module active for System Administrators.</p>
             </div>

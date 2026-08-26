@@ -72,30 +72,30 @@ export default function WarehousePortalPage({ setCurrentView, currentUser, t }) 
   // Handlers
   const confirmReceiving = (lotId) => {
     setIncomingProcurement(prev => prev.map(l => l.lotId === lotId ? { ...l, status: 'RECEIVED' } : l));
-    alert(`✅ Goods Receiving Note (GRN) generated for ${lotId}. Physical receiving confirmed.`);
+    alert(`Goods Receiving Note (GRN) generated for ${lotId}. Physical receiving confirmed.`);
   };
 
   const confirmDispatch = (orderId) => {
     setDispatchOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'DISPATCHED' } : o));
-    alert(`🚚 Dispatch Note generated for ${orderId}. Stock loaded and inventory updated.`);
+    alert(`Dispatch Note generated for ${orderId}. Stock loaded and inventory updated.`);
   };
 
   // Nav Items list matching user specification (14 items)
   const navItems = [
-    { key: 'dashboard', label: '📊 Dashboard', icon: Warehouse },
-    { key: 'incoming', label: '⬇ Incoming Stock', icon: ArrowDownLeft },
-    { key: 'receiving', label: '🧾 Goods Receiving (GRN)', icon: CheckCircle2 },
-    { key: 'inventory', label: '📦 Inventory Records', icon: Package },
-    { key: 'storage', label: '🧱 Storage Locations & Zones', icon: Layers },
-    { key: 'movement', label: '🔄 Stock Movement Log', icon: RefreshCw },
-    { key: 'reservations', label: '🔒 Stock Reservations', icon: Lock },
-    { key: 'dispatch', label: '📋 Approved Dispatch Orders', icon: FileText },
-    { key: 'loading', label: '🚚 Loading & Dispatch', icon: Truck },
-    { key: 'damaged', label: '⚠️ Damaged & Quarantine', icon: AlertTriangle },
-    { key: 'reconciliation', label: '⚖️ Physical Reconciliation', icon: RefreshCw },
-    { key: 'capacity', label: '📈 Warehouse Capacity', icon: Layers },
-    { key: 'documents', label: '📄 Warehouse Documents', icon: FileText },
-    { key: 'reports', label: '📊 Reports & Analytics', icon: ArrowUpRight },
+    { key: 'dashboard', label: 'Dashboard', icon: Warehouse },
+    { key: 'incoming', label: 'Incoming Stock', icon: ArrowDownLeft },
+    { key: 'receiving', label: 'Goods Receiving (GRN)', icon: CheckCircle2 },
+    { key: 'inventory', label: 'Inventory Records', icon: Package },
+    { key: 'storage', label: 'Storage Locations & Zones', icon: Layers },
+    { key: 'movement', label: 'Stock Movement Log', icon: RefreshCw },
+    { key: 'reservations', label: 'Stock Reservations', icon: Lock },
+    { key: 'dispatch', label: 'Approved Dispatch Orders', icon: FileText },
+    { key: 'loading', label: 'Loading & Dispatch', icon: Truck },
+    { key: 'damaged', label: 'Damaged & Quarantine', icon: AlertTriangle },
+    { key: 'reconciliation', label: 'Physical Reconciliation', icon: RefreshCw },
+    { key: 'capacity', label: 'Warehouse Capacity', icon: Layers },
+    { key: 'documents', label: 'Warehouse Documents', icon: FileText },
+    { key: 'reports', label: 'Reports & Analytics', icon: ArrowUpRight },
   ];
 
   return (
@@ -205,7 +205,7 @@ export default function WarehousePortalPage({ setCurrentView, currentUser, t }) 
                     { alert: 'Damaged Stock Quarantined: 120 KG Wheat isolated in Bay Q-1 (Moisture Spoilage).', level: 'WARNING' },
                   ].map((a, idx) => (
                     <div key={idx} className={`p-3 rounded-xl border flex items-center justify-between ${a.level === 'WARNING' ? 'bg-amber-50 border-amber-200 text-amber-900' : a.level === 'ACTION' ? 'bg-sky-50 border-sky-200 text-sky-900' : 'bg-emerald-50 border-emerald-200 text-emerald-900'}`}>
-                      <span>⚠️ {a.alert}</span>
+                      <span className="flex items-center gap-1.5"><AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" /> {a.alert}</span>
                       <span className="font-extrabold text-[10px] underline cursor-pointer">View Details →</span>
                     </div>
                   ))}
@@ -219,8 +219,9 @@ export default function WarehousePortalPage({ setCurrentView, currentUser, t }) 
             <div className="space-y-4">
               <h2 className="text-xl font-extrabold text-[#142618]">INCOMING PRODUCE RECEIVING & VERIFICATION</h2>
               <div className="bg-white rounded-2xl border border-emerald-100 p-5 shadow-sm space-y-3 font-mono text-xs">
-                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 font-bold">
-                  🔒 Restriction Rule: The Warehouse Manager verifies physical weight and generates GRN. Quality Grade cannot be altered.
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 font-bold flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-amber-700 shrink-0" />
+                  <span>Restriction Rule: The Warehouse Manager verifies physical weight and generates GRN. Quality Grade cannot be altered.</span>
                 </div>
                 <div className="space-y-2">
                   {incomingProcurement.map(lot => (
@@ -236,7 +237,10 @@ export default function WarehousePortalPage({ setCurrentView, currentUser, t }) 
                             Confirm Receiving & Issue GRN
                           </button>
                         ) : (
-                          <span className="bg-emerald-100 text-emerald-800 font-extrabold px-3 py-1 rounded-xl">✓ RECEIVED & GRN ISSUED</span>
+                          <span className="bg-emerald-100 text-emerald-800 font-extrabold px-3 py-1 rounded-xl flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                            <span>RECEIVED & GRN ISSUED</span>
+                          </span>
                         )}
                       </div>
                     </div>
@@ -293,7 +297,7 @@ export default function WarehousePortalPage({ setCurrentView, currentUser, t }) 
                     <tr>
                       <th className="p-3">Movement ID & Time</th>
                       <th className="p-3">Lot ID & Crop</th>
-                      <th className="p-3">From ➔ To Location</th>
+                      <th className="p-3">From → To Location</th>
                       <th className="p-3">Quantity</th>
                       <th className="p-3">Reason</th>
                       <th className="p-3">Performed By</th>
@@ -304,7 +308,7 @@ export default function WarehousePortalPage({ setCurrentView, currentUser, t }) 
                       <tr key={m.id} className="hover:bg-emerald-50/40">
                         <td className="p-3 font-bold text-[#142618]">{m.id}<br/><span className="text-[10px] text-[#637554]">{m.time}</span></td>
                         <td className="p-3 font-bold">{m.lotId}<br/><span className="text-[#637554]">{m.crop}</span></td>
-                        <td className="p-3">{m.from} ➔ <strong className="text-emerald-700">{m.to}</strong></td>
+                        <td className="p-3">{m.from} → <strong className="text-emerald-700">{m.to}</strong></td>
                         <td className="p-3 font-bold">{m.qty}</td>
                         <td className="p-3 text-[#637554]">{m.reason}</td>
                         <td className="p-3">{m.by}</td>
@@ -334,7 +338,10 @@ export default function WarehousePortalPage({ setCurrentView, currentUser, t }) 
                           Confirm Loading & Issue Dispatch Note →
                         </button>
                       ) : (
-                        <span className="bg-emerald-100 text-emerald-800 font-extrabold px-3 py-1 rounded-xl">✓ DISPATCHED</span>
+                        <span className="bg-emerald-100 text-emerald-800 font-extrabold px-3 py-1 rounded-xl flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                          <span>DISPATCHED</span>
+                        </span>
                       )}
                     </div>
                   </div>
@@ -348,8 +355,9 @@ export default function WarehousePortalPage({ setCurrentView, currentUser, t }) 
             <div className="space-y-4 font-mono text-xs">
               <h2 className="text-xl font-extrabold text-[#142618]">DAMAGED & QUARANTINED STOCK WORKFLOW</h2>
               <div className="bg-white rounded-2xl border border-emerald-100 p-5 shadow-sm space-y-3">
-                <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-900 font-bold">
-                  🔒 Permission Rule: Damaged stock cannot be deleted independently. All adjustments create an audit record and require authorization.
+                <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-900 font-bold flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-red-700 shrink-0" />
+                  <span>Permission Rule: Damaged stock cannot be deleted independently. All adjustments create an audit record and require authorization.</span>
                 </div>
                 {damagedStock.map(d => (
                   <div key={d.id} className="p-3 bg-[#f8fbf8] border border-emerald-100 rounded-xl flex justify-between items-center">

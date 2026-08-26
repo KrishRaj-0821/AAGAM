@@ -27,7 +27,8 @@ import AuthRequiredModal from './components/modals/AuthRequiredModal';
 import HelpdeskModal from './components/modals/HelpdeskModal';
 import VoiceAgentModal from './components/voice/VoiceAgentModal';
 import SuccessToast from './components/common/SuccessToast';
-import { LifeBuoy, Mic, Bot, Headphones, X, PhoneCall } from 'lucide-react';
+import { LifeBuoy, Mic, Bot, Headphones, X, PhoneCall, Sprout, Coins, Building2, QrCode, Microscope, Warehouse as WarehouseIcon, ShieldCheck, Compass } from 'lucide-react';
+import { signOutFirebaseUser } from './services/firebase';
 
 export default function App() {
   // System & Accessibility States
@@ -240,6 +241,7 @@ export default function App() {
 
   // Confirm and Execute Logout
   const handleConfirmLogout = () => {
+    signOutFirebaseUser().catch(console.error);
     setCurrentUser(null);
     try {
       localStorage.removeItem('aagam_auth_user');
@@ -412,34 +414,38 @@ export default function App() {
             </div>
             <div className="flex items-center gap-1 overflow-x-auto">
               {[
-                { key: 'Farmer', label: '🌾 Farmer' },
-                { key: 'Buyer', label: '💼 Buyer' },
-                { key: 'Officer', label: '🏛️ Officer' },
-                { key: 'Operator', label: '🏪 Operator' },
-                { key: 'Quality', label: '🔬 Quality' },
-                { key: 'Warehouse', label: '🏭 Warehouse' },
-                { key: 'Admin', label: '⚙️ Admin' },
-                { key: 'Navigator', label: '📑 171 Navigator' },
-              ].map(r => (
-                <button
-                  key={r.key}
-                  onClick={() => {
-                    if (isAuthenticated && currentUser?.role && currentUser.role !== r.key && r.key !== 'Navigator') {
-                      const shouldLogout = window.confirm(
-                        `🔒 Role Lock Policy\n\nYou are currently signed in as "${currentUser.role}".\n\nTo access the "${r.key}" portal, you must log out of your current account first.\n\nWould you like to Log Out now?`
-                      );
-                      if (shouldLogout) {
-                        handleRequestLogout();
+                { key: 'Farmer', label: 'Farmer', icon: Sprout },
+                { key: 'Buyer', label: 'Buyer', icon: Coins },
+                { key: 'Officer', label: 'Officer', icon: Building2 },
+                { key: 'Operator', label: 'Operator', icon: QrCode },
+                { key: 'Quality', label: 'Quality', icon: Microscope },
+                { key: 'Warehouse', label: 'Warehouse', icon: WarehouseIcon },
+                { key: 'Admin', label: 'Admin', icon: ShieldCheck },
+                { key: 'Navigator', label: '171 Navigator', icon: Compass },
+              ].map(r => {
+                const IconComponent = r.icon;
+                return (
+                  <button
+                    key={r.key}
+                    onClick={() => {
+                      if (isAuthenticated && currentUser?.role && currentUser.role !== r.key && r.key !== 'Navigator') {
+                        const shouldLogout = window.confirm(
+                          `Role Lock Policy\n\nYou are currently signed in as "${currentUser.role}".\n\nTo access the "${r.key}" portal, you must log out of your current account first.\n\nWould you like to Log Out now?`
+                        );
+                        if (shouldLogout) {
+                          handleRequestLogout();
+                        }
+                        return;
                       }
-                      return;
-                    }
-                    setActiveRole(r.key);
-                  }}
-                  className={`px-2.5 py-1 rounded-lg transition-all ${activeRole === r.key ? 'bg-amber-600 text-white font-bold' : 'bg-white/10 hover:bg-white/20 text-slate-200'}`}
-                >
-                  {r.label}
-                </button>
-              ))}
+                      setActiveRole(r.key);
+                    }}
+                    className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 ${activeRole === r.key ? 'bg-amber-600 text-white font-bold' : 'bg-white/10 hover:bg-white/20 text-slate-200'}`}
+                  >
+                    <IconComponent className="w-3.5 h-3.5" />
+                    <span>{r.label}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 

@@ -4,7 +4,8 @@ import {
   TrendingUp, TrendingDown, BarChart3, Activity, Zap, Globe,
   Truck, Warehouse, QrCode, Phone, Mail, ShieldCheck,
   MapPin, Clock, Coins, Building2, UserCheck, FileText,
-  Sprout, Gavel, Send, LifeBuoy, Users, Lock, Mic, Bot
+  Sprout, Gavel, Send, LifeBuoy, Users, Lock, Mic, Bot,
+  CreditCard, Microscope, Scale, Shield, Settings, Wrench, Link as LinkIcon
 } from 'lucide-react';
 
 // ─── Crop price data for Analytics pages ──────────────────────────────────────
@@ -324,7 +325,7 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
 
   const handleExecuteAction = () => {
     const time = new Date().toLocaleTimeString('en-IN');
-    setActionSuccessMsg(`✓ Page #${activePageObj.id} action executed at ${time} — Blockchain ledger synchronized.`);
+    setActionSuccessMsg(`Page #${activePageObj.id} action executed at ${time} — Blockchain ledger synchronized.`);
     setSimulationState(prev => ({
       ...prev,
       [activePageObj.id]: { executed: true, time, code: `GOI-SYNC-0x${Math.floor(Math.random() * 999999).toString(16).toUpperCase()}` }
@@ -342,25 +343,36 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
       <div className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[
-            { label: 'Pan-India Mandis', val: '2,840 Live', sub: 'Agmarknet Gateway Active', bg: 'emerald', icon: '🏪' },
-            { label: 'Total DBT Transferred', val: '₹1,42,500 Cr', sub: '100% NPCI Escrow Backed', bg: 'amber', icon: '💳' },
-            { label: 'Registered Farmers', val: '4.2 Crore', sub: 'PM-KISAN Database Linked', bg: 'sky', icon: '🌾' }
-          ].map(c => (
-            <div key={c.label} className={`bg-${c.bg}-50 border border-${c.bg}-300 p-4 rounded-2xl font-mono`}>
-              <div className="text-xl mb-1">{c.icon}</div>
-              <div className={`text-[10px] text-${c.bg}-800 uppercase font-bold`}>{c.label}</div>
-              <div className={`text-2xl font-extrabold text-${c.bg}-900`}>{c.val}</div>
-              <div className={`text-[10px] text-${c.bg}-700`}>{c.sub}</div>
-            </div>
-          ))}
+            { label: 'Pan-India Mandis', val: '2,840 Live', sub: 'Agmarknet Gateway Active', bg: 'emerald', icon: Building2 },
+            { label: 'Total DBT Transferred', val: '₹1,42,500 Cr', sub: '100% NPCI Escrow Backed', bg: 'amber', icon: CreditCard },
+            { label: 'Registered Farmers', val: '4.2 Crore', sub: 'PM-KISAN Database Linked', bg: 'sky', icon: Sprout }
+          ].map(c => {
+            const IconComp = c.icon;
+            return (
+              <div key={c.label} className={`bg-${c.bg}-50 border border-${c.bg}-300 p-4 rounded-2xl font-mono`}>
+                <IconComp className={`w-6 h-6 mb-1 text-${c.bg}-800`} />
+                <div className={`text-[10px] text-${c.bg}-800 uppercase font-bold`}>{c.label}</div>
+                <div className={`text-2xl font-extrabold text-${c.bg}-900`}>{c.val}</div>
+                <div className={`text-[10px] text-${c.bg}-700`}>{c.sub}</div>
+              </div>
+            );
+          })}
         </div>
         <div className="bg-[#f0f4ea] p-4 rounded-2xl border border-[#abbe99]">
           <h4 className="font-extrabold text-xs text-[#243118] mb-2">Quick Navigation — Core AAGAM Workflows</h4>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-bold text-[#243118]">
-            <button onClick={() => setCurrentView('prices')} className="bg-white p-3 rounded-xl border border-[#abbe99] hover:bg-[#71873f] hover:text-white transition-all">📊 Live MSP Prices</button>
-            <button onClick={() => setCurrentView('marketplace')} className="bg-white p-3 rounded-xl border border-[#abbe99] hover:bg-[#71873f] hover:text-white transition-all">🌾 Crop Market</button>
-            <button onClick={() => setCurrentView('eauction')} className="bg-white p-3 rounded-xl border border-[#abbe99] hover:bg-[#71873f] hover:text-white transition-all">🔨 Live e-Auction</button>
-            <button onClick={() => setCurrentView('logistics')} className="bg-white p-3 rounded-xl border border-[#abbe99] hover:bg-[#71873f] hover:text-white transition-all">🚚 GPS Logistics</button>
+            <button onClick={() => setCurrentView('prices')} className="bg-white p-3 rounded-xl border border-[#abbe99] hover:bg-[#71873f] hover:text-white transition-all flex items-center justify-center gap-1.5">
+              <BarChart3 className="w-4 h-4" /> <span>Live MSP Prices</span>
+            </button>
+            <button onClick={() => setCurrentView('marketplace')} className="bg-white p-3 rounded-xl border border-[#abbe99] hover:bg-[#71873f] hover:text-white transition-all flex items-center justify-center gap-1.5">
+              <Sprout className="w-4 h-4" /> <span>Crop Market</span>
+            </button>
+            <button onClick={() => setCurrentView('eauction')} className="bg-white p-3 rounded-xl border border-[#abbe99] hover:bg-[#71873f] hover:text-white transition-all flex items-center justify-center gap-1.5">
+              <Gavel className="w-4 h-4" /> <span>Live e-Auction</span>
+            </button>
+            <button onClick={() => setCurrentView('logistics')} className="bg-white p-3 rounded-xl border border-[#abbe99] hover:bg-[#71873f] hover:text-white transition-all flex items-center justify-center gap-1.5">
+              <Truck className="w-4 h-4" /> <span>GPS Logistics</span>
+            </button>
           </div>
         </div>
       </div>
@@ -393,7 +405,10 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
             {['NIC MeitY Tier-4 Cloud', 'SHA-256 Encryption', 'NPCI DBT Bridge', 'AgriStack Linked'].map(f => (
               <div key={f} className="bg-white p-3 rounded-xl border border-emerald-300 text-center">
-                <div className="text-emerald-600 font-bold text-[10px]">✓ Active</div>
+                <div className="text-emerald-600 font-bold text-[10px] flex items-center justify-center gap-1">
+                  <CheckCircle2 className="w-3 h-3" />
+                  <span>Active</span>
+                </div>
                 <div className="font-bold text-[#243118]">{f}</div>
               </div>
             ))}
@@ -406,7 +421,10 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
     if (id === 5) return (
       <div className="space-y-4">
         <div className="bg-white p-4 rounded-2xl border border-[#abbe99]">
-          <h4 className="font-extrabold text-sm text-[#243118] mb-3">🔍 Live Price Discovery — Top Mandis Right Now</h4>
+          <h4 className="font-extrabold text-sm text-[#243118] mb-3 flex items-center gap-1.5">
+            <Search className="w-4 h-4 text-emerald-700" />
+            <span>Live Price Discovery — Top Mandis Right Now</span>
+          </h4>
           <div className="space-y-2">
             {[
               { crop: 'Wheat (Sharbati)', mandi: 'Karnal Central, HR', msp: 2425, price: 2590, vol: '1,420 MT' },
@@ -420,11 +438,11 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
                 <div key={r.crop} className="flex items-center justify-between bg-[#fcfaf7] p-2.5 rounded-xl border border-[#abbe99]/60 text-xs font-mono">
                   <div>
                     <div className="font-bold text-[#243118]">{r.crop}</div>
-                    <div className="text-[10px] text-[#637554]">{r.mandi} • {r.vol}</div>
+                    <div className="text-[10px] text-[#637554]">{r.mandi} • Volume: {r.vol}</div>
                   </div>
                   <div className="text-right">
-                    <div className="font-extrabold text-[#243118]">₹{r.price.toLocaleString('en-IN')}/Qtl</div>
-                    <div className="text-emerald-700 font-bold text-[10px]">+{pct}% above MSP (₹{r.msp})</div>
+                    <div className="font-extrabold text-base text-[#243118]">₹{r.price}/Qtl</div>
+                    <div className="text-[10px] font-bold text-emerald-700">+{pct}% above MSP (₹{r.msp})</div>
                   </div>
                 </div>
               );
@@ -434,31 +452,23 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
       </div>
     );
 
-    // PAGE 6: Crop Marketplace
+    // PAGE 6: Marketplace
     if (id === 6) return (
       <div className="space-y-4">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {[
-            { label: 'Listed Lots', val: '4,820', bg: 'emerald' },
-            { label: 'Active Offers', val: '1,240', bg: 'amber' },
-            { label: 'Verified Sellers', val: '28,500', bg: 'sky' },
-            { label: 'Avg Lot Size', val: '210 Qtl', bg: 'purple' }
-          ].map(c => (
-            <div key={c.label} className={`bg-${c.bg}-50 border border-${c.bg}-300 p-3 rounded-2xl font-mono text-center`}>
-              <div className={`text-xl font-extrabold text-${c.bg}-900`}>{c.val}</div>
-              <div className={`text-[10px] text-${c.bg}-700 font-bold uppercase`}>{c.label}</div>
-            </div>
-          ))}
-        </div>
         <div className="bg-white p-4 rounded-2xl border border-[#abbe99]">
-          <h4 className="font-extrabold text-xs text-[#243118] mb-2">Active Crop Lots Available Now</h4>
+          <div className="flex justify-between items-center mb-3">
+            <h4 className="font-extrabold text-sm text-[#243118]">Featured Verified Produce Lots</h4>
+            <button onClick={() => setCurrentView('marketplace')} className="text-xs text-[#71873f] font-bold hover:underline">
+              View All 4,820 Lots →
+            </button>
+          </div>
           <div className="space-y-2 text-xs font-mono">
             {[
-              { crop: 'Wheat (FAQ Grade A)', qty: '500 Qtl', mandi: 'Karnal, HR', seller: 'Sukhwinder Singh', price: 2590 },
-              { crop: 'Mustard Bold', qty: '320 Qtl', mandi: 'Bharatpur, RJ', seller: 'Ramesh Sharma', price: 6340 },
-              { crop: 'Chana Desi', qty: '180 Qtl', mandi: 'Latur, MH', seller: 'Vijay Patil', price: 5820 }
+              { crop: 'Wheat FAQ Sharbati', qty: '500 Qtl', seller: 'Gurpreet Singh (PB)', mandi: 'Khanna APMC', price: 2580 },
+              { crop: 'Basmati Paddy 1121', qty: '800 Qtl', seller: 'Amarjit Kaur (HR)', mandi: 'Karnal Yard', price: 4180 },
+              { crop: 'Mustard Bold Grade A', qty: '350 Qtl', seller: 'Ramesh Sharma (RJ)', mandi: 'Bharatpur', price: 6320 }
             ].map(l => (
-              <div key={l.crop} className="flex justify-between items-center bg-[#fcfaf7] p-2.5 rounded-xl border border-[#abbe99]/60">
+              <div key={l.crop} className="flex justify-between items-center p-2.5 bg-[#fcfaf7] rounded-xl border border-[#abbe99]/60">
                 <div>
                   <div className="font-bold text-[#243118]">{l.crop} — {l.qty}</div>
                   <div className="text-[10px] text-[#637554]">{l.seller} • {l.mandi}</div>
@@ -476,7 +486,10 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
       <div className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="bg-red-50 border border-red-300 p-4 rounded-2xl font-mono text-center">
-            <div className="text-[10px] text-red-700 font-bold uppercase">🔴 LIVE NOW</div>
+            <div className="text-[10px] text-red-700 font-bold uppercase flex items-center justify-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-red-600 animate-ping"></span>
+              <span>LIVE NOW</span>
+            </div>
             <div className="text-2xl font-extrabold text-red-900">12 Auctions</div>
             <div className="text-[10px] text-red-600">Active Bidding Rooms</div>
           </div>
@@ -486,7 +499,7 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
             <div className="text-[10px] text-amber-700">Today's Session</div>
           </div>
           <div className="bg-emerald-50 border border-emerald-300 p-4 rounded-2xl font-mono text-center">
-            <div className="text-[10px] text-emerald-800 font-bold uppercase">Value Transacted</div>
+            <div className="text-[10px] text-emerald-800 uppercase font-bold">Value Transacted</div>
             <div className="text-2xl font-extrabold text-emerald-900">₹8.4 Cr</div>
             <div className="text-[10px] text-emerald-700">Today Total</div>
           </div>
@@ -511,8 +524,9 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
               </div>
             ))}
           </div>
-          <button onClick={() => setCurrentView('eauction')} className="w-full mt-3 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-xs transition-all">
-            🔨 Enter Live Auction Room →
+          <button onClick={() => setCurrentView('eauction')} className="w-full mt-3 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-xs transition-all flex items-center justify-center gap-1.5">
+            <Gavel className="w-4 h-4" />
+            <span>Enter Live Auction Room →</span>
           </button>
         </div>
       </div>
@@ -564,7 +578,10 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
       <div className="space-y-4">
         <div className="bg-white p-4 rounded-2xl border border-[#abbe99]">
           <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-            <h4 className="font-extrabold text-sm text-[#243118]">📊 Crop Price Trend — Jan–Aug 2025 (vs MSP Baseline)</h4>
+            <h4 className="font-extrabold text-sm text-[#243118] flex items-center gap-1.5">
+              <BarChart3 className="w-4 h-4 text-emerald-700" />
+              <span>Crop Price Trend — Jan–Aug 2025 (vs MSP Baseline)</span>
+            </h4>
             <label className="flex items-center gap-2 text-xs font-bold text-[#637554] cursor-pointer select-none">
               <input type="checkbox" checked={compareMode} onChange={e => setCompareMode(e.target.checked)} className="w-3.5 h-3.5" />
               Compare Mode
@@ -749,18 +766,24 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
           <h4 className="font-extrabold text-sm text-[#243118] border-b pb-2">Privacy Policy — AAGAM Portal (IT Act 2000 & DPDP 2023 Compliant)</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 font-mono">
             {[
-              { icon: '🔐', title: 'Data Encryption', desc: 'AES-256 + SHA-256 end-to-end for all PII data' },
-              { icon: '🛡️', title: 'Aadhaar Policy', desc: 'UIDAI compliant — no Aadhaar raw data stored' },
-              { icon: '🏦', title: 'Banking Data', desc: 'Bank account data masked — only UTR reference kept' },
-              { icon: '📍', title: 'Location Data', desc: 'GPS data used only for logistics ETAs — not retained beyond 7 days' },
-              { icon: '📧', title: 'Contact Data', desc: 'Mobile & email used only for OTP, notifications, DBT alerts' },
-              { icon: '📊', title: 'Analytics', desc: 'Aggregated, anonymized data used for government policy planning only' }
-            ].map(c => (
-              <div key={c.title} className="p-2.5 bg-[#fcfaf7] rounded-xl border border-[#abbe99]/60">
-                <div className="font-bold text-[#243118]">{c.icon} {c.title}</div>
-                <div className="text-[#637554] text-[10px]">{c.desc}</div>
-              </div>
-            ))}
+              { icon: Lock, title: 'Data Encryption', desc: 'AES-256 + SHA-256 end-to-end for all PII data' },
+              { icon: Shield, title: 'Aadhaar Policy', desc: 'UIDAI compliant — no Aadhaar raw data stored' },
+              { icon: Building2, title: 'Banking Data', desc: 'Bank account data masked — only UTR reference kept' },
+              { icon: MapPin, title: 'Location Data', desc: 'GPS data used only for logistics ETAs — not retained beyond 7 days' },
+              { icon: Mail, title: 'Contact Data', desc: 'Mobile & email used only for OTP, notifications, DBT alerts' },
+              { icon: BarChart3, title: 'Analytics', desc: 'Aggregated, anonymized data used for government policy planning only' }
+            ].map(c => {
+              const IconComp = c.icon;
+              return (
+                <div key={c.title} className="p-2.5 bg-[#fcfaf7] rounded-xl border border-[#abbe99]/60">
+                  <div className="font-bold text-[#243118] flex items-center gap-1.5">
+                    <IconComp className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                    <span>{c.title}</span>
+                  </div>
+                  <div className="text-[#637554] text-[10px] mt-0.5">{c.desc}</div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -802,13 +825,13 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
     if (id >= 20 && id <= 51) {
       const farmerSpecific = {
         20: { title: 'Farmer Dashboard Overview', widgets: ['My Crops: 2 Active', 'DBT Balance: ₹4,36,500', 'Next Slot: 08-Sep-25 (10 AM)', 'Avg Moisture: 10.8%'] },
-        21: { title: 'Aadhaar e-KYC Profile', widgets: ['Aadhaar: XXXX-XXXX-9482 ✓', 'Bank: SBI XXXX4892', 'Land: 4.5 Acres (Khasra 48/2)', 'Mobile: +91 98765 XXXXX'] },
-        22: { title: 'Land Records (Khasra/Khatauni)', widgets: ['Plot: Khasra 48/2, 4.5 Acres', 'District: Karnal, Haryana', 'Soil: Sandy Loam (Class II)', 'Bhulekh Status: VERIFIED ✓'] },
+        21: { title: 'Aadhaar e-KYC Profile', widgets: ['Aadhaar: XXXX-XXXX-9482 (Verified)', 'Bank: SBI XXXX4892', 'Land: 4.5 Acres (Khasra 48/2)', 'Mobile: +91 98765 XXXXX'] },
+        22: { title: 'Land Records (Khasra/Khatauni)', widgets: ['Plot: Khasra 48/2, 4.5 Acres', 'District: Karnal, Haryana', 'Soil: Sandy Loam (Class II)', 'Bhulekh Status: VERIFIED'] },
         23: { title: 'Add New Land Record', widgets: ['Khasra Number Entry', 'State → District → Tehsil', 'Land Area in Acres/Bigha', 'Upload: Jamabandi / Patta'] },
-        24: { title: 'Land Verification Status', widgets: ['Block Status: APPROVED', 'Patwari Confirmation: ✓', 'Doob / Encumbrance: NIL', 'Ownership Type: Patta (Self)'] },
+        24: { title: 'Land Verification Status', widgets: ['Block Status: APPROVED', 'Patwari Confirmation: Verified', 'Doob / Encumbrance: NIL', 'Ownership Type: Patta (Self)'] },
         25: { title: 'My Registered Crops', widgets: ['Wheat (180 Qtl) — Active', 'Paddy (220 Qtl) — Kharif 2025', 'Season: Rabi 2024-25', 'Variety: HD-3086 Sharbati'] },
         26: { title: 'Add New Crop Declaration', widgets: ['Crop: Select from 100+ types', 'Sowing Date: Input', 'Expected Harvest: Qtl/Acre', 'Variety: Local / Hybrid'] },
-        27: { title: 'Crop Details & Moisture', widgets: ['Moisture: 10.8% (FAQ ✓)', 'Grade: A (< 12%)', 'Protein: 11.2%', 'Foreign Matter: 0.8%'] },
+        27: { title: 'Crop Details & Moisture', widgets: ['Moisture: 10.8% (FAQ Pass)', 'Grade: A (< 12%)', 'Protein: 11.2%', 'Foreign Matter: 0.8%'] },
         28: { title: 'Crop Offers — Active Bids', widgets: ['Highest Offer: ₹2,630/Qtl', 'Bidder: Punjab Agri Corp', 'Offer Valid: 48 hours', 'Accept / Counter Available'] },
         29: { title: 'Price Comparison Tool', widgets: ['Your MSP: ₹2,425', 'Best Mandi Rate: ₹2,590', 'Best Buyer Offer: ₹2,630', 'Premium: ₹205/Qtl above MSP'] },
         30: { title: 'Nearby Mandi Live Rates', widgets: ['Karnal: ₹2,590 (14 km)', 'Kurukshetra: ₹2,565 (28 km)', 'Kaithal: ₹2,540 (35 km)', 'Panipat: ₹2,520 (62 km)'] },
@@ -818,7 +841,7 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
         34: { title: 'Auction Lot Details', widgets: ['Lot: #PB-KNH-2241', 'Bids Received: 14', 'Highest: ₹4,220/Qtl', 'Time Left: 2h 45m'] },
         35: { title: 'Procurement Centers Directory', widgets: ['36 States, 2,840 Centers', 'Sort by Distance / Capacity', 'Filter by Crop Type', 'Check Slot Availability'] },
         36: { title: 'Book Arrival Slot', widgets: ['Center: Karnal Yard, Lane 4', 'Date: 08-Sep-2025', 'Slot: 10:00 AM – 11:00 AM', 'Vehicle: PB-10-AB-1234'] },
-        37: { title: 'My Booked Slots', widgets: ['Slot #HR-KRN-SLT-4829', 'Date: 08-Sep-2025, 10 AM', 'Center: Karnal Central Yard', 'Status: CONFIRMED ✓'] },
+        37: { title: 'My Booked Slots', widgets: ['Slot #HR-KRN-SLT-4829', 'Date: 08-Sep-2025, 10 AM', 'Center: Karnal Central Yard', 'Status: CONFIRMED'] },
         38: { title: 'My QR Tokens', widgets: ['Token: #HR-KRN-4829', 'Crop: 180 Qtl Wheat', 'Validity: 8-Sep-2025', 'QR: Scannable at Gate'] },
         39: { title: 'Digital Gate Pass', widgets: ['Pass: AAGAM-GP-4829', 'Lane: Weighbridge #4', 'ETA: 08-Sep-25 10:00 AM', 'QR: Download PDF'] },
         40: { title: 'Virtual Yard Queue', widgets: ['Current Queue: 42 Trucks', 'Your Position: #8', 'Estimated Wait: 48 minutes', 'Live GPS Tracking Active'] },
@@ -847,7 +870,10 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
             ))}
           </div>
           <div className="bg-white p-4 rounded-2xl border border-[#abbe99] text-xs font-mono">
-            <div className="font-extrabold text-[#243118] border-b pb-2 mb-2">🌾 {spec.title}</div>
+            <div className="font-extrabold text-[#243118] border-b pb-2 mb-2 flex items-center gap-1.5">
+              <Sprout className="w-4 h-4 text-[#71873f]" />
+              <span>{spec.title}</span>
+            </div>
             <div className="grid grid-cols-2 gap-2 text-[#637554]">
               <div className="p-2 bg-[#fcfaf7] rounded-xl border border-[#abbe99]/60">
                 <div className="font-bold text-[#243118]">Farmer ID</div>
@@ -875,7 +901,7 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
     if (id >= 52 && id <= 65) {
       const buyerSpecific = {
         52: ['Escrow Balance: ₹28.5L', 'Active Bids: 3 Lots', 'Won Auctions: 8 Today', 'Settlement: ₹2.14 Cr'],
-        53: ['License: eNAM-TRD-PB-88219', 'Entity: Punjab Agri Corp', 'KYC Status: VERIFIED ✓', 'Credit Limit: ₹50 Lakh'],
+        53: ['License: eNAM-TRD-PB-88219', 'Entity: Punjab Agri Corp', 'KYC Status: VERIFIED', 'Credit Limit: ₹50 Lakh'],
         54: ['Listed Crops: 4,820 Lots', 'Grade A Only: 2,140 Lots', 'Wheat FAQ: 820 Lots', 'Price Range: ₹2,500–₹2,650'],
         55: ['NIR: 10.8% Moisture', 'Grade: A FAQ', 'Protein: 11.2%', 'Lot: 500 Qtl Wheat HD-3086'],
         56: ['Offer #OF-48291: ₹2,630', 'Status: Counter-Offered', 'Offer #OF-48288: ₹5,890', 'Status: Accepted'],
@@ -885,7 +911,7 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
         60: ['Bid #1: ₹4,220 (Winning)', 'Bid #2: ₹5,890 (Winning)', 'Bid #3: ₹2,620 (Outbid)', 'Total Staked: ₹62.4 Lakh'],
         61: ['Won: 8 Lots Today', 'Total: 1,840 Qtl', 'Value: ₹2.14 Crore', 'Delivery: 3 Pending'],
         62: ['Wheat: 1,000 Qtl (Karnal)', 'Paddy: 420 Qtl (Khanna)', 'Chana: 160 Qtl (Latur)', 'In Transit: 580 Qtl'],
-        63: ['Order #ORD-KRN-4829: ✓', 'Escrow Released: ₹4,36,500', 'Order #ORD-KNH-2241: Pending', 'Delivery ETA: 2 days'],
+        63: ['Order #ORD-KRN-4829: Confirmed', 'Escrow Released: ₹4,36,500', 'Order #ORD-KNH-2241: Pending', 'Delivery ETA: 2 days'],
         64: ['Paid Today: ₹2.14 Cr', 'PFMS UTR: 8 Cleared', 'Avg Settlement: 6.2 hours', 'Method: NPCI RTGS'],
         65: ['Trucks: 12 In-Transit', 'Route: Karnal → Delhi', 'ETA: Today 6 PM', 'GPS: Live Tracking On']
       };
@@ -902,7 +928,10 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
             ))}
           </div>
           <div className="bg-white p-4 rounded-2xl border border-[#abbe99] text-xs font-mono space-y-2">
-            <div className="font-extrabold text-[#243118] border-b pb-2">💼 Buyer Operations: {p.titleEn}</div>
+            <div className="font-extrabold text-[#243118] border-b pb-2 flex items-center gap-1.5">
+              <Coins className="w-4 h-4 text-amber-700" />
+              <span>Buyer Operations: {p.titleEn}</span>
+            </div>
             <div className="grid grid-cols-2 gap-2 text-[#637554]">
               <div className="p-2 bg-amber-50 rounded-xl border border-amber-200">
                 <div className="font-bold text-amber-900">Trading License</div>
@@ -913,8 +942,9 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
                 <div>₹28,50,000 PFMS Linked</div>
               </div>
             </div>
-            <button onClick={() => setCurrentView('eauction')} className="w-full bg-[#a36627] hover:bg-[#804d19] text-white font-bold py-2 rounded-xl text-xs transition-all">
-              🔨 Enter Live Bidding Room →
+            <button onClick={() => setCurrentView('eauction')} className="w-full bg-[#a36627] hover:bg-[#804d19] text-white font-bold py-2 rounded-xl text-xs transition-all flex items-center justify-center gap-1.5">
+              <Gavel className="w-4 h-4" />
+              <span>Enter Live Bidding Room →</span>
             </button>
           </div>
         </div>
@@ -952,7 +982,10 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
             ))}
           </div>
           <div className="bg-white p-4 rounded-2xl border border-[#abbe99] text-xs font-mono">
-            <div className="font-extrabold text-[#243118] border-b pb-2">🏛️ Officer Module: {p.titleEn}</div>
+            <div className="font-extrabold text-[#243118] border-b pb-2 flex items-center gap-1.5">
+              <Building2 className="w-4 h-4 text-sky-700" />
+              <span>Officer Module: {p.titleEn}</span>
+            </div>
             <div className="mt-2 text-[#637554]">
               Procurement officer supervisory view. All 14 weighbridge lanes operating within nominal capacity. Zero SLA breach detected for current session.
             </div>
@@ -987,8 +1020,11 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
             ))}
           </div>
           <div className="bg-white p-4 rounded-2xl border border-[#abbe99] text-xs font-mono space-y-1.5">
-            <div className="font-extrabold text-[#243118] border-b pb-2">🏪 Mandi Operator: {p.titleEn}</div>
-            <div className="flex justify-between"><span className="text-[#637554]">NIR Sensor Bandwidth:</span><span className="font-bold text-emerald-700">950nm–1650nm ✓ Calibrated</span></div>
+            <div className="font-extrabold text-[#243118] border-b pb-2 flex items-center gap-1.5">
+              <Building2 className="w-4 h-4 text-[#71873f]" />
+              <span>Mandi Operator: {p.titleEn}</span>
+            </div>
+            <div className="flex justify-between"><span className="text-[#637554]">NIR Sensor Bandwidth:</span><span className="font-bold text-emerald-700">950nm–1650nm (Calibrated)</span></div>
             <div className="flex justify-between"><span className="text-[#637554]">Weighbridge Lanes:</span><span className="font-bold text-[#243118]">14 Active / 14 Total</span></div>
             <div className="flex justify-between"><span className="text-[#637554]">RFID Gate Status:</span><span className="font-bold text-[#71873f]">Automated — Active</span></div>
           </div>
@@ -1018,12 +1054,15 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
             </div>
           </div>
           <div className="bg-white p-4 rounded-2xl border border-[#abbe99] text-xs font-mono">
-            <div className="font-extrabold text-[#243118] border-b pb-2">🔬 Quality Inspector Module: {p.titleEn}</div>
+            <div className="font-extrabold text-[#243118] border-b pb-2 flex items-center gap-1.5">
+              <Microscope className="w-4 h-4 text-emerald-700" />
+              <span>Quality Inspector Module: {p.titleEn}</span>
+            </div>
             <div className="mt-2 space-y-1.5 text-[#637554]">
               {id === 94 && <>
                 <div className="flex justify-between"><span>NIR Wavelength:</span><span className="font-bold text-[#243118]">950nm–1650nm</span></div>
-                <div className="flex justify-between"><span>Calibration Status:</span><span className="font-bold text-emerald-700">✓ 45 minutes ago</span></div>
-                <div className="flex justify-between"><span>Last Sample:</span><span className="font-bold">Wheat HD-3086 — 10.2% ✓</span></div>
+                <div className="flex justify-between"><span>Calibration Status:</span><span className="font-bold text-emerald-700 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> 45 minutes ago</span></div>
+                <div className="flex justify-between"><span>Last Sample:</span><span className="font-bold flex items-center gap-1"><span>Wheat HD-3086 — 10.2%</span> <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" /></span></div>
               </>}
               {id === 97 && <>
                 <div className="flex justify-between"><span>AI Model:</span><span className="font-bold text-[#243118]">AgriVision v3.1 (ICAR)</span></div>
@@ -1059,16 +1098,19 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
             </div>
           </div>
           <div className="bg-white p-4 rounded-2xl border border-[#abbe99] text-xs font-mono">
-            <div className="font-extrabold text-[#243118] border-b pb-2">🚚 Logistics Module: {p.titleEn}</div>
+            <div className="font-extrabold text-[#243118] border-b pb-2 flex items-center gap-1.5">
+              <Truck className="w-4 h-4 text-sky-700" />
+              <span>Logistics Module: {p.titleEn}</span>
+            </div>
             <div className="mt-2 space-y-1.5">
               {[
                 { route: 'Karnal Yard → FCI Depot Delhi', truck: 'HR-10-ZA-1234', status: 'In Transit (14 km left)', eta: '4:45 PM' },
-                { route: 'Khanna APMC → Punjab State Store', truck: 'PB-10-AB-9921', status: 'Delivered ✓', eta: 'Done' },
+                { route: 'Khanna APMC → Punjab State Store', truck: 'PB-10-AB-9921', status: 'Delivered (Verified)', eta: 'Done' },
                 { route: 'Bharatpur → Rajasthan Buffer', truck: 'RJ-14-BB-4821', status: 'Loading at Origin', eta: 'ETA 7 PM' }
               ].map(t => (
                 <div key={t.truck} className="flex justify-between p-2 bg-[#fcfaf7] rounded-xl border border-[#abbe99]/60">
                   <div><div className="font-bold text-[#243118]">{t.truck}</div><div className="text-[#637554]">{t.route}</div></div>
-                  <div className="text-right"><div className={`font-bold ${t.status.includes('✓') ? 'text-emerald-700' : 'text-sky-700'}`}>{t.status}</div><div className="text-[#637554]">{t.eta}</div></div>
+                  <div className="text-right"><div className={`font-bold ${t.status.includes('Delivered') ? 'text-emerald-700' : 'text-sky-700'}`}>{t.status}</div><div className="text-[#637554]">{t.eta}</div></div>
                 </div>
               ))}
             </div>
@@ -1104,7 +1146,10 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
             ))}
           </div>
           <div className="bg-white p-4 rounded-2xl border border-[#abbe99] text-xs font-mono">
-            <div className="font-extrabold text-[#243118] border-b pb-2">🏭 Warehouse Module: {p.titleEn}</div>
+            <div className="font-extrabold text-[#243118] border-b pb-2 flex items-center gap-1.5">
+              <Warehouse className="w-4 h-4 text-indigo-700" />
+              <span>Warehouse Module: {p.titleEn}</span>
+            </div>
             <div className="mt-2 space-y-1 text-[#637554]">
               <div className="flex justify-between"><span>Total Capacity:</span><span className="font-bold text-[#243118]">48,000 MT</span></div>
               <div className="flex justify-between"><span>Current Stock:</span><span className="font-bold text-[#a36627]">32,640 MT (68%)</span></div>
@@ -1149,7 +1194,10 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
           </div>
           <div className="bg-white p-4 rounded-2xl border border-[#abbe99] text-xs font-mono">
             <div className="font-extrabold text-[#243118] border-b pb-2 flex justify-between items-center">
-              <span>💳 Live DBT Payment Feed — {p.titleEn}</span>
+              <span className="flex items-center gap-1.5">
+                <CreditCard className="w-4 h-4 text-emerald-700" />
+                <span>Live DBT Payment Feed — {p.titleEn}</span>
+              </span>
               <div className="flex gap-1">
                 {['All', 'CREDITED', 'PROCESSING', 'PENDING'].map(f => (
                   <button key={f} onClick={() => setPaymentFilter(f)}
@@ -1182,7 +1230,10 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
     if (id >= 128 && id <= 136) return (
       <div className="space-y-4">
         <div className="bg-white p-4 rounded-2xl border border-[#abbe99]">
-          <h4 className="font-extrabold text-sm text-[#243118] mb-3">📊 AI Analytics Module: {p.titleEn}</h4>
+          <h4 className="font-extrabold text-sm text-[#243118] mb-3 flex items-center gap-1.5">
+            <BarChart3 className="w-4 h-4 text-purple-700" />
+            <span>AI Analytics Module: {p.titleEn}</span>
+          </h4>
           <div className="flex flex-wrap gap-2 mb-4">
             {Object.keys(CROP_PRICE_DATA).slice(0, 5).map(c => (
               <button key={c} onClick={() => setSelectedCrop(c)}
@@ -1214,7 +1265,10 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
     if (id >= 137 && id <= 142) return (
       <div className="space-y-4">
         <div className="bg-white p-4 rounded-2xl border border-[#abbe99]">
-          <h4 className="font-extrabold text-sm text-[#243118] mb-3">🔗 Crop Traceability Chain: {p.titleEn}</h4>
+          <h4 className="font-extrabold text-sm text-[#243118] mb-3 flex items-center gap-1.5">
+            <LinkIcon className="w-4 h-4 text-emerald-700" />
+            <span>Crop Traceability Chain: {p.titleEn}</span>
+          </h4>
           <div className="space-y-2">
             {[
               { step: 'Farm Origin', detail: 'Khasra 48/2, Karnal, HR — Sukhwinder Singh', hash: '0x4f82...1a2b', ts: '01-Sep-2025 06:00 AM' },
@@ -1280,7 +1334,10 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
             ))}
           </div>
           <div className="bg-white p-4 rounded-2xl border border-[#abbe99] text-xs font-mono">
-            <div className="font-extrabold text-[#243118] border-b pb-2">⚙️ Admin Control Panel: {p.titleEn}</div>
+            <div className="font-extrabold text-[#243118] border-b pb-2 flex items-center gap-1.5">
+              <Settings className="w-4 h-4 text-indigo-700" />
+              <span>Admin Control Panel: {p.titleEn}</span>
+            </div>
             <div className="mt-2 text-[#637554]">Administrative master control and configuration interface. All actions are logged to the NIC blockchain audit trail with admin ID and timestamp.</div>
           </div>
         </div>
@@ -1304,7 +1361,10 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
           ))}
         </div>
         <div className="bg-white p-4 rounded-2xl border border-[#abbe99] text-xs font-mono">
-          <div className="font-extrabold text-[#243118] border-b pb-2">🔧 {p.titleEn}</div>
+          <div className="font-extrabold text-[#243118] border-b pb-2 flex items-center gap-1.5">
+            <Wrench className="w-4 h-4 text-slate-700" />
+            <span>{p.titleEn}</span>
+          </div>
           {id === 163 && <div className="mt-2 text-[#637554]">Update your display name, profile photo, designation, and preferred language. Changes sync across all AAGAM modules.</div>}
           {id === 164 && <div className="mt-2 text-[#637554]">Manage account email, linked mobile number, bank account details, and Aadhaar seeding status.</div>}
           {id === 165 && <div className="mt-2 text-[#637554]">Change password, manage active sessions, enable/disable 2FA, and view login history.</div>}
@@ -1436,9 +1496,12 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
                   </div>
                 </div>
                 <div className="bg-white p-3 rounded-xl border border-[#abbe99] font-mono text-xs space-y-1.5">
-                  <div className="font-extrabold text-[#243118] border-b pb-1.5 flex justify-between">
+                  <div className="font-extrabold text-[#243118] border-b pb-1.5 flex justify-between items-center">
                     <span>Audit Trail</span>
-                    <span className="text-emerald-700">✓ SYNCHRONIZED</span>
+                    <span className="text-emerald-700 flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>SYNCHRONIZED</span>
+                    </span>
                   </div>
                   <div className="flex justify-between text-[#637554]">
                     <span>Route:</span>

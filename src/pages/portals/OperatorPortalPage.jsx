@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   ChevronLeft, QrCode, Truck, UserCheck, Scale, Microscope, Gavel, 
   FileText, ArrowRight, Building2, Bell, Search, Filter, Plus, CheckCircle2, 
-  RefreshCw, Clock, Layers, Lock, Download, DollarSign
+  RefreshCw, Clock, Layers, Lock, Download, DollarSign, Trophy
 } from 'lucide-react';
 
 export default function OperatorPortalPage({ setCurrentView, currentUser, t }) {
@@ -28,37 +28,38 @@ export default function OperatorPortalPage({ setCurrentView, currentUser, t }) {
 
   // 3. Weighment Calculations (Gross - Tare = Net)
   const [weighments, setWeighments] = useState([
-    { weighId: 'WGH-9901', lotId: 'LOT-2026-00452', farmer: 'Raj Kumar', crop: 'Wheat', gross: 5850, tare: 850, net: 5000, unit: 'KG', machine: 'Weighbridge #01', time: '09:55 AM', receiptNo: 'RCP-WGH-001' },
-    { weighId: 'WGH-9902', lotId: 'LOT-2026-00453', farmer: 'Gurpreet Singh', crop: 'Paddy Basmati', gross: 20200, tare: 2200, net: 18000, unit: 'KG', machine: 'Weighbridge #02', time: '10:25 AM', receiptNo: 'RCP-WGH-002' },
+    { weighId: 'WGH-4401', lotId: 'LOT-2026-00045', farmer: 'Gurpreet Singh', crop: 'Wheat (Sharbati)', gross: 5850, tare: 850, net: 5000, status: 'RECORDED', receiptNo: 'RCP-99482' },
+    { weighId: 'WGH-4402', lotId: 'LOT-2026-00046', farmer: 'Baldev Ram', crop: 'Paddy (Basmati)', gross: 9200, tare: 1200, net: 8000, status: 'RECORDED', receiptNo: 'RCP-99483' },
   ]);
 
-  // 4. Mandi Auction Bidding Sessions
+  // Live Auctions in Mandi Yard
   const [auctions, setAuctions] = useState([
-    { auctionId: 'AUC-301', lotId: 'LOT-2026-00452', crop: 'Wheat (Grade A)', qty: '5,000 KG', startPrice: '₹2,400 / Qtl', bids: [{ buyer: 'Buyer A', bid: '₹2,430' }, { buyer: 'Buyer B', bid: '₹2,450' }, { buyer: 'Buyer C', bid: '₹2,470' }], winner: 'Buyer C', finalPrice: '₹2,470 / Qtl', status: 'COMPLETED' },
+    { auctionId: 'MND-AUC-8801', crop: 'Wheat (Sharbati)', qty: '5,000 KG', highestBid: '₹2,490', winner: 'Karnal Agro Traders', bids: [{ buyer: 'Karnal Agro', bid: '₹2,490' }, { buyer: 'North Wheat Mill', bid: '₹2,475' }, { buyer: 'Haryana Foods', bid: '₹2,460' }], status: 'ROUND CLOSED', finalPrice: '₹2,490 / Qtl' },
+    { auctionId: 'MND-AUC-8802', crop: 'Paddy (Basmati)', qty: '8,000 KG', highestBid: '₹3,750', winner: 'Rice Exports Ltd', bids: [{ buyer: 'Rice Exports Ltd', bid: '₹3,750' }, { buyer: 'Punjab Grain Corp', bid: '₹3,720' }], status: 'ROUND CLOSED', finalPrice: '₹3,750 / Qtl' },
   ]);
 
   // Handlers
   const registerNewArrival = () => {
-    alert(`🎫 New Arrival Token Generated: MND-${Math.floor(200+Math.random()*100)}. Added to Weighment Queue.`);
+    alert(`New Arrival Token Generated: MND-${Math.floor(200+Math.random()*100)}. Added to Weighment Queue.`);
   };
 
   // Nav Items list matching user specification (17 items)
   const navItems = [
-    { key: 'dashboard', label: '📊 Dashboard', icon: QrCode },
-    { key: 'arrivals', label: '🌾 Farmer Arrivals & Tokens', icon: UserCheck },
-    { key: 'vehicles', label: '🚚 Vehicle Entry Control', icon: Truck },
-    { key: 'queue', label: '⏳ Queue Management', icon: Clock },
-    { key: 'registration', label: '🏷️ Lot Registration', icon: Layers },
-    { key: 'weighment', label: '⚖️ Physical Weighment (Gross/Tare/Net)', icon: Scale },
-    { key: 'inspection', label: '🔬 Quality Inspection Coordination', icon: Microscope },
-    { key: 'auction', label: '🔨 Auction & Bidding', icon: Gavel },
-    { key: 'buyer', label: '🏪 Buyer Coordination', icon: Building2 },
-    { key: 'status', label: '📋 Procurement Status Tracking', icon: FileText },
-    { key: 'receipts', label: '🧾 Digital Receipts', icon: Download },
-    { key: 'dispatch', label: '🚚 Mandi Yard Dispatch', icon: Truck },
-    { key: 'inventory', label: '📦 Mandi Yard Stock View', icon: Layers },
-    { key: 'reports', label: '📊 Reports & Analytics', icon: FileText },
-    { key: 'notifications', label: '🔔 Notifications', icon: Bell },
+    { key: 'dashboard', label: 'Dashboard', icon: QrCode },
+    { key: 'arrivals', label: 'Farmer Arrivals & Tokens', icon: UserCheck },
+    { key: 'vehicles', label: 'Vehicle Entry Control', icon: Truck },
+    { key: 'queue', label: 'Queue Management', icon: Clock },
+    { key: 'registration', label: 'Lot Registration', icon: Layers },
+    { key: 'weighment', label: 'Physical Weighment (Gross/Tare/Net)', icon: Scale },
+    { key: 'inspection', label: 'Quality Inspection Coordination', icon: Microscope },
+    { key: 'auction', label: 'Auction & Bidding', icon: Gavel },
+    { key: 'buyer', label: 'Buyer Coordination', icon: Building2 },
+    { key: 'status', label: 'Procurement Status Tracking', icon: FileText },
+    { key: 'receipts', label: 'Digital Receipts', icon: Download },
+    { key: 'dispatch', label: 'Mandi Yard Dispatch', icon: Truck },
+    { key: 'inventory', label: 'Mandi Yard Stock View', icon: Layers },
+    { key: 'reports', label: 'Reports & Analytics', icon: FileText },
+    { key: 'notifications', label: 'Notifications', icon: Bell },
   ];
 
   return (
@@ -72,7 +73,10 @@ export default function OperatorPortalPage({ setCurrentView, currentUser, t }) {
         </div>
         <div className="flex items-center gap-4 text-[11px]">
           <span>Operator: <strong className="text-amber-400">{currentUser?.name || 'Rakesh Verma'}</strong></span>
-          <span className="text-emerald-400">Gate #02 Active ✓</span>
+          <span className="text-emerald-400 flex items-center gap-1">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            <span>Gate #02 Active</span>
+          </span>
         </div>
       </div>
 
@@ -180,8 +184,9 @@ export default function OperatorPortalPage({ setCurrentView, currentUser, t }) {
             <div className="space-y-4 font-mono text-xs">
               <h2 className="text-xl font-extrabold text-[#243118]">PHYSICAL WEIGHMENT (GROSS - TARE = NET WEIGHT)</h2>
               <div className="bg-white rounded-2xl border border-[#abbe99]/60 p-5 shadow-sm space-y-3">
-                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 font-bold">
-                  🔒 Restriction Rule: Net Weight is calculated automatically. Re-weighment requests preserve historical records.
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 font-bold flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-amber-700 shrink-0" />
+                  <span>Restriction Rule: Net Weight is calculated automatically. Re-weighment requests preserve historical records.</span>
                 </div>
                 <table className="w-full text-left">
                   <thead className="bg-[#243118] text-white">
@@ -232,8 +237,9 @@ export default function OperatorPortalPage({ setCurrentView, currentUser, t }) {
                         </div>
                       ))}
                     </div>
-                    <div className="font-extrabold text-emerald-800">
-                      🏆 Winning Buyer: {auc.winner} @ {auc.finalPrice}
+                    <div className="font-extrabold text-emerald-800 flex items-center gap-1.5">
+                      <Trophy className="w-4 h-4 text-amber-500 shrink-0" />
+                      <span>Winning Buyer: {auc.winner} @ {auc.finalPrice}</span>
                     </div>
                   </div>
                 ))}
@@ -244,7 +250,9 @@ export default function OperatorPortalPage({ setCurrentView, currentUser, t }) {
           {/* FALLBACK FOR OTHER TABS */}
           {!['dashboard', 'arrivals', 'vehicles', 'weighment', 'auction'].includes(activeTab) && (
             <div className="bg-white rounded-2xl border border-[#abbe99]/60 p-8 text-center space-y-3 shadow-sm font-mono">
-              <div className="w-12 h-12 bg-[#f0f4ea] text-[#71873f] rounded-full flex items-center justify-center mx-auto text-xl font-bold">🏪</div>
+              <div className="w-12 h-12 bg-[#f0f4ea] text-[#71873f] rounded-full flex items-center justify-center mx-auto text-xl font-bold">
+                <Building2 className="w-6 h-6 text-[#71873f]" />
+              </div>
               <h3 className="text-base font-extrabold text-[#243118] uppercase">{activeTab.replace('_', ' ')} Mandi Terminal</h3>
               <p className="text-xs text-[#637554]">Mandi Operator physical arrival, weighbridge receipt, and auction coordination active.</p>
             </div>

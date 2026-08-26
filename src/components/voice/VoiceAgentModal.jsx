@@ -18,7 +18,12 @@ import {
   ExternalLink,
   MessageSquareText,
   Activity,
-  Waves
+  Waves,
+  Sprout,
+  QrCode,
+  Coins,
+  Microscope,
+  Scale
 } from 'lucide-react';
 
 const AGENT_CONFIG = {
@@ -469,41 +474,41 @@ export default function VoiceAgentModal({
           <div className="flex flex-wrap gap-1.5 max-h-20 overflow-y-auto">
             <button
               onClick={() => handleQuickPrompt('What is the 2026 MSP for Wheat & Paddy?', 'गेहूं और धान का 2026-27 एमएसपी क्या है?')}
-              className="px-2.5 py-1 bg-white hover:bg-[#f0f4ea] text-[#243118] border border-[#abbe99] hover:border-[#71873f] rounded-xl text-[11px] font-bold transition-all text-left shadow-xs flex items-center gap-1"
+              className="px-2.5 py-1 bg-white hover:bg-[#f0f4ea] text-[#243118] border border-[#abbe99] hover:border-[#71873f] rounded-xl text-[11px] font-bold transition-all text-left shadow-xs flex items-center gap-1.5"
             >
-              <span>🌾</span>
+              <Sprout className="w-3.5 h-3.5 text-[#71873f] shrink-0" />
               <span>{activeLang === 'hi' ? 'गेहूं/धान MSP भाव' : 'Wheat & Paddy MSP'}</span>
             </button>
 
             <button
               onClick={() => handleQuickPrompt('How do I book a Mandi Gate Pass slot?', 'मंडी गेट पास स्लॉट कैसे बुक करें?')}
-              className="px-2.5 py-1 bg-white hover:bg-[#f0f4ea] text-[#243118] border border-[#abbe99] hover:border-[#71873f] rounded-xl text-[11px] font-bold transition-all text-left shadow-xs flex items-center gap-1"
+              className="px-2.5 py-1 bg-white hover:bg-[#f0f4ea] text-[#243118] border border-[#abbe99] hover:border-[#71873f] rounded-xl text-[11px] font-bold transition-all text-left shadow-xs flex items-center gap-1.5"
             >
-              <span>🎫</span>
+              <QrCode className="w-3.5 h-3.5 text-[#a36627] shrink-0" />
               <span>{activeLang === 'hi' ? 'गेट पास स्लॉट बुकिंग' : 'Mandi Gate Pass Slot'}</span>
             </button>
 
             <button
               onClick={() => handleQuickPrompt('When will my DBT payment arrive in bank account?', 'डीबीटी भुगतान खाते में कब आएगा?')}
-              className="px-2.5 py-1 bg-white hover:bg-[#f0f4ea] text-[#243118] border border-[#abbe99] hover:border-[#71873f] rounded-xl text-[11px] font-bold transition-all text-left shadow-xs flex items-center gap-1"
+              className="px-2.5 py-1 bg-white hover:bg-[#f0f4ea] text-[#243118] border border-[#abbe99] hover:border-[#71873f] rounded-xl text-[11px] font-bold transition-all text-left shadow-xs flex items-center gap-1.5"
             >
-              <span>💰</span>
+              <Coins className="w-3.5 h-3.5 text-amber-600 shrink-0" />
               <span>{activeLang === 'hi' ? 'डीबीटी भुगतान स्थिति' : 'DBT Payment Status'}</span>
             </button>
 
             <button
               onClick={() => handleQuickPrompt('What are the grain moisture & quality FAQ limits?', 'अनाज में नमी और गुणवत्ता मानक क्या हैं?')}
-              className="px-2.5 py-1 bg-white hover:bg-[#f0f4ea] text-[#243118] border border-[#abbe99] hover:border-[#71873f] rounded-xl text-[11px] font-bold transition-all text-left shadow-xs flex items-center gap-1"
+              className="px-2.5 py-1 bg-white hover:bg-[#f0f4ea] text-[#243118] border border-[#abbe99] hover:border-[#71873f] rounded-xl text-[11px] font-bold transition-all text-left shadow-xs flex items-center gap-1.5"
             >
-              <span>🧪</span>
+              <Microscope className="w-3.5 h-3.5 text-sky-600 shrink-0" />
               <span>{activeLang === 'hi' ? 'नमी व गुणवत्ता मानक' : 'Moisture & FAQ Norms'}</span>
             </button>
 
             <button
               onClick={() => handleQuickPrompt('How does e-NAM live bidding and auction work?', 'ई-नीलामी में बोली कैसे लगाएं?')}
-              className="px-2.5 py-1 bg-white hover:bg-[#f0f4ea] text-[#243118] border border-[#abbe99] hover:border-[#71873f] rounded-xl text-[11px] font-bold transition-all text-left shadow-xs flex items-center gap-1"
+              className="px-2.5 py-1 bg-white hover:bg-[#f0f4ea] text-[#243118] border border-[#abbe99] hover:border-[#71873f] rounded-xl text-[11px] font-bold transition-all text-left shadow-xs flex items-center gap-1.5"
             >
-              <span>⚖️</span>
+              <Scale className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
               <span>{activeLang === 'hi' ? 'ई-नीलामी व बोली' : 'e-NAM Live Bidding'}</span>
             </button>
           </div>

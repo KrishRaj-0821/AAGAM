@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { CheckCircle2, X, Sparkles, ShieldCheck } from 'lucide-react';
+import { CheckCircle2, X, Sparkles, ShieldCheck, Smartphone, Mail, Clock } from 'lucide-react';
 
 export default function SuccessToast({ notification, onClose }) {
   useEffect(() => {
@@ -57,17 +57,17 @@ export default function SuccessToast({ notification, onClose }) {
                 </div>
 
                 {/* Instant Multi-Channel Dispatch Info */}
-                <div className="text-[10px] font-sans text-slate-300 space-y-0.5 pt-1 border-t border-white/10">
+                <div className="text-[10px] font-sans text-slate-300 space-y-1 pt-1 border-t border-white/10">
                   <div className="flex items-center gap-1.5 text-emerald-300">
-                    <span>📱</span>
+                    <Smartphone className="w-3 h-3 text-emerald-400 shrink-0" />
                     <span>SMS sent to: <strong>+91 98765 43210</strong></span>
                   </div>
                   <div className="flex items-center gap-1.5 text-sky-300">
-                    <span>📧</span>
+                    <Mail className="w-3 h-3 text-sky-400 shrink-0" />
                     <span>Receipt sent to: <strong>farmer.kisan@gmail.com</strong></span>
                   </div>
                   <div className="flex items-center gap-1.5 text-[#e0b87e] font-semibold">
-                    <span>⏰</span>
+                    <Clock className="w-3 h-3 text-[#e0b87e] shrink-0" />
                     <span>Automated SMS reminder scheduled 1-hr before arrival slot.</span>
                   </div>
                 </div>

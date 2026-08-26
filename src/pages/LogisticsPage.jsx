@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, Truck, MapPin, Navigation, Clock, ShieldCheck, CheckCircle2, ArrowRight, UserCheck } from 'lucide-react';
+import { ChevronLeft, Truck, MapPin, Navigation, Clock, ShieldCheck, CheckCircle2, ArrowRight, UserCheck, X } from 'lucide-react';
 import { logisticsVehicles } from '../data/mockData';
 
 export default function LogisticsPage({ setCurrentView, t }) {
@@ -115,9 +115,9 @@ export default function LogisticsPage({ setCurrentView, t }) {
                 </h3>
                 <button
                   onClick={() => setSelectedVehicle(null)}
-                  className="text-slate-400 hover:text-slate-600 font-mono text-xl"
+                  className="text-slate-400 hover:text-slate-600 p-1"
                 >
-                  ✕
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
@@ -126,7 +126,11 @@ export default function LogisticsPage({ setCurrentView, t }) {
                   <span>{selectedVehicle.truckNo}</span>
                   <span className="text-[#71873f]">{selectedVehicle.speed}</span>
                 </div>
-                <div className="text-[#637554]">{selectedVehicle.origin} ➔ {selectedVehicle.destination}</div>
+                <div className="text-[#637554] flex items-center gap-1.5">
+                  <span>{selectedVehicle.origin}</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-[#71873f]" />
+                  <span>{selectedVehicle.destination}</span>
+                </div>
                 <div className="text-[10px] text-slate-500">GPS Coords: {selectedVehicle.gps}</div>
               </div>
 

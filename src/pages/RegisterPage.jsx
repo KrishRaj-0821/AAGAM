@@ -15,8 +15,10 @@ import {
   Building2, 
   ShieldCheck, 
   Sparkles,
-  UserCheck
+  UserCheck,
+  Loader2
 } from 'lucide-react';
+import { signInWithGoogle } from '../services/firebase';
 
 export default function RegisterPage({ 
   setCurrentView, 
@@ -45,6 +47,31 @@ export default function RegisterPage({
     declaration: true,
     regId: ''
   });
+  const [authLoading, setAuthLoading] = useState(false);
+
+  const handleGoogleRegister = async () => {
+    setAuthLoading(true);
+    try {
+      const res = await signInWithGoogle(regRole);
+      if (res.success && res.user) {
+        if (onLoginSuccess) {
+          onLoginSuccess({
+            ...res.user,
+            role: regRole,
+            aadhaar: regForm.aadhaar,
+            mandi: regForm.mandi,
+            state: regForm.state
+          });
+        } else if (setCurrentView) {
+          setCurrentView('home');
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setAuthLoading(false);
+    }
+  };
 
   const handleFinishAndEnter = () => {
     const newUser = {
@@ -55,6 +82,7 @@ export default function RegisterPage({
       mobile: regForm.mobile,
       mandi: regForm.mandi,
       state: regForm.state,
+      authMethod: 'Firebase Registered',
       token: `GOI-REG-TOKEN-${Math.floor(1000 + Math.random() * 9000)}`
     };
 
@@ -135,7 +163,7 @@ export default function RegisterPage({
                     : 'bg-[#f0f4ea] text-[#637554] border border-[#abbe99]'
                 }`}
               >
-                {regStep > item.step ? '✓' : item.step}
+                {regStep > item.step ? <CheckCircle2 className="w-4 h-4" /> : item.step}
               </div>
               <span className={`text-[11px] font-bold hidden sm:inline ${regStep === item.step ? 'text-[#a36627]' : regStep > item.step ? 'text-[#71873f]' : 'text-[#637554]'}`}>
                 {item.label}
@@ -158,6 +186,37 @@ export default function RegisterPage({
                 <p className="text-xs text-[#637554] mt-1">
                   {t('Select how you participate in the Indian agricultural grain supply chain.', 'चुनें कि आप आपूर्ति श्रृंखला में कैसे भाग लेते हैं।')}
                 </p>
+              </div>
+
+              {/* Google Fast 1-Click Registration */}
+              <div className="bg-[#f0f4ea] p-4 rounded-2xl border border-[#abbe99] flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="text-xs text-[#243118]">
+                  <div className="font-extrabold flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>{t('Instant Registration via Google (Firebase SSO):', 'गूगल द्वारा त्वरित पंजीकरण (फायरबेस):')}</span>
+                  </div>
+                  <div className="text-[11px] text-[#637554] mt-0.5">
+                    {t('One-click verification with Google security & automatic portal setup.', 'गूगल सुरक्षा एवं स्वतः पोर्टल सेटअप के साथ 1-क्लिक सत्यापन।')}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleGoogleRegister}
+                  disabled={authLoading}
+                  className="w-full sm:w-auto bg-white hover:bg-slate-50 disabled:opacity-60 text-slate-800 font-bold px-4 py-2.5 rounded-xl border border-slate-300 text-xs flex items-center justify-center gap-2.5 shadow-sm shrink-0 cursor-pointer"
+                >
+                  {authLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-[#4285F4]" />
+                  ) : (
+                    <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                      <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z" />
+                      <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.26v3.15C3.29 21.39 7.37 24 12 24z" />
+                      <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.26C.46 8.16 0 9.98 0 12s.46 3.84 1.26 5.42l4.02-3.15z" />
+                      <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.29 2.61 1.26 6.58l4.02 3.15c.95-2.83 3.6-4.98 6.72-4.98z" />
+                    </svg>
+                  )}
+                  <span>{authLoading ? t('Verifying...', 'सत्यापित हो रहा है...') : t('Sign up with Google', 'गूगल से रजिस्टर करें')}</span>
+                </button>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

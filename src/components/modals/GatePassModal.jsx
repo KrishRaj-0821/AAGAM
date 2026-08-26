@@ -342,7 +342,7 @@ export default function GatePassModal({
       </div>
       <div class="bill-header-right">
         <div class="token-num">TOKEN #: ${token}</div>
-        <div class="status-chip">✓ ACTIVE & CONFIRMED</div>
+        <div class="status-chip">ACTIVE & CONFIRMED</div>
       </div>
     </div>
 
@@ -382,7 +382,7 @@ export default function GatePassModal({
       <div class="qr-info">
         <h4>100% SCANNABLE OFFICIAL GATE PASS QR</h4>
         <p>Present this QR code at ${mandi} barrier for fast-track automated barrier opening. Token: <strong>${token}</strong></p>
-        <p style="margin-top:4px; font-weight:700;">✓ 1-Hour Prior Automated SMS Notification Scheduled to ${mobile}</p>
+        <p style="margin-top:4px; font-weight:700;">1-Hour Prior Automated SMS Notification Scheduled to ${mobile}</p>
       </div>
     </div>
 
@@ -415,7 +415,7 @@ export default function GatePassModal({
   </div>
 
   <div class="no-print">
-    <button class="btn-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+    <button class="btn-print" onclick="window.print()">Print / Save as PDF</button>
   </div>
 
   <script>
@@ -500,7 +500,10 @@ export default function GatePassModal({
             <div className="space-y-1">
               <label className="font-bold text-[#243118] flex items-center justify-between">
                 <span>{t('Farmer Registration ID / Mobile Number:', 'किसान पंजीकरण आईडी / मोबाइल:')}</span>
-                <span className="text-[10px] text-emerald-700 font-bold">✓ GOI Verified</span>
+                <span className="text-[10px] text-emerald-700 font-bold flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                  <span>GOI Verified</span>
+                </span>
               </label>
               <input
                 type="text"

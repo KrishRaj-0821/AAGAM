@@ -71,7 +71,7 @@ export default function Navbar({
     if (isAuthenticated && currentUser?.role) {
       if (currentUser.role !== roleKey) {
         const shouldLogout = window.confirm(
-          `🔒 Role Lock Policy\n\nYou are currently signed in as "${currentUser.role}".\n\nTo access the "${roleKey}" portal, you must log out of your current account first.\n\nWould you like to Log Out now?`
+          `Role Lock Policy\n\nYou are currently signed in as "${currentUser.role}".\n\nTo access the "${roleKey}" portal, you must log out of your current account first.\n\nWould you like to Log Out now?`
         );
         if (shouldLogout) {
           if (onRequestLogout) {
