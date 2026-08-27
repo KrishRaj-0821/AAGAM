@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ChevronLeft, 
   Sprout, 
@@ -15,13 +15,14 @@ import {
   UserPlus, 
   Building2, 
   ShieldCheck, 
+  ShieldAlert,
   Sparkles,
   UserCheck,
   Loader2,
   Check
 } from 'lucide-react';
 import { signInWithGoogle } from '../services/firebase';
-import { validateField, validateStep } from '../utils/validators';
+import { validateField, validateStep, validateAadhaar } from '../utils/validators';
 import { api } from '../services/api';
 
 export default function RegisterPage({ 
@@ -70,8 +71,34 @@ export default function RegisterPage({
     return validateField(fieldName, regForm[fieldName], regForm, regRole);
   };
 
+  // Ironclad Guard: User can NEVER proceed to Step 3, 4, or 5 without a valid Aadhaar number passing Verhoeff checksum
+  useEffect(() => {
+    if (regStep > 2) {
+      const checkAadhaar = validateAadhaar(regForm.aadhaar);
+      if (!checkAadhaar.isValid) {
+        setRegStep(2);
+        setTouched(prev => ({ ...prev, aadhaar: true }));
+        setStepErrorBanner(t(
+          checkAadhaar.errorEn || 'Step 3 is locked: A valid 12-digit Aadhaar number with UIDAI Verhoeff Checksum is strictly required.',
+          checkAadhaar.errorHi || 'चरण 3 लॉक है: वैध 12-अंकीय आधार नंबर (वेरहोफ चेकसम) अनिवार्य है।'
+        ));
+      }
+    }
+  }, [regStep, regForm.aadhaar]);
+
   // Step 2 Proceed Guard
   const handleProceedStep2 = () => {
+    // 1. Strict Aadhaar Gate: Must pass 12-digit UIDAI Verhoeff checksum
+    const aadhaarRes = validateAadhaar(regForm.aadhaar);
+    if (!aadhaarRes.isValid) {
+      setTouched(prev => ({ ...prev, aadhaar: true }));
+      setStepErrorBanner(t(
+        aadhaarRes.errorEn || 'Valid 12-digit Aadhaar number with UIDAI Verhoeff Checksum is strictly required to proceed.',
+        aadhaarRes.errorHi || 'आगे बढ़ने के लिए वैध 12-अंकीय आधार नंबर (यूआईडीएआई वेरहोफ चेकसम) अनिवार्य है।'
+      ));
+      return;
+    }
+
     const { isValid, errors } = validateStep(2, regForm, regRole);
     if (!isValid) {
       setTouched(prev => ({
@@ -580,21 +607,61 @@ export default function RegisterPage({
                 </div>
               </div>
 
-              <div className="flex gap-3">
+              {/* Aadhaar Gatekeeper Banner */}
+              {!validateAadhaar(regForm.aadhaar).isValid ? (
+                <div className="bg-amber-50/95 border-2 border-amber-300 rounded-2xl p-3.5 flex items-start gap-3 text-amber-900 text-xs shadow-xs animate-in fade-in duration-200">
+                  <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                  <div className="space-y-0.5">
+                    <span className="font-extrabold uppercase tracking-wide text-[11px] text-amber-800 block">
+                      {t('Step 3 Locked: Valid Aadhaar Number Required', 'चरण 3 लॉक है: वैध आधार नंबर आवश्यक है')}
+                    </span>
+                    <p className="text-[11px] text-amber-700 leading-relaxed font-medium">
+                      {t(
+                        'You cannot proceed to the next step without entering a valid 12-digit Aadhaar number that passes UIDAI Verhoeff Checksum verification.',
+                        'वैध 12-अंकीय आधार नंबर (यूआईडीएआई वेरहोफ चेकसम) दर्ज किए बिना आप अगले चरण पर नहीं जा सकते।'
+                      )}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-emerald-50 border-2 border-emerald-300 rounded-2xl p-3 flex items-center gap-2.5 text-emerald-800 text-xs font-bold shadow-xs animate-in fade-in duration-200">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                  <div>
+                    <span>{t('Aadhaar Verified & Unlocked ✓ (UIDAI Verhoeff Checksum Passed)', 'आधार सत्यापित व अनलॉक ✓ (यूआईडीएआई वेरहोफ चेकसम पास हुआ)')}</span>
+                    <span className="block text-[10px] text-emerald-700 font-normal">{t('You are clear to proceed to operational & land mapping.', 'आप कार्यस्थल एवं भूमि विवरण के चरण 3 पर आगे बढ़ सकते हैं।')}</span>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-1">
                 <button
                   type="button"
                   onClick={() => setRegStep(1)}
-                  className="w-1/3 bg-[#f4efe6] text-[#243118] font-bold py-3 rounded-xl border border-[#abbe99] cursor-pointer"
+                  className="w-1/3 bg-[#f4efe6] hover:bg-[#e8dfd1] text-[#243118] font-bold py-3.5 rounded-xl border border-[#abbe99] cursor-pointer transition-all"
                 >
                   {t('Back', 'पीछे')}
                 </button>
                 <button
                   type="button"
                   onClick={handleProceedStep2}
-                  className="w-2/3 bg-[#71873f] hover:bg-[#688557] text-white font-bold py-3 rounded-xl shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-all"
+                  disabled={!validateAadhaar(regForm.aadhaar).isValid}
+                  className={`w-2/3 py-3.5 rounded-xl flex items-center justify-center gap-2 font-extrabold text-xs transition-all ${
+                    validateAadhaar(regForm.aadhaar).isValid
+                      ? 'bg-[#71873f] hover:bg-[#688557] text-white cursor-pointer shadow-lg shadow-[#71873f]/25'
+                      : 'bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300 shadow-none'
+                  }`}
+                  title={!validateAadhaar(regForm.aadhaar).isValid ? t('Please enter a valid 12-digit Aadhaar number to unlock next step', 'अगले चरण पर जाने के लिए कृपया वैध आधार नंबर दर्ज करें') : ''}
                 >
-                  <span>{t('Proceed to Operational Details', 'आगे बढ़ें: कार्यस्थल विवरण')}</span>
-                  <ArrowRight className="w-4 h-4" />
+                  {!validateAadhaar(regForm.aadhaar).isValid ? (
+                    <Lock className="w-4 h-4 text-slate-400" />
+                  ) : (
+                    <ArrowRight className="w-4 h-4 text-white" />
+                  )}
+                  <span>
+                    {!validateAadhaar(regForm.aadhaar).isValid
+                      ? t('Aadhaar Required to Unlock Step 3', 'चरण 3 के लिए वैध आधार आवश्यक')
+                      : t('Proceed to Operational Details', 'आगे बढ़ें: कार्यस्थल विवरण')}
+                  </span>
                 </button>
               </div>
             </div>

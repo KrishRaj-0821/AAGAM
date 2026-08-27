@@ -16,18 +16,28 @@ import {
 } from 'firebase/auth';
 
 export const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyBver8hGGWlfGKTpixC7hMw8zHVNePM1go",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "aagam-16f20.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "aagam-16f20",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "aagam-16f20.firebasestorage.app",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "409592571151",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:409592571151:web:2f493b157a55797fef8a7a",
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-9FW9F63TH1"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyCnenq1Qgjhsb5eC6widtqL6-RvjV3cAKo",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "aagam-e161f.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "aagam-e161f",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "aagam-e161f.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "851793061468",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:851793061468:web:e73985484cfd5f8af0e899",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || ""
 };
 
-// Initialize Firebase (singleton check)
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-export const auth = getAuth(app);
+// Initialize Firebase safely without crashing top-level script if unconfigured
+let app = null;
+let auth = null;
+try {
+  if (firebaseConfig.apiKey) {
+    app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+    auth = getAuth(app);
+  }
+} catch (err) {
+  console.warn("Firebase Auth failed to initialize, running with local authentication fallback:", err);
+}
+
+export { app, auth };
 
 // Providers
 const googleProvider = new GoogleAuthProvider();
@@ -102,17 +112,30 @@ export const registerWithEmail = async (email, password, displayName, selectedRo
 /**
  * Setup Recaptcha for Phone Auth
  */
-export const setupPhoneRecaptcha = (containerId) => {
+export const setupPhoneRecaptcha = (containerId = 'recaptcha-container') => {
   if (typeof window === 'undefined') return null;
-  if (!window.recaptchaVerifier) {
+  try {
+    if (window.recaptchaVerifier) {
+      try {
+        window.recaptchaVerifier.clear();
+      } catch (e) {
+        // ignore
+      }
+      window.recaptchaVerifier = null;
+    }
+    const container = document.getElementById(containerId);
+    if (!container) return null;
     window.recaptchaVerifier = new RecaptchaVerifier(auth, containerId, {
       size: 'invisible',
       callback: () => {
         // reCAPTCHA solved
       }
     });
+    return window.recaptchaVerifier;
+  } catch (err) {
+    console.warn('Recaptcha initialization warning:', err);
+    return null;
   }
-  return window.recaptchaVerifier;
 };
 
 /**
