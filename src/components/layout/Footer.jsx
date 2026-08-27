@@ -2,7 +2,7 @@ import React from 'react';
 import { directoryCategories } from '../../data/mockData';
 import { Mic } from 'lucide-react';
 
-export default function Footer({ highContrast, language, onOpenHelpdesk, onOpenVoiceAgent, t }) {
+export default function Footer({ highContrast, language, onOpenHelpdesk, onOpenVoiceAgent, onNavigateToPage, t }) {
   return (
     <footer className={`${highContrast ? 'bg-black text-yellow-300 border-t border-yellow-500' : 'bg-[#243118] text-white border-t border-[#abbe99]/40'}`}>
       
@@ -70,12 +70,25 @@ export default function Footer({ highContrast, language, onOpenHelpdesk, onOpenV
                 {t(cat.titleEn, cat.titleHi)}
               </h4>
               <ul className="space-y-2 text-xs text-slate-300">
-                {(language === 'hi' ? cat.linksHi : cat.linksEn).map((link, linkIdx) => (
-                  <li key={linkIdx} className="hover:text-white hover:underline cursor-pointer transition-colors flex items-center gap-1.5">
-                    <span className="w-1 h-1 rounded-full bg-[#71873f]" />
-                    <span>{link}</span>
-                  </li>
-                ))}
+                {(language === 'hi' ? cat.linksHi : cat.linksEn).map((link, linkIdx) => {
+                  const pageNum = cat.pageNums ? cat.pageNums[linkIdx] : linkIdx + 1;
+                  return (
+                    <li
+                      key={linkIdx}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (onNavigateToPage && pageNum) {
+                          onNavigateToPage(pageNum);
+                        }
+                      }}
+                      className="hover:text-amber-300 hover:underline cursor-pointer transition-colors flex items-center gap-1.5 group select-none py-0.5"
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#71873f] group-hover:bg-amber-400 transition-colors shrink-0" />
+                      <span className="truncate">{link}</span>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}
@@ -85,10 +98,10 @@ export default function Footer({ highContrast, language, onOpenHelpdesk, onOpenV
         <div className="pt-8 border-t border-[#688557]/40 flex flex-col sm:flex-row items-center justify-between text-xs text-[#abbe99] gap-4">
           <p>© 2026 AAGAM Portal, Ministry of Agriculture & Farmers Welfare, Govt of India.</p>
           <div className="flex items-center gap-4">
-            <span className="hover:text-white cursor-pointer">{t('Privacy Policy', 'गोपनीयता नीति')}</span>
-            <span className="hover:text-white cursor-pointer">{t('Terms of Service', 'सेवा की शर्तें')}</span>
-            <span className="hover:text-white cursor-pointer">{t('Accessibility Statement', 'सुगम्यता कथन')}</span>
-            <span className="hover:text-white cursor-pointer">{t('NIC Cloud', 'एनआईसी क्लाउड')}</span>
+            <span onClick={() => onNavigateToPage && onNavigateToPage(13)} className="hover:text-white cursor-pointer">{t('Privacy Policy', 'गोपनीयता नीति')}</span>
+            <span onClick={() => onNavigateToPage && onNavigateToPage(12)} className="hover:text-white cursor-pointer">{t('Terms of Service', 'सेवा की शर्तें')}</span>
+            <span onClick={() => onNavigateToPage && onNavigateToPage(166)} className="hover:text-white cursor-pointer">{t('Accessibility Statement', 'सुगम्यता कथन')}</span>
+            <span onClick={() => onNavigateToPage && onNavigateToPage(153)} className="hover:text-white cursor-pointer">{t('NIC Cloud', 'एनआईसी क्लाउड')}</span>
           </div>
         </div>
       </div>

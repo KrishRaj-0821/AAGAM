@@ -125,8 +125,10 @@ function CropPriceChart({ cropName, data, msp }) {
   );
 }
 
-export default function PersonaPortalPage({ activeRole, setActiveRole, setCurrentView, currentUser, onOpenVoiceAgent, t }) {
-  const [activePageNum, setActivePageNum] = useState(1);
+export default function PersonaPortalPage({ activeRole, setActiveRole, setCurrentView, currentUser, onOpenVoiceAgent, onOpenAiCropAnalyzer, activePageNum: propPageNum, setActivePageNum: propSetPageNum, t }) {
+  const [internalPageNum, setInternalPageNum] = useState(1);
+  const activePageNum = propPageNum !== undefined ? propPageNum : internalPageNum;
+  const setActivePageNum = propSetPageNum || setInternalPageNum;
   const [searchFilter, setSearchFilter] = useState('');
   const [actionSuccessMsg, setActionSuccessMsg] = useState('');
   const [simulationState, setSimulationState] = useState({});
@@ -892,6 +894,16 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
                 <div className="text-[#a36627] font-bold">₹4,36,500 Credited</div>
               </div>
             </div>
+
+            {onOpenAiCropAnalyzer && (
+              <button
+                onClick={onOpenAiCropAnalyzer}
+                className="w-full mt-3 bg-[#71873f] hover:bg-[#607433] text-white font-extrabold py-3 rounded-xl text-xs transition-all flex items-center justify-center gap-2 shadow-md"
+              >
+                <Sprout className="w-4 h-4 text-amber-300" />
+                <span>Launch AI Crop Quality & Market Price Analysis Agent →</span>
+              </button>
+            )}
           </div>
         </div>
       );

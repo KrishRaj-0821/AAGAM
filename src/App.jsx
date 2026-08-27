@@ -25,6 +25,7 @@ import QuickSearchModal from './components/modals/QuickSearchModal';
 import LogoutConfirmModal from './components/modals/LogoutConfirmModal';
 import AuthRequiredModal from './components/modals/AuthRequiredModal';
 import HelpdeskModal from './components/modals/HelpdeskModal';
+import AiCropAnalyzerModal from './components/modals/AiCropAnalyzerModal';
 import VoiceAgentModal from './components/voice/VoiceAgentModal';
 import SuccessToast from './components/common/SuccessToast';
 import { LifeBuoy, Mic, Bot, Headphones, X, PhoneCall, Sprout, Coins, Building2, QrCode, Microscope, Warehouse as WarehouseIcon, ShieldCheck, Compass } from 'lucide-react';
@@ -53,6 +54,41 @@ export default function App() {
   // Page Routing State (Default: 'home' for front landing page)
   const [currentView, setCurrentView] = useState('home');
   const [activeRole, setActiveRole] = useState(() => currentUser?.role || 'Farmer');
+  const [activePageNum, setActivePageNum] = useState(1);
+
+  // Global Page Navigator (171 Pages Navigation Engine)
+  const navigateToPage = (pageNum) => {
+    const num = typeof pageNum === 'number' ? pageNum : parseInt(pageNum, 10) || 1;
+    setActivePageNum(num);
+
+    if (num === 1) {
+      setCurrentView('home');
+    } else if (num === 6) {
+      setCurrentView('marketplace');
+    } else if (num === 7) {
+      setCurrentView('eauction');
+    } else if (num === 8) {
+      setCurrentView('procurement');
+    } else if (num === 9) {
+      setCurrentView('analytics');
+    } else if (num === 14) {
+      setCurrentView('login');
+    } else if (num === 15) {
+      setCurrentView('register');
+    } else if (num === 98) {
+      setCurrentView('logistics');
+    } else {
+      setCurrentView('portal');
+      setActiveRole('Navigator');
+    }
+
+    // Scroll to top immediately so user sees target page
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, 0);
+    }
+  };
 
   // Dynamic URL Path Router (Handles routes like /admin, /operator, /persona/81, /aagam/v2/operator/81)
   useEffect(() => {
@@ -96,6 +132,7 @@ export default function App() {
   const [isAuthRequiredModalOpen, setIsAuthRequiredModalOpen] = useState(false);
   const [isHelpdeskOpen, setIsHelpdeskOpen] = useState(false);
   const [isVoiceAgentOpen, setIsVoiceAgentOpen] = useState(false);
+  const [isAiCropAnalyzerOpen, setIsAiCropAnalyzerOpen] = useState(false);
   const [targetPortalName, setTargetPortalName] = useState('Portal');
   const [pendingRedirect, setPendingRedirect] = useState(null);
 
@@ -274,7 +311,7 @@ export default function App() {
   // Smooth scroll to top on page view change
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [currentView, activeRole, authView]);
+  }, [currentView, activeRole, authView, activePageNum]);
 
   // Font scale CSS wrapper class
   const fontScaleClass = fontSize === 'sm' ? 'font-scale-sm' : fontSize === 'lg' ? 'font-scale-lg' : 'font-scale-md';
@@ -308,6 +345,7 @@ export default function App() {
         openGatePassWithAuth={openGatePassWithAuth}
         onOpenHelpdesk={() => setIsHelpdeskOpen(true)}
         onOpenVoiceAgent={() => setIsVoiceAgentOpen(true)}
+        onOpenAiCropAnalyzer={() => setIsAiCropAnalyzerOpen(true)}
         currentUser={currentUser}
         isAuthenticated={isAuthenticated}
         onRequestLogout={handleRequestLogout}
@@ -506,6 +544,9 @@ export default function App() {
               setCurrentView={setCurrentView}
               currentUser={currentUser}
               onOpenVoiceAgent={() => setIsVoiceAgentOpen(true)}
+              onOpenAiCropAnalyzer={() => setIsAiCropAnalyzerOpen(true)}
+              activePageNum={activePageNum}
+              setActivePageNum={setActivePageNum}
               t={t}
             />
           )}
@@ -542,6 +583,7 @@ export default function App() {
         language={language}
         onOpenHelpdesk={() => setIsHelpdeskOpen(true)}
         onOpenVoiceAgent={() => setIsVoiceAgentOpen(true)}
+        onNavigateToPage={navigateToPage}
         t={t}
       />
 
@@ -549,6 +591,7 @@ export default function App() {
       <QuickSearchModal
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
+        onNavigateToPage={navigateToPage}
         t={t}
       />
 
@@ -596,6 +639,14 @@ export default function App() {
         currentUser={currentUser}
         triggerSuccessNotification={triggerSuccessNotification}
         onOpenVoiceAgent={() => setIsVoiceAgentOpen(true)}
+        t={t}
+      />
+
+      {/* AI Crop Quality & Market Price Analysis Agent Modal */}
+      <AiCropAnalyzerModal
+        isOpen={isAiCropAnalyzerOpen}
+        onClose={() => setIsAiCropAnalyzerOpen(false)}
+        triggerSuccessNotification={triggerSuccessNotification}
         t={t}
       />
 

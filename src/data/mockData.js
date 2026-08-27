@@ -565,84 +565,98 @@ export const directoryCategories = [
   {
     titleEn: '1. Public Pages (1-13)',
     titleHi: '1. सार्वजनिक पृष्ठ (1-13)',
+    pageNums: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
     linksEn: ['Home / Landing Page', 'About AAGAM Portal', 'How AAGAM Works', 'Core Features & Architecture', 'Price Discovery Engine', 'Crop Marketplace', 'Live E-Auction Desk', 'Procurement Centers Locator', 'Analytics & Forecasting', 'Contact Us & Grievance', 'FAQ & Helpdesk', 'Terms & Conditions', 'Privacy Policy'],
     linksHi: ['मुख्य पृष्ठ', 'आगामी पोर्टल के बारे में', 'आगामी कैसे काम करता है', 'मुख्य विशेषताएं', 'मूल्य खोज इंजन', 'फसल बाजार', 'लाइव ई-नीलामी', 'खरीद केंद्र लोकेटर', 'विश्लेषण और पूर्वानुमान', 'संपर्क करें और शिकायत', 'सामान्य प्रश्न', 'नियम और शर्तें', 'गोपनीयता नीति']
   },
   {
     titleEn: '2. Authentication Pages (14-19)',
     titleHi: '2. प्रमाणीकरण पृष्ठ (14-19)',
+    pageNums: [14, 15, 16, 17, 18, 19],
     linksEn: ['GOI SSO Login', 'Stakeholder Registration', '7-Persona Role Selection', 'Mobile & Aadhaar OTP Verification', 'Forgot Password Recovery', 'Reset Password Portal'],
     linksHi: ['साइन इन पोर्टल', 'हितधारक पंजीकरण', '7-भूमिका चयन', 'ओटीपी सत्यापन', 'पासवर्ड भूल गए', 'पासवर्ड रीसेट']
   },
   {
     titleEn: '3. Farmer Portal (20-51)',
     titleHi: '3. किसान पोर्टल (20-51)',
+    pageNums: [20, 21, 22, 23, 24, 25, 26, 27, 29, 30, 31, 32, 33, 36, 38, 42, 44, 48, 50],
     linksEn: ['Farmer Dashboard', 'My Profile & Aadhaar e-KYC', 'Land Records & Khasra', 'Add Agricultural Land', 'Land Verification Status', 'My Registered Crops', 'Add New Crop Declaration', 'Crop Details & Moisture', 'Price Comparison Tool', 'Nearby Mandi Live Rates', 'Private Buyer Offers', 'My Live Auctions', 'Create New Auction Lot', 'Book Slot & Gate Pass', 'My QR Tokens', 'AI Quality Assay Reports', 'Weighment Tola Parchi', 'Direct Bank Transfer (DBT)', 'Crop Journey Traceability'],
     linksHi: ['किसान डैशबोर्ड', 'प्रोफ़ाइल', 'भूमि रिकॉर्ड', 'भूमि जोड़ें', 'भूमि सत्यापन', 'मेरी फसलें', 'नई फसल घोषणा', 'मूल्य तुलना', 'निकटतम मंडी दरें', 'निजी खरीदार ऑफ़र', 'मेरी नीलामी', 'स्लॉट और गेट पास बुक करें', 'क्यूआर टोकन', 'एआई गुणवत्ता रिपोर्ट', 'तौल पर्ची', 'डीबीटी भुगतान लेजर', 'फसल ट्रैसेबिलिटी']
   },
   {
     titleEn: '4. Buyer / Trader Portal (52-65)',
     titleHi: '4. व्यापारी पोर्टल (52-65)',
+    pageNums: [52, 53, 54, 56, 58, 60, 61, 62, 63, 64, 65],
     linksEn: ['Buyer Dashboard', 'Trader Profile & License', 'Crop Marketplace Desk', 'My Submitted Offers', 'Live e-NAM National Auction', 'Pan-India Bidding Desk', 'Won Auctions & Lots', 'Purchased Crops Inventory', 'Order & Escrow History', 'Payment History & Receipts', 'Delivery & Fleet Tracking'],
     linksHi: ['व्यापारी डैशबोर्ड', 'व्यापारी प्रोफ़ाइल', 'फसल बाजार डेस्क', 'मेरे ऑफ़र', 'ई-नाम राष्ट्रीय नीलामी', 'बोली डेस्क', 'जीती नीलामी', 'खरीदी गई फसलें', 'एस्क्रो इतिहास', 'भुगतान रसीदें', 'डिलीवरी ट्रैकिंग']
   },
   {
     titleEn: '5. Government & Procurement (66-80)',
     titleHi: '5. सरकारी अधिकारी पोर्टल (66-80)',
+    pageNums: [66, 67, 69, 71, 72, 73, 76, 77, 78, 80],
     linksEn: ['Officer Dashboard', 'Farmer & Land Verification Review', 'Crop Declaration Approval', 'Procurement Center Capacity Management', 'Daily Procurement Summary', 'Slot Rescheduling Engine', 'Gate Entry & Queue Monitoring', 'IoT Weighbridge Sync Monitor', 'AI Quality Compliance Assay', 'Escrow Payment Approval'],
     linksHi: ['अधिकारी डैशबोर्ड', 'किसान और भूमि सत्यापन', 'फसल घोषणा समीक्षा', 'खरीद केंद्र क्षमता', 'दैनिक खरीद सारांश', 'कतार निगरानी', 'धर्म कांटा सिंक', 'गुणवत्ता अनुपालन', 'एस्क्रो भुगतान स्वीकृति']
   },
   {
     titleEn: '6. Mandi Operator Portal (81-90)',
     titleHi: '6. मंडी संचालक पोर्टल (81-90)',
+    pageNums: [81, 82, 83, 84, 86, 87, 88, 89],
     linksEn: ['Operator Dashboard', 'QR Token Gate Scanner', 'Manual Token Entry Fallback', 'Gate Entry Vehicle Log', 'Vehicle Priority Queue', 'Live Yard Queue Monitor', 'Weighment Entry Terminal', 'Digital Tola Parchi Issuance'],
     linksHi: ['संचालक डैशबोर्ड', 'क्यूआर टोकन स्कैनर', 'मैनुअल टोकन प्रविष्टि', 'गेट वाहन लॉग', 'वाहन प्राथमिकता कतार', 'लाइव यार्ड कतार', 'धर्म कांटा टर्मिनल', 'डिजिटल तोला पर्ची']
   },
   {
     titleEn: '7. Quality Assayer Portal (91-97)',
     titleHi: '7. गुणवत्ता निरीक्षक पोर्टल (91-97)',
+    pageNums: [91, 92, 94, 95, 96, 97],
     linksEn: ['Assayer Dashboard', 'Pending Sample Inspections', 'NIR Moisture & Purity Check', 'Quality Grading (Grade A FAQ)', 'Inspection History Audit', 'AI vs Manual Quality Deviation Report'],
     linksHi: ['गुणवत्ता निरीक्षक डैशबोर्ड', 'लंबित नमूना निरीक्षण', 'एनआईआर नमी और शुद्धता जांच', 'गुणवत्ता ग्रेडिंग', 'निरीक्षण इतिहास', 'एआई बनाम मैनुअल रिपोर्ट']
   },
   {
     titleEn: '8. Logistics & Transport (98-107)',
     titleHi: '8. लॉजिस्टिक्स एवं परिवहन (98-107)',
+    pageNums: [98, 99, 100, 102, 103, 104, 105, 106],
     linksEn: ['Logistics Dashboard', 'Transport Requests Pool', 'Available Vehicle Fleet', 'Driver & Vehicle Management', 'Transport Task Assignment', 'Pickup Yard Management', 'Live GPS Transit Tracking', 'Completed Delivery Receipts'],
     linksHi: ['लॉजिस्टिक्स डैशबोर्ड', 'परिवहन अनुरोध पूल', 'वाहन बेड़ा', 'चालक प्रबंधन', 'परिवहन कार्य आवंटन', 'लाइव जीपीएस ट्रैकिंग', 'वितरण रसीदें']
   },
   {
     titleEn: '9. Warehouse & Silos (108-118)',
     titleHi: '9. गोदाम एवं साइलो प्रबंधक (108-118)',
+    pageNums: [108, 109, 110, 111, 112, 113, 115, 118],
     linksEn: ['Warehouse Dashboard', 'Capacity & Holding Monitor', 'Current Grain Inventory', 'Crop-wise Stock Ledger', 'Stock Inward Logging', 'Stock Outward Release', 'Warehouse Stock Transfers', 'Electronic Warehouse Receipt (e-NWR)'],
     linksHi: ['गोदाम डैशबोर्ड', 'क्षमता और स्टॉक मॉनिटर', 'वर्तमान अनाज सूची', 'फसल वार स्टॉक लेजर', 'स्टॉक इनवर्ड लॉग', 'इलेक्ट्रॉनिक वेयरहाउस रसीद (e-NWR)']
   },
   {
     titleEn: '10. Payment & Escrow (119-127)',
     titleHi: '10. भुगतान एवं डीबीटी लेजर (119-127)',
+    pageNums: [119, 120, 121, 122, 125, 126, 127],
     linksEn: ['Payment Dashboard', 'Pending Disbursals', 'Processing Escrow Payments', 'Completed DBT Transfers', 'NPCI Aadhaar Payment Tracker', 'Bank UTR Search Engine', 'PFMS Audit Reports'],
     linksHi: ['भुगतान डैशबोर्ड', 'लंबित भुगतान', 'एस्क्रो प्रसंस्करण', 'पूर्ण डीबीटी हस्तांतरण', 'आधार भुगतान ट्रैकर', 'बैंक यूटीआर खोज', 'पीएफएमएस ऑडिट रिपोर्ट']
   },
   {
     titleEn: '11. AI & Predictive Analytics (128-136)',
     titleHi: '11. एआई एवं विश्लेषणात्मक डैशबोर्ड (128-136)',
+    pageNums: [128, 129, 130, 131, 132, 133, 136],
     linksEn: ['AI Analytics Dashboard', 'Crop Supply Prediction', 'Arrival Volume Forecast', 'Mandi Overload Alert Engine', 'Warehouse Capacity Forecast', 'Price Trend AI Prediction', 'Demand Forecast & Risk Dashboard'],
     linksHi: ['एआई विश्लेषणात्मक डैशबोर्ड', 'फसल आपूर्ति पूर्वानुमान', 'आवक मात्रा पूर्वानुमान', 'मंडी ओवरलोड चेतावनी', 'मूल्य प्रवृत्ति पूर्वानुमान', 'जोखिम डैशबोर्ड']
   },
   {
     titleEn: '12. Crop Traceability & Audit (137-142)',
     titleHi: '12. फसल ट्रैसेबिलिटी एवं ब्लॉकचेन (137-142)',
+    pageNums: [137, 138, 139, 140, 142],
     linksEn: ['Crop Traceability Dashboard', 'Farm-to-Fork Journey Timeline', 'Cryptographic Transaction Ledger', 'Immutable Seed-to-Silo Audit', 'Blockchain Block Hash Certificate'],
     linksHi: ['फसल ट्रैसेबिलिटी डैशबोर्ड', 'खेत से थाली तक जीवनचक्र', 'क्रिप्टोग्राफिक लेनदेन लेजर', 'ब्लॉकचेन हैश प्रमाणपत्र']
   },
   {
     titleEn: '13. System Administration (143-162)',
     titleHi: '13. सिस्टम प्रशासन (143-162)',
+    pageNums: [143, 144, 145, 147, 149, 150, 152],
     linksEn: ['Admin Dashboard', 'User & Role Management', 'Farmer & Buyer Master Registry', 'Officer Delegation Center', 'Procurement Mandi Management', 'Crop & Price Ceiling Master', 'System Security Audit Logs'],
     linksHi: ['प्रशासक डैशबोर्ड', 'उपयोगकर्ता और भूमिका प्रबंधन', 'किसान एवं व्यापारी मास्टर', 'खरीद केंद्र प्रशासन', 'फसल और एमएसपी मास्टर', 'सुरक्षा ऑडिट लॉग']
   },
   {
     titleEn: '14. Common & Help System (163-171)',
     titleHi: '14. सामान्य सहायता प्रणाली (163-171)',
+    pageNums: [163, 165, 166, 167, 168, 169, 170],
     linksEn: ['My Notifications Center', 'Account Security Settings', 'Bilingual Language Switcher', 'Kisan Helpdesk & Grievance', 'Report System Incident', '404 Not Found Page', 'Access Denied Guard'],
     linksHi: ['अधिसूचना केंद्र', 'खाता सुरक्षा सेटिंग्स', 'द्विभाषिक भाषा चयन', 'किसान हेल्पलाइन एवं शिकायत', '404 अप्राप्य पृष्ठ', 'पहुंच अस्वीकृत सुरक्षा']
   }

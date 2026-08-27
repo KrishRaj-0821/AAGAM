@@ -30,6 +30,7 @@ export default function Navbar({
   openGatePassWithAuth,
   onOpenHelpdesk,
   onOpenVoiceAgent,
+  onOpenAiCropAnalyzer,
   currentUser,
   isAuthenticated,
   onRequestLogout,
@@ -249,6 +250,18 @@ export default function Navbar({
             {/* Right: Grouped Action & Auth Buttons Cluster */}
             <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 ml-auto shrink-0 w-full sm:w-auto justify-end">
               
+              {/* AI Crop Quality & Market Price Analysis Agent Trigger */}
+              {onOpenAiCropAnalyzer && (
+                <button
+                  onClick={onOpenAiCropAnalyzer}
+                  className="flex items-center gap-1.5 bg-[#71873f] hover:bg-[#607433] text-white font-extrabold px-3.5 py-2 rounded-xl transition-all shadow-md active:scale-95 whitespace-nowrap border border-white/20 group"
+                  title={t('AI Crop Quality & Market Price Analysis Agent', 'एआई फसल जांच एवं बाजार भाव')}
+                >
+                  <Sprout className="w-4 h-4 text-amber-300 group-hover:rotate-12 transition-transform" />
+                  <span>{t('🌾 Check Your Crop', '🌾 फसल जांच करें')}</span>
+                </button>
+              )}
+
               {/* Payment Status (Auth Protected) */}
               <button
                 onClick={() => openDbtWithAuth ? openDbtWithAuth() : null}
