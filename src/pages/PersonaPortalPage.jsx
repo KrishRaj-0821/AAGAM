@@ -860,48 +860,53 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
         51: { title: 'Notifications Center', widgets: ['SMS: Slot confirmed (3 min ago)', 'Email: DBT credited (2h ago)', 'WhatsApp: Arrive by 10 AM', 'App Alert: Grade A Passed'] }
       };
 
-      const spec = farmerSpecific[id] || { title: p.titleEn, widgets: ['Module Active', 'Data Loading', 'Synced', 'Verified'] };
+      const spec = farmerSpecific[id] || { title: t(p.titleEn, p.titleHi), widgets: [t('Module Active', 'मॉड्यूल सक्रिय'), t('Data Loading', 'डेटा लोडिंग'), t('Synced', 'सिंक हुआ'), t('Verified', 'सत्यापित')] };
+      const realUserName = currentUser?.name || currentUser?.full_name || 'Gurpreet Singh';
+      const realUserMobile = currentUser?.mobile || currentUser?.phone || '+91 98765 43210';
+      const realUserEmail = currentUser?.email || 'gurpreet.kisan@gmail.com';
+      const realUserId = currentUser?.id || 'FRM-10245';
+
       return (
-        <div className="space-y-4">
+        <div className="space-y-4 font-mono text-xs">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {spec.widgets.map((w, i) => (
-              <div key={i} className="bg-[#f0f4ea] border border-[#71873f] p-3 rounded-xl font-mono text-xs">
-                <div className="text-[#637554] text-[9px] uppercase font-bold">Field {i + 1}</div>
+              <div key={i} className="bg-[#f0f4ea] border border-[#71873f] p-3 rounded-xl">
+                <div className="text-[#637554] text-[9px] uppercase font-bold">{t(`Field ${i + 1}`, `क्षेत्र ${i + 1}`)}</div>
                 <div className="font-bold text-[#243118] mt-0.5">{w}</div>
               </div>
             ))}
           </div>
-          <div className="bg-white p-4 rounded-2xl border border-[#abbe99] text-xs font-mono">
-            <div className="font-extrabold text-[#243118] border-b pb-2 mb-2 flex items-center gap-1.5">
+          <div className="bg-white p-4 rounded-2xl border border-[#abbe99]">
+            <div className="font-extrabold text-[#243118] border-b pb-2 mb-2 flex items-center gap-1.5 text-sm">
               <Sprout className="w-4 h-4 text-[#71873f]" />
               <span>{spec.title}</span>
             </div>
             <div className="grid grid-cols-2 gap-2 text-[#637554]">
               <div className="p-2 bg-[#fcfaf7] rounded-xl border border-[#abbe99]/60">
-                <div className="font-bold text-[#243118]">Farmer ID</div>
-                <div>PB-FARM-99482</div>
+                <div className="font-bold text-[#243118]">{t('User Name & ID', 'उपयोगकर्ता का नाम एवं आईडी')}</div>
+                <div className="font-semibold text-slate-900">{realUserName} ({realUserId})</div>
               </div>
               <div className="p-2 bg-[#fcfaf7] rounded-xl border border-[#abbe99]/60">
-                <div className="font-bold text-[#243118]">Status</div>
-                <div className="text-emerald-700 font-bold">ACTIVE & VERIFIED</div>
+                <div className="font-bold text-[#243118]">{t('Mobile & Status', 'मोबाइल एवं स्थिति')}</div>
+                <div className="text-emerald-700 font-bold">{realUserMobile} • {t('ACTIVE & VERIFIED', 'सक्रिय एवं सत्यापित')}</div>
               </div>
               <div className="p-2 bg-[#fcfaf7] rounded-xl border border-[#abbe99]/60">
-                <div className="font-bold text-[#243118]">Crop / Lot</div>
-                <div>Wheat 180 Qtl (Sharbati)</div>
+                <div className="font-bold text-[#243118]">{t('Email & Mandi', 'ईमेल एवं मंडी')}</div>
+                <div>{realUserEmail} • {currentUser?.mandi || 'Karnal Central APMC'}</div>
               </div>
               <div className="p-2 bg-[#fcfaf7] rounded-xl border border-[#abbe99]/60">
-                <div className="font-bold text-[#243118]">DBT Payment</div>
-                <div className="text-[#a36627] font-bold">₹4,36,500 Credited</div>
+                <div className="font-bold text-[#243118]">{t('DBT Payment Status', 'डीबीटी भुगतान स्थिति')}</div>
+                <div className="text-[#a36627] font-bold">₹4,36,500 {t('Credited', 'जमा हुआ')}</div>
               </div>
             </div>
 
             {onOpenAiCropAnalyzer && (
               <button
                 onClick={onOpenAiCropAnalyzer}
-                className="w-full mt-3 bg-[#71873f] hover:bg-[#607433] text-white font-extrabold py-3 rounded-xl text-xs transition-all flex items-center justify-center gap-2 shadow-md"
+                className="w-full mt-3 bg-[#71873f] hover:bg-[#607433] text-white font-extrabold py-3 rounded-xl text-xs transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer"
               >
                 <Sprout className="w-4 h-4 text-amber-300" />
-                <span>Launch AI Crop Quality & Market Price Analysis Agent →</span>
+                <span>{t('Launch AI Crop Quality & Market Price Analysis Agent →', 'एआई फसल गुणवत्ता एवं बाजार मूल्य विश्लेषण एजेंट चालू करें →')}</span>
               </button>
             )}
           </div>
