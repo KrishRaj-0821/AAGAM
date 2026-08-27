@@ -1356,23 +1356,104 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
       );
     }
 
+    // PAGES 167-168: Help, Support & Complaints Status Dashboard
+    if (id === 167 || id === 168) {
+      return (
+        <div className="space-y-4 font-mono text-xs">
+          <div className="bg-white p-5 rounded-3xl border border-[#abbe99] shadow-sm space-y-4">
+            <div className="flex justify-between items-center border-b pb-3">
+              <h4 className="font-extrabold text-base text-[#243118] flex items-center gap-2">
+                <HelpCircle className="w-5 h-5 text-[#71873f]" />
+                <span>SUPPORT & COMPLAINTS STATUS DASHBOARD</span>
+              </h4>
+              <span className="bg-[#71873f] text-white font-bold px-3 py-1 rounded-full text-[10px]">
+                GOI CITIZEN REDRESSAL ACTIVE
+              </span>
+            </div>
+
+            {/* 3 Status Columns */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+              
+              {/* Problem Solved */}
+              <div className="bg-emerald-50 rounded-2xl p-4 border border-emerald-300 space-y-2">
+                <div className="flex items-center justify-between border-b border-emerald-300 pb-2">
+                  <span className="font-extrabold text-emerald-900 flex items-center gap-1">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>PROBLEM SOLVED</span>
+                  </span>
+                  <span className="bg-emerald-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">RESOLVED</span>
+                </div>
+                <div className="bg-white p-3 rounded-xl border border-emerald-200 shadow-xs space-y-1">
+                  <div className="font-extrabold text-[#243118]">#CMP-2026-9910</div>
+                  <div className="font-bold text-[11px]">Weight Discrepancy Refund</div>
+                  <div className="text-[10px] text-emerald-800 bg-emerald-50 p-1.5 rounded font-sans">
+                    Difference of 20kg adjusted in Tola Parchi. Additional ₹494 credited.
+                  </div>
+                  <div className="text-[9px] text-slate-400">By: Inspector Raj Kumar • 22 Aug 2026</div>
+                </div>
+              </div>
+
+              {/* Processing */}
+              <div className="bg-amber-50 rounded-2xl p-4 border border-amber-300 space-y-2">
+                <div className="flex items-center justify-between border-b border-amber-300 pb-2">
+                  <span className="font-extrabold text-amber-900 flex items-center gap-1">
+                    <Clock className="w-4 h-4 text-amber-600 animate-spin" />
+                    <span>PROCESSING</span>
+                  </span>
+                  <span className="bg-amber-500 text-slate-950 text-[9px] font-black px-2 py-0.5 rounded-full">IN REVIEW</span>
+                </div>
+                <div className="bg-white p-3 rounded-xl border border-amber-200 shadow-xs space-y-1">
+                  <div className="font-extrabold text-[#243118]">#CMP-2026-9924</div>
+                  <div className="font-bold text-[11px]">Arrival Slot Reschedule</div>
+                  <div className="text-[10px] text-amber-900 bg-amber-50 p-1.5 rounded font-sans">
+                    Gate pass validity extended to 26-Aug 10:00 AM.
+                  </div>
+                  <div className="text-[9px] text-slate-400">Assigned: Officer Sharma • 24 Aug 2026</div>
+                </div>
+              </div>
+
+              {/* Not Resolved */}
+              <div className="bg-[#fcfaf7] rounded-2xl p-4 border border-[#a36627] space-y-2">
+                <div className="flex items-center justify-between border-b border-[#a36627]/40 pb-2">
+                  <span className="font-extrabold text-[#a36627] flex items-center gap-1">
+                    <AlertTriangle className="w-4 h-4 text-[#a36627]" />
+                    <span>NOT RESOLVED</span>
+                  </span>
+                  <span className="bg-[#a36627] text-white text-[9px] font-bold px-2 py-0.5 rounded-full">OPEN DISPUTE</span>
+                </div>
+                <div className="bg-white p-3 rounded-xl border border-[#a36627]/30 shadow-xs space-y-1">
+                  <div className="font-extrabold text-[#243118]">#CMP-2026-9938</div>
+                  <div className="font-bold text-[11px]">Moisture Re-Testing Appeal</div>
+                  <div className="text-[10px] text-[#a36627] bg-[#f7f2ea] p-1.5 rounded font-sans">
+                    Re-inspection scheduled with Zonal Mobile Quality Van on 28-Aug.
+                  </div>
+                  <div className="text-[9px] text-slate-400">Escalated: Zonal Inspector Anita Roy • 25 Aug 2026</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     // PAGES 163-171: Common / Settings
     return (
-      <div className="space-y-4">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-xs">
+      <div className="space-y-4 font-mono text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {[
-            { label: 'Module', val: p.section + ' System', color: 'slate' },
-            { label: 'Page ID', val: `AAGAM-PG-${p.id}`, color: 'slate' },
-            { label: 'Uptime', val: '99.99%', color: 'emerald' },
-            { label: 'Security', val: 'NIC Level 3', color: 'sky' }
+            { label: 'Module', val: p.section + ' System' },
+            { label: 'Page ID', val: `AAGAM-PG-${p.id}` },
+            { label: 'Uptime', val: '99.99%' },
+            { label: 'Security', val: 'NIC Level 3' }
           ].map(c => (
-            <div key={c.label} className={`bg-${c.color}-50 border border-${c.color}-300 p-3 rounded-xl text-center`}>
-              <div className={`font-extrabold text-${c.color}-900`}>{c.val}</div>
-              <div className={`text-[10px] text-${c.color}-700 font-bold uppercase`}>{c.label}</div>
+            <div key={c.label} className="bg-white border border-[#abbe99] p-3 rounded-xl text-center">
+              <div className="font-extrabold text-[#243118]">{c.val}</div>
+              <div className="text-[10px] text-[#637554] font-bold uppercase">{c.label}</div>
             </div>
           ))}
         </div>
-        <div className="bg-white p-4 rounded-2xl border border-[#abbe99] text-xs font-mono">
+        <div className="bg-white p-4 rounded-2xl border border-[#abbe99]">
           <div className="font-extrabold text-[#243118] border-b pb-2 flex items-center gap-1.5">
             <Wrench className="w-4 h-4 text-slate-700" />
             <span>{p.titleEn}</span>
@@ -1381,8 +1462,6 @@ export default function PersonaPortalPage({ activeRole, setActiveRole, setCurren
           {id === 164 && <div className="mt-2 text-[#637554]">Manage account email, linked mobile number, bank account details, and Aadhaar seeding status.</div>}
           {id === 165 && <div className="mt-2 text-[#637554]">Change password, manage active sessions, enable/disable 2FA, and view login history.</div>}
           {id === 166 && <div className="mt-2 text-[#637554]">Switch between English, हिंदी, ਪੰਜਾਬੀ, मराठी, ગુજરાતી, and 18 other official Indian languages.</div>}
-          {id === 167 && <div className="mt-2 text-[#637554]">Access guided help articles, video tutorials, and raise a ticket to the Helpdesk team at aagam.help.gov@gmail.com.</div>}
-          {id === 168 && <div className="mt-2 text-[#637554]">Report a bug or system error. Your ticket is auto-tagged by category and dispatched to aagam.help.gov@gmail.com via Formspree.</div>}
           {id === 169 && <div className="mt-2 text-[#637554]">Page not found. This route does not exist or has been moved. Return to Home or search for the correct page.</div>}
           {id === 170 && <div className="mt-2 text-[#637554]">You do not have permission to access this page. Contact your district procurement officer for role elevation.</div>}
           {id === 171 && <div className="mt-2 text-[#637554]">An unexpected server error occurred. Our NIC cloud team has been auto-notified. Please retry in 2 minutes.</div>}
