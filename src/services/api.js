@@ -165,19 +165,38 @@ export const api = {
   notifications: {
     sendBookingSmsWebhook: async (bookingPayload) => {
       const webhookUrl = 'https://connect-with-me247.app.n8n.cloud/webhook/aagam-sms-booking';
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s timeout
+
       try {
         const response = await fetch(webhookUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Accept': 'application/json'
           },
           body: JSON.stringify(bookingPayload),
+          signal: controller.signal
         });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          const errorText = await response.text().catch(() => '');
+          return {
+            success: false,
+            error: `Webhook returned HTTP ${response.status} (${response.statusText})${errorText ? `: ${errorText}` : ''}`
+          };
+        }
+
         const data = await response.json();
         return { success: true, data };
       } catch (err) {
-        console.warn('n8n SMS Webhook notification error:', err);
-        return { success: false, error: err.message };
+        clearTimeout(timeoutId);
+        const errMsg = err.name === 'AbortError'
+          ? 'Webhook network request timed out (12s)'
+          : (err.message || 'Network error');
+        console.warn('n8n SMS Webhook notification error:', errMsg);
+        return { success: false, error: errMsg };
       }
     }
   }

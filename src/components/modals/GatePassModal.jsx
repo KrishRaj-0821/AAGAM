@@ -19,7 +19,9 @@ import {
   Mail,
   BellRing,
   Loader2,
-  User
+  User,
+  AlertTriangle,
+  RefreshCw
 } from 'lucide-react';
 import QRCode from 'qrcode';
 import { allIndianStatesData, allIndianCropsList } from '../../data/realTimeData';
@@ -50,6 +52,23 @@ export default function GatePassModal({
 
   const [isSubmittingWebhook, setIsSubmittingWebhook] = useState(false);
   const [webhookSuccess, setWebhookSuccess] = useState(null);
+  const [webhookError, setWebhookError] = useState(null);
+
+  // Default values initialization
+  if (!bookingDetails.date) {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    bookingDetails.date = tomorrow.toISOString().split('T')[0];
+  }
+  if (!bookingDetails.timeSlot) {
+    bookingDetails.timeSlot = '09:00 AM - 11:00 AM';
+  }
+  if (!bookingDetails.lane) {
+    bookingDetails.lane = 'Lane 04 - Weighbridge A';
+  }
+  if (!bookingDetails.estimatedQty) {
+    bookingDetails.estimatedQty = '40';
+  }
 
   const allStatesList = Object.keys(allIndianStatesData);
   const currentState = bookingDetails.state || allStatesList[0] || 'Haryana';
@@ -188,6 +207,8 @@ export default function GatePassModal({
       slot_date: formattedSlotDate
     };
 
+    setWebhookError(null);
+    setWebhookSuccess(null);
     setIsSubmittingWebhook(true);
 
     // POST request to https://connect-with-me247.app.n8n.cloud/webhook/aagam-sms-booking
@@ -198,9 +219,12 @@ export default function GatePassModal({
         if (webhookRes.data.token) {
           token = webhookRes.data.token;
         }
+      } else {
+        setWebhookError(webhookRes?.error || 'Webhook SMS notification failed to dispatch');
       }
     } catch (err) {
       console.warn("n8n Webhook dispatch error:", err);
+      setWebhookError(err.message || 'Network communication error');
     } finally {
       setIsSubmittingWebhook(false);
     }
@@ -230,6 +254,42 @@ export default function GatePassModal({
         ),
         tokenNo: token
       });
+    }
+  };
+
+  const handleRetryWebhook = async () => {
+    const effectiveFarmerName = bookingDetails.farmerName || farmerName.trim() || 'Ram Singh';
+    const cleanPhone = (bookingDetails.phoneNumber || phoneNumber).replace(/\D/g, '').slice(-10) || '9876543210';
+    const cropName = bookingDetails.commodity || getEffectiveCropName();
+    const mandiLocation = bookingDetails.mandi || getEffectiveMandiName();
+    const quantity = String(bookingDetails.estimatedQty || '40');
+    const formattedSlotDate = bookingDetails.formattedSlotDate || formatSlotDateString(bookingDetails.date, bookingDetails.timeSlot);
+
+    const n8nPayload = {
+      farmer_name: effectiveFarmerName,
+      phone_number: cleanPhone,
+      crop_name: cropName,
+      quantity: quantity,
+      mandi_location: mandiLocation,
+      slot_date: formattedSlotDate
+    };
+
+    setIsSubmittingWebhook(true);
+    setWebhookError(null);
+    try {
+      const webhookRes = await api.notifications.sendBookingSmsWebhook(n8nPayload);
+      if (webhookRes?.success && webhookRes?.data) {
+        setWebhookSuccess(webhookRes.data);
+        if (webhookRes.data.token) {
+          setBookingDetails(prev => ({ ...prev, tokenNo: webhookRes.data.token }));
+        }
+      } else {
+        setWebhookError(webhookRes?.error || 'Webhook notification dispatch failed');
+      }
+    } catch (err) {
+      setWebhookError(err.message || 'Network error');
+    } finally {
+      setIsSubmittingWebhook(false);
     }
   };
 
@@ -866,23 +926,49 @@ export default function GatePassModal({
           <div className="space-y-5 text-center">
             
             {/* Live Success Banner */}
-            <div className="bg-emerald-50 text-emerald-800 border border-emerald-300 p-3 rounded-2xl text-xs font-bold space-y-1">
+            <div className="bg-emerald-50 text-emerald-800 border border-emerald-300 p-3.5 rounded-2xl text-xs font-bold space-y-2 shadow-xs">
               <div className="flex items-center justify-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 animate-bounce" />
-                <span>{t('Gate Pass Confirmed & SMS Dispatched!', 'गेट पास सफलतापूर्वक बुक व एसएमएस भेजा गया!')}</span>
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 animate-bounce" />
+                <span className="text-sm">{t('Gate Pass Confirmed & Recorded Successfully!', 'गेट पास सफलतापूर्वक बुक व दर्ज हुआ!')}</span>
               </div>
-              <div className="text-[11px] text-emerald-700 font-sans font-medium flex flex-wrap justify-center items-center gap-3 pt-1 border-t border-emerald-200">
-                <span className="flex items-center gap-1">
+              <div className="text-[11px] text-emerald-700 font-sans font-medium flex flex-wrap justify-center items-center gap-3 pt-2 border-t border-emerald-200">
+                <span className="flex items-center gap-1.5">
                   <Smartphone className="w-3.5 h-3.5 text-emerald-700" />
-                  <span>n8n SMS Notification Sent: +91 {bookingDetails.phoneNumber || '9876543210'}</span>
+                  <span>n8n SMS Target: <strong>+91 {bookingDetails.phoneNumber || '9876543210'}</strong></span>
                 </span>
                 {webhookSuccess && (
-                  <span className="bg-emerald-200/80 text-emerald-900 px-2 py-0.5 rounded text-[10px] font-mono font-bold">
-                    Webhook: {webhookSuccess.message || 'SMS Dispatched'} ({webhookSuccess.token || bookingDetails.tokenNo})
+                  <span className="bg-emerald-200/80 text-emerald-900 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold border border-emerald-300">
+                    Webhook Token: {webhookSuccess.token || bookingDetails.tokenNo} • {webhookSuccess.message || 'SMS Dispatched'}
                   </span>
                 )}
               </div>
             </div>
+
+            {/* If Webhook Encountered an Error / Timeout */}
+            {webhookError && (
+              <div className="bg-amber-50 text-amber-900 border border-amber-300 p-3.5 rounded-2xl text-xs space-y-2 text-left shadow-xs">
+                <div className="flex items-center justify-between font-bold">
+                  <span className="flex items-center gap-1.5 text-amber-800">
+                    <AlertTriangle className="w-4 h-4 text-amber-600" />
+                    <span>{t('SMS Webhook Alert', 'एसएमएस वेबहुक अलर्ट')}</span>
+                  </span>
+                  <button
+                    onClick={handleRetryWebhook}
+                    disabled={isSubmittingWebhook}
+                    className="bg-amber-700 hover:bg-amber-800 disabled:opacity-50 text-white font-bold px-2.5 py-1 rounded-lg text-[10px] flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    {isSubmittingWebhook ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+                    <span>{t('Retry SMS Dispatch', 'एसएमएस पुनः भेजें')}</span>
+                  </button>
+                </div>
+                <p className="text-[11px] text-amber-800 font-sans">
+                  {t(
+                    `Your official gate pass is valid and ready. The automated SMS notification returned: "${webhookError}". Click Retry SMS above or use your QR code and PDF below.`,
+                    `आपका गेट पास तैयार है। हालांकि एसएमएस वेबहुक से संदेश आया: "${webhookError}"। पुनः प्रयास करें या नीचे दिए गेट पास का उपयोग करें।`
+                  )}
+                </p>
+              </div>
+            )}
 
             {/* 1-Hour Prior Scheduled Reminder Notice */}
             <div className="bg-amber-50 border border-amber-200 p-2.5 rounded-xl text-[11px] text-amber-900 flex items-center justify-center gap-2 text-left">
