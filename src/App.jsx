@@ -758,6 +758,7 @@ export default function App() {
       <SuccessToast
         notification={notification}
         onClose={() => setNotification(prev => ({ ...prev, isOpen: false }))}
+        currentUser={currentUser}
       />
 
     </div>

@@ -330,15 +330,13 @@ export default function LoginPage({
   };
 
   const handleCompleteLogin = () => {
-    const user = demoUsers[loginRole] || {
-      name: 'Gurpreet Singh',
+    const baseUser = demoUsers[loginRole] || demoUsers.Farmer;
+    const user = {
+      ...baseUser,
+      mobile: loginInput || baseUser.mobile,
+      phone: loginInput || baseUser.mobile,
       role: loginRole,
       id: `AAGAM-USER-${Math.floor(10000 + Math.random() * 90000)}`,
-      mobile: loginInput,
-      email: `${loginRole.toLowerCase()}@aagam-portal.gov.in`,
-      mandi: 'Karnal Central Yard (HR)',
-      state: 'Haryana',
-      authMethod: 'Firebase Verified',
       token: `GOI-SSO-TOKEN-2026-${Math.floor(1000 + Math.random() * 9000)}`
     };
 

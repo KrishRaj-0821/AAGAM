@@ -232,10 +232,11 @@ export default function RegisterPage({
       role: regRole,
       id: regForm.regId || `AAGAM-REG-2026-${Math.floor(100000 + Math.random() * 900000)}`,
       aadhaar: regForm.aadhaar,
-      mobile: regForm.mobile,
+      mobile: regForm.mobile || '+91 98765 43210',
+      phone: regForm.mobile || '+91 98765 43210',
       email: `${cleanPhone || 'user'}@aagam-portal.gov.in`,
-      mandi: regForm.mandi,
-      state: regForm.state,
+      mandi: regForm.mandi || 'Karnal Central APMC (HR)',
+      state: regForm.state || 'Haryana',
       authMethod: 'Django Database Registered',
       token: `GOI-REG-TOKEN-${Math.floor(1000 + Math.random() * 9000)}`
     };

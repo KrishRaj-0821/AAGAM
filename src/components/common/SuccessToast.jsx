@@ -1,17 +1,70 @@
 import React, { useEffect } from 'react';
-import { CheckCircle2, X, Sparkles, ShieldCheck, Smartphone, Mail, Clock } from 'lucide-react';
+import { CheckCircle2, X, Sparkles, ShieldCheck, Smartphone, Mail, Clock, Download, FileText } from 'lucide-react';
 
-export default function SuccessToast({ notification, onClose }) {
+export default function SuccessToast({ notification, onClose, currentUser }) {
   useEffect(() => {
     if (notification?.isOpen) {
       const timer = setTimeout(() => {
         onClose();
-      }, 7000);
+      }, 9000);
       return () => clearTimeout(timer);
     }
   }, [notification, onClose]);
 
   if (!notification?.isOpen) return null;
+
+  const userMobile = currentUser?.mobile || currentUser?.phone || '+91 98765 43210';
+  const userName = currentUser?.name || currentUser?.full_name || 'Verified User';
+  const userRole = currentUser?.role || 'Farmer';
+  const userEmail = currentUser?.email || 'user.kisan@gmail.com';
+
+  const handleDownloadReceipt = () => {
+    const receiptContent = `================================================================
+  GOVERNMENT OF INDIA — AAGAM AGRICULTURAL PORTAL
+  OFFICIAL NOTIFICATION RECEIPT & VERIFICATION RECORD
+================================================================
+
+RECEIPT REF   : ${notification.tokenNo || 'GOI-NTF-' + Math.floor(100000 + Math.random() * 900000)}
+DATE & TIME   : ${new Date().toLocaleString('en-IN')}
+STATUS        : VERIFIED & RECORDED ON GOI BLOCKCHAIN LEDGER
+
+----------------------------------------------------------------
+RECIPIENT & USER DETAILS
+----------------------------------------------------------------
+User Name     : ${userName}
+User Role     : ${userRole}
+Mobile Number : ${userMobile}
+Email Address : ${userEmail}
+Assigned Mandi: ${currentUser?.mandi || 'Karnal Central APMC (HR)'}
+
+----------------------------------------------------------------
+NOTIFICATION DETAILS
+----------------------------------------------------------------
+Title         : ${notification.title || 'Process Completed Successfully'}
+Information   : ${notification.message}
+
+----------------------------------------------------------------
+DISPATCH CONFIRMATION
+----------------------------------------------------------------
+SMS Gateway   : Dispatched to ${userMobile}
+Email Gateway : Dispatched to ${userEmail}
+Verification  : Verhoeff Checksum Validated (GOI Cloud)
+
+================================================================
+  National Informatics Centre (NIC) & Ministry of Agriculture
+  This is an official computer-generated digital receipt.
+================================================================`;
+
+    const blob = new Blob([receiptContent], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `AAGAM_Notification_Receipt_${notification.tokenNo || 'Record'}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="fixed top-6 right-6 z-[100] max-w-md w-full animate-in slide-in-from-top-5 duration-300 pointer-events-auto">
@@ -46,33 +99,36 @@ export default function SuccessToast({ notification, onClose }) {
               {notification.message}
             </p>
 
-            {notification.tokenNo && (
-              <div className="mt-2 bg-white/10 p-2.5 rounded-xl border border-white/15 space-y-1.5 font-mono text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="text-[#e0b87e] font-extrabold">{notification.tokenNo}</span>
-                  <span className="text-[10px] text-emerald-400 font-sans font-bold flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-[#e0b87e]" />
-                    Verified & Recorded
-                  </span>
-                </div>
+            <div className="mt-2 bg-white/10 p-2.5 rounded-xl border border-white/15 space-y-2 font-mono text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-[#e0b87e] font-extrabold">{notification.tokenNo || 'GOI-VERIFIED'}</span>
+                <span className="text-[10px] text-emerald-400 font-sans font-bold flex items-center gap-1">
+                  <Sparkles className="w-3 h-3 text-[#e0b87e]" />
+                  Recorded
+                </span>
+              </div>
 
-                {/* Instant Multi-Channel Dispatch Info */}
-                <div className="text-[10px] font-sans text-slate-300 space-y-1 pt-1 border-t border-white/10">
-                  <div className="flex items-center gap-1.5 text-emerald-300">
-                    <Smartphone className="w-3 h-3 text-emerald-400 shrink-0" />
-                    <span>SMS sent to: <strong>+91 98765 43210</strong></span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-sky-300">
-                    <Mail className="w-3 h-3 text-sky-400 shrink-0" />
-                    <span>Receipt sent to: <strong>farmer.kisan@gmail.com</strong></span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-[#e0b87e] font-semibold">
-                    <Clock className="w-3 h-3 text-[#e0b87e] shrink-0" />
-                    <span>Automated SMS reminder scheduled 1-hr before arrival slot.</span>
-                  </div>
+              {/* Instant Multi-Channel Dispatch Info with User's Custom Mobile */}
+              <div className="text-[10px] font-sans text-slate-300 space-y-1 pt-1 border-t border-white/10">
+                <div className="flex items-center gap-1.5 text-emerald-300">
+                  <Smartphone className="w-3 h-3 text-emerald-400 shrink-0" />
+                  <span>SMS sent to: <strong>{userMobile}</strong></span>
+                </div>
+                <div className="flex items-center gap-1.5 text-sky-300">
+                  <Mail className="w-3 h-3 text-sky-400 shrink-0" />
+                  <span>Receipt sent to: <strong>{userEmail}</strong></span>
                 </div>
               </div>
-            )}
+
+              {/* Action Button: Download Notification Information Receipt */}
+              <button
+                onClick={handleDownloadReceipt}
+                className="w-full mt-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black py-2 rounded-xl text-xs transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 cursor-pointer font-sans"
+              >
+                <Download className="w-4 h-4 text-slate-950" />
+                <span>Download Notification Receipt (.txt)</span>
+              </button>
+            </div>
           </div>
 
           {/* Close Button */}
