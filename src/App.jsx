@@ -158,6 +158,8 @@ export default function App() {
   // Slot Booking Details State with State, District, Mandi, and Custom Crop Support
   const [slotStep, setSlotStep] = useState(1);
   const [bookingDetails, setBookingDetails] = useState({
+    farmerName: '',
+    phoneNumber: '',
     farmerId: currentUser?.id || '',
     state: '',
     district: '',
@@ -603,6 +605,7 @@ export default function App() {
         bookingDetails={bookingDetails}
         setBookingDetails={setBookingDetails}
         triggerSuccessNotification={triggerSuccessNotification}
+        currentUser={currentUser}
         t={t}
       />
 

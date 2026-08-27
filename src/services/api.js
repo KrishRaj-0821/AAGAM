@@ -159,6 +159,27 @@ export const api = {
   // 16. Blockchain Traceability & Audit
   traceability: {
     traceLot: (lotId) => get(`/traceability/lots/${lotId}/`),
+  },
+
+  // 17. Automated Notifications & n8n SMS Webhooks
+  notifications: {
+    sendBookingSmsWebhook: async (bookingPayload) => {
+      const webhookUrl = 'https://connect-with-me247.app.n8n.cloud/webhook/aagam-sms-booking';
+      try {
+        const response = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(bookingPayload),
+        });
+        const data = await response.json();
+        return { success: true, data };
+      } catch (err) {
+        console.warn('n8n SMS Webhook notification error:', err);
+        return { success: false, error: err.message };
+      }
+    }
   }
 };
 

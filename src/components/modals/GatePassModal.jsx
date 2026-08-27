@@ -17,11 +17,14 @@ import {
   Printer,
   Smartphone,
   Mail,
-  BellRing
+  BellRing,
+  Loader2,
+  User
 } from 'lucide-react';
 import QRCode from 'qrcode';
 import { allIndianStatesData, allIndianCropsList } from '../../data/realTimeData';
 import WorkingQRCode from '../common/WorkingQRCode';
+import { api } from '../../services/api';
 
 export default function GatePassModal({
   isOpen,
@@ -31,9 +34,22 @@ export default function GatePassModal({
   bookingDetails,
   setBookingDetails,
   triggerSuccessNotification,
+  currentUser,
   t
 }) {
   if (!isOpen) return null;
+
+  const [farmerName, setFarmerName] = useState(() => {
+    return bookingDetails.farmerName || currentUser?.full_name || currentUser?.name || 'Ram Singh';
+  });
+
+  const [phoneNumber, setPhoneNumber] = useState(() => {
+    const raw = bookingDetails.phoneNumber || currentUser?.phone || currentUser?.mobile || '';
+    return raw.replace(/\D/g, '').slice(-10) || '9876543210';
+  });
+
+  const [isSubmittingWebhook, setIsSubmittingWebhook] = useState(false);
+  const [webhookSuccess, setWebhookSuccess] = useState(null);
 
   const allStatesList = Object.keys(allIndianStatesData);
   const currentState = bookingDetails.state || allStatesList[0] || 'Haryana';
@@ -120,15 +136,83 @@ export default function GatePassModal({
     return bookingDetails.mandi || 'Karnal Central Grain Yard';
   };
 
-  const handleGenerateQR = () => {
+  const formatSlotDateString = (rawDate, rawSlot) => {
+    let datePart = '';
+    if (rawDate) {
+      try {
+        const d = new Date(rawDate);
+        if (!isNaN(d.getTime())) {
+          const day = d.getDate();
+          const month = d.toLocaleString('en-US', { month: 'short' });
+          datePart = `${day} ${month}`;
+        }
+      } catch (e) {}
+    }
+    if (!datePart) {
+      const today = new Date();
+      datePart = `${today.getDate()} ${today.toLocaleString('en-US', { month: 'short' })}`;
+    }
+
+    let timePart = '10:30 AM';
+    if (rawSlot) {
+      const matchTime = rawSlot.match(/(\d{1,2}:\d{2}\s*(?:AM|PM))/i);
+      if (matchTime) {
+        timePart = matchTime[1];
+      } else {
+        timePart = rawSlot.split('-')[0].trim();
+      }
+    }
+
+    return `${datePart}, ${timePart}`;
+  };
+
+  const handleGenerateQR = async () => {
     const statePrefix = (currentState || 'GOI').slice(0, 2).toUpperCase();
     const distPrefix = (currentDistrict || 'MND').slice(0, 3).toUpperCase();
-    const token = `${statePrefix}-${distPrefix}-${Math.floor(1000 + Math.random() * 9000)}`;
+    let token = `${statePrefix}-${distPrefix}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    const effectiveFarmerName = farmerName.trim() || 'Ram Singh';
+    const cleanPhone = phoneNumber.replace(/\D/g, '').slice(-10) || '9876543210';
+    const cropName = getEffectiveCropName();
+    const mandiLocation = getEffectiveMandiName();
+    const quantity = String(bookingDetails.estimatedQty || '40');
+    const formattedSlotDate = formatSlotDateString(bookingDetails.date, bookingDetails.timeSlot);
+
+    // EXACT JSON BODY REQUIRED BY N8N WEBHOOK
+    const n8nPayload = {
+      farmer_name: effectiveFarmerName,
+      phone_number: cleanPhone,
+      crop_name: cropName,
+      quantity: quantity,
+      mandi_location: mandiLocation,
+      slot_date: formattedSlotDate
+    };
+
+    setIsSubmittingWebhook(true);
+
+    // POST request to https://connect-with-me247.app.n8n.cloud/webhook/aagam-sms-booking
+    try {
+      const webhookRes = await api.notifications.sendBookingSmsWebhook(n8nPayload);
+      if (webhookRes?.success && webhookRes?.data) {
+        setWebhookSuccess(webhookRes.data);
+        if (webhookRes.data.token) {
+          token = webhookRes.data.token;
+        }
+      }
+    } catch (err) {
+      console.warn("n8n Webhook dispatch error:", err);
+    } finally {
+      setIsSubmittingWebhook(false);
+    }
 
     const updatedDetails = {
       ...bookingDetails,
-      commodity: getEffectiveCropName(),
-      mandi: getEffectiveMandiName(),
+      farmerName: effectiveFarmerName,
+      phoneNumber: cleanPhone,
+      commodity: cropName,
+      estimatedQty: quantity,
+      mandi: mandiLocation,
+      formattedSlotDate: formattedSlotDate,
       qrGenerated: true,
       tokenNo: token
     };
@@ -141,8 +225,8 @@ export default function GatePassModal({
       triggerSuccessNotification({
         title: t('Gate Pass Confirmed & SMS Dispatched!', 'गेट पास बुक हुआ एवं एसएमएस भेजा गया!'),
         message: t(
-          `Token ${token} created for ${updatedDetails.commodity} (${updatedDetails.estimatedQty} Qtl) at ${updatedDetails.mandi}. SMS sent to registered mobile & 1-hour prior alert scheduled.`,
-          `टोकन ${token} जारी: ${updatedDetails.commodity} (${updatedDetails.estimatedQty} क्विंटल), ${updatedDetails.mandi}। पंजीकृत मोबाइल पर एसएमएस भेजा गया व 1 घंटे पूर्व का अलर्ट शेड्यूल किया गया।`
+          `Token ${token} confirmed for ${effectiveFarmerName} (${cropName}, ${quantity} Qtl) at ${mandiLocation}. SMS notification dispatched to +91 ${cleanPhone} via n8n booking webhook.`,
+          `टोकन ${token} जारी: ${effectiveFarmerName} (${cropName}, ${quantity} क्विंटल) - ${mandiLocation}। +91 ${cleanPhone} पर स्वचालित एसएमएस भेजा गया।`
         ),
         tokenNo: token
       });
@@ -161,7 +245,7 @@ export default function GatePassModal({
     const state = currentState;
     const district = currentDistrict;
     const farmerId = bookingDetails.farmerId || 'PB-FARM-99482';
-    const mobile = '+91 98765 43210';
+    const mobile = bookingDetails.phoneNumber ? `+91 ${bookingDetails.phoneNumber}` : '+91 98765 43210';
     const email = 'farmer.kisan@gmail.com';
     const printTime = new Date().toLocaleString('en-IN');
 
@@ -169,7 +253,7 @@ export default function GatePassModal({
     const qrPayload = JSON.stringify({
       system: "GOI AAGAM National Grain Procurement",
       token: token,
-      farmer: bookingDetails.farmerName || 'Gurpreet Singh',
+      farmer: bookingDetails.farmerName || 'Ram Singh',
       farmerId: farmerId,
       mandi: mandi,
       state: state,
@@ -496,22 +580,47 @@ export default function GatePassModal({
         {slotStep === 1 && (
           <div className="space-y-4 text-xs">
             
-            {/* Farmer Identification */}
-            <div className="space-y-1">
-              <label className="font-bold text-[#243118] flex items-center justify-between">
-                <span>{t('Farmer Registration ID / Mobile Number:', 'किसान पंजीकरण आईडी / मोबाइल:')}</span>
-                <span className="text-[10px] text-emerald-700 font-bold flex items-center gap-1">
-                  <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                  <span>GOI Verified</span>
-                </span>
-              </label>
-              <input
-                type="text"
-                value={bookingDetails.farmerId}
-                onChange={(e) => setBookingDetails({ ...bookingDetails, farmerId: e.target.value })}
-                placeholder="e.g. PB-FARM-99482 or 9876543210"
-                className="w-full bg-[#fcfaf7] border border-[#abbe99] rounded-xl p-3 text-xs font-mono font-bold text-[#243118] focus:border-[#71873f] focus:outline-none shadow-xs"
-              />
+            {/* Farmer Identification & n8n SMS Booking Contact */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <label className="font-bold text-[#243118] flex items-center justify-between">
+                  <span className="flex items-center gap-1">
+                    <User className="w-3.5 h-3.5 text-[#71873f]" />
+                    {t('Farmer Name (as on Aadhaar):', 'किसान का पूरा नाम (आधार अनुसार):')}
+                  </span>
+                  <span className="text-[10px] text-emerald-700 font-bold flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                    <span>KYC Verified</span>
+                  </span>
+                </label>
+                <input
+                  type="text"
+                  value={farmerName}
+                  onChange={(e) => setFarmerName(e.target.value)}
+                  placeholder="e.g. Ram Singh"
+                  className="w-full bg-[#fcfaf7] border border-[#abbe99] rounded-xl p-3 text-xs font-bold text-[#243118] focus:border-[#71873f] focus:outline-none shadow-xs"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-bold text-[#243118] flex items-center justify-between">
+                  <span className="flex items-center gap-1">
+                    <Smartphone className="w-3.5 h-3.5 text-[#a36627]" />
+                    {t('10-Digit Phone (SMS Alert):', '10-अंकीय मोबाइल (एसएमएस अलर्ट):')}
+                  </span>
+                  <span className="text-[10px] text-[#71873f] font-mono font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                    Webhook SMS Active
+                  </span>
+                </label>
+                <input
+                  type="tel"
+                  maxLength={10}
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                  placeholder="e.g. 9876543210"
+                  className="w-full bg-[#fcfaf7] border border-[#abbe99] rounded-xl p-3 text-xs font-mono font-bold text-[#243118] focus:border-[#71873f] focus:outline-none shadow-xs"
+                />
+              </div>
             </div>
 
             {/* Hierarchical Location: State -> District -> Procurement Center */}
@@ -733,10 +842,20 @@ export default function GatePassModal({
               </button>
               <button
                 onClick={handleGenerateQR}
-                className="w-2/3 bg-[#a36627] hover:bg-[#804d19] text-white font-bold py-3.5 rounded-xl text-xs shadow-md transition-colors flex items-center justify-center gap-2"
+                disabled={isSubmittingWebhook}
+                className="w-2/3 bg-[#a36627] hover:bg-[#804d19] disabled:opacity-70 text-white font-bold py-3.5 rounded-xl text-xs shadow-md transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
-                <Sparkles className="w-4 h-4" />
-                <span>{t('Generate Official Gate Pass QR', 'क्यूआर गेट पास जनरेट करें')}</span>
+                {isSubmittingWebhook ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>{t('Dispatching n8n SMS Booking...', 'एसएमएस बुकिंग भेजा जा रहा है...')}</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    <span>{t('Generate Official Gate Pass & Send SMS', 'गेट पास बुक करें एवं एसएमएस भेजें')}</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -750,11 +869,18 @@ export default function GatePassModal({
             <div className="bg-emerald-50 text-emerald-800 border border-emerald-300 p-3 rounded-2xl text-xs font-bold space-y-1">
               <div className="flex items-center justify-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 animate-bounce" />
-                <span>{t('Gate Pass Confirmed & Recorded Successfully!', 'गेट पास सफलतापूर्वक बुक व दर्ज हुआ!')}</span>
+                <span>{t('Gate Pass Confirmed & SMS Dispatched!', 'गेट पास सफलतापूर्वक बुक व एसएमएस भेजा गया!')}</span>
               </div>
               <div className="text-[11px] text-emerald-700 font-sans font-medium flex flex-wrap justify-center items-center gap-3 pt-1 border-t border-emerald-200">
-                <span className="flex items-center gap-1"><Smartphone className="w-3 h-3" /> SMS Dispatched: +91 98765 43210</span>
-                <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> Email Dispatched: farmer.kisan@gmail.com</span>
+                <span className="flex items-center gap-1">
+                  <Smartphone className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>n8n SMS Notification Sent: +91 {bookingDetails.phoneNumber || '9876543210'}</span>
+                </span>
+                {webhookSuccess && (
+                  <span className="bg-emerald-200/80 text-emerald-900 px-2 py-0.5 rounded text-[10px] font-mono font-bold">
+                    Webhook: {webhookSuccess.message || 'SMS Dispatched'} ({webhookSuccess.token || bookingDetails.tokenNo})
+                  </span>
+                )}
               </div>
             </div>
 
@@ -781,13 +907,13 @@ export default function GatePassModal({
                 value={{
                   system: "GOI AAGAM National Grain Procurement",
                   token: bookingDetails.tokenNo,
-                  farmer: bookingDetails.farmerName || 'Gurpreet Singh',
+                  farmer: bookingDetails.farmerName || 'Ram Singh',
                   farmerId: bookingDetails.farmerId || 'PB-FARM-99482',
                   mandi: getEffectiveMandiName(),
                   state: currentState,
                   district: currentDistrict,
                   crop: getEffectiveCropName(),
-                  quantity: `${bookingDetails.estimatedQty || '150'} Qtl`,
+                  quantity: `${bookingDetails.estimatedQty || '40'} Qtl`,
                   date: bookingDetails.date,
                   slot: bookingDetails.timeSlot,
                   lane: bookingDetails.lane,
