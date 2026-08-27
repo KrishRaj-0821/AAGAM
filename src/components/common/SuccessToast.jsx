@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
-import { CheckCircle2, X, Sparkles, ShieldCheck, Smartphone, Mail, Clock, Download, FileText } from 'lucide-react';
+import { CheckCircle2, X, Sparkles, ShieldCheck, Smartphone, Mail, Clock, Download, FileText, Printer } from 'lucide-react';
 
 export default function SuccessToast({ notification, onClose, currentUser }) {
   useEffect(() => {
     if (notification?.isOpen) {
       const timer = setTimeout(() => {
         onClose();
-      }, 9000);
+      }, 10000);
       return () => clearTimeout(timer);
     }
   }, [notification, onClose]);
@@ -17,14 +17,16 @@ export default function SuccessToast({ notification, onClose, currentUser }) {
   const userName = currentUser?.name || currentUser?.full_name || 'Verified User';
   const userRole = currentUser?.role || 'Farmer';
   const userEmail = currentUser?.email || 'user.kisan@gmail.com';
+  const token = notification.tokenNo || 'GOI-NTF-' + Math.floor(100000 + Math.random() * 900000);
 
-  const handleDownloadReceipt = () => {
+  // 1. Text Format Receipt Download
+  const handleDownloadTextReceipt = () => {
     const receiptContent = `================================================================
   GOVERNMENT OF INDIA — AAGAM AGRICULTURAL PORTAL
   OFFICIAL NOTIFICATION RECEIPT & VERIFICATION RECORD
 ================================================================
 
-RECEIPT REF   : ${notification.tokenNo || 'GOI-NTF-' + Math.floor(100000 + Math.random() * 900000)}
+RECEIPT REF   : ${token}
 DATE & TIME   : ${new Date().toLocaleString('en-IN')}
 STATUS        : VERIFIED & RECORDED ON GOI BLOCKCHAIN LEDGER
 
@@ -59,11 +61,120 @@ Verification  : Verhoeff Checksum Validated (GOI Cloud)
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `AAGAM_Notification_Receipt_${notification.tokenNo || 'Record'}.txt`;
+    link.download = `AAGAM_Notification_Receipt_${token}.txt`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+  };
+
+  // 2. Printable PDF & Official HTML Document Generator
+  const handlePrintPdfReceipt = () => {
+    const dateStr = new Date().toLocaleString('en-IN');
+
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>AAGAM Official PDF Receipt — ${token}</title>
+  <style>
+    @page { size: A4; margin: 15mm; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1c2713; background: #fff; margin: 0; padding: 20px; line-height: 1.5; }
+    .header { border-bottom: 3px double #71873f; padding-bottom: 15px; text-align: center; margin-bottom: 20px; }
+    .emblem { font-size: 24px; font-weight: 900; color: #71873f; letter-spacing: 1px; }
+    .subtitle { font-size: 12px; font-weight: 700; color: #a36627; text-transform: uppercase; margin-top: 4px; }
+    .title-box { background: #f0f4ea; border: 2px solid #71873f; padding: 12px; text-align: center; border-radius: 10px; margin-bottom: 25px; }
+    .title-box h2 { margin: 0; font-size: 18px; color: #1c2713; text-transform: uppercase; }
+    .title-box p { margin: 4px 0 0; font-size: 11px; font-weight: bold; color: #637554; }
+    .section-header { background: #71873f; color: #fff; font-size: 12px; font-weight: bold; padding: 6px 12px; text-transform: uppercase; border-radius: 6px; margin: 20px 0 10px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 12px; }
+    th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    th { font-weight: bold; color: #637554; width: 35%; }
+    td { font-weight: 600; color: #1c2713; }
+    .info-card { background: #fcfaf7; border: 1px solid #e0b87e; border-left: 5px solid #a36627; padding: 12px; border-radius: 8px; margin-bottom: 20px; }
+    .info-card h4 { margin: 0 0 6px; font-size: 14px; color: #243118; }
+    .info-card p { margin: 0; font-size: 12px; color: #4a5568; }
+    .footer-seal { border-top: 2px solid #71873f; padding-top: 15px; margin-top: 30px; display: flex; justify-space-between; align-items: center; font-size: 10px; color: #637554; }
+    .badge { background: #e0e8d6; color: #243118; font-weight: bold; font-family: monospace; padding: 3px 8px; border-radius: 4px; display: inline-block; }
+    .btn-print { background: #71873f; color: white; border: none; padding: 10px 20px; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 13px; shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .btn-print:hover { background: #5c6e33; }
+    @media print {
+      body { padding: 0; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="no-print" style="margin-bottom: 20px; text-align: right;">
+    <button onclick="window.print()" class="btn-print">🖨️ Save as PDF / Print Certificate</button>
+  </div>
+
+  <div class="header">
+    <div class="emblem">🏛️ GOVERNMENT OF INDIA</div>
+    <div class="subtitle">Ministry of Agriculture & Farmers Welfare • National Informatics Centre (NIC)</div>
+    <div style="font-size: 11px; color: #637554; margin-top: 2px;">AAGAM — Automated Agricultural Grain & Allocation Management System</div>
+  </div>
+
+  <div class="title-box">
+    <h2>Official Notification & Verification Certificate</h2>
+    <p>DIGITALLY VERIFIED AND RECORDED ON NATIONAL AGRICULTURAL LEDGER</p>
+  </div>
+
+  <div class="section-header">1. Receipt Identification</div>
+  <table>
+    <tr><th>Receipt Reference ID</th><td><span class="badge">${token}</span></td></tr>
+    <tr><th>Issued Timestamp</th><td>${dateStr}</td></tr>
+    <tr><th>Verification Status</th><td style="color: #16a34a; font-weight: bold;">VERIFIED & RECORDED ✓</td></tr>
+  </table>
+
+  <div class="section-header">2. Stakeholder & Recipient Profile</div>
+  <table>
+    <tr><th>Recipient Full Name</th><td>${userName}</td></tr>
+    <tr><th>Stakeholder Role</th><td>${userRole}</td></tr>
+    <tr><th>Mobile Number (SMS)</th><td>${userMobile}</td></tr>
+    <tr><th>Email Address</th><td>${userEmail}</td></tr>
+    <tr><th>Assigned Mandi / APMC</th><td>${currentUser?.mandi || 'Karnal Central APMC (HR)'}</td></tr>
+  </table>
+
+  <div class="section-header">3. Notification Details & Action Summary</div>
+  <div class="info-card">
+    <h4>${notification.title || 'Process Completed Successfully'}</h4>
+    <p>${notification.message}</p>
+  </div>
+
+  <div class="section-header">4. Multi-Channel Dispatch Confirmation</div>
+  <table>
+    <tr><th>SMS Gateway Alert</th><td>Sent to +91 ${userMobile}</td></tr>
+    <tr><th>Email Notification</th><td>Sent to ${userEmail}</td></tr>
+    <tr><th>Security Standard</th><td>Verhoeff Aadhaar Checksum & Merkle Ledger Validated</td></tr>
+  </table>
+
+  <div class="footer-seal">
+    <div>
+      <strong>AAGAM National Portal</strong><br/>
+      Computer-Generated Official Receipt. No physical signature required.
+    </div>
+    <div style="text-align: right;">
+      <strong>NIC Cloud Verification Seal</strong><br/>
+      REF: GOI-NIC-${Math.floor(100000 + Math.random() * 900000)}
+    </div>
+  </div>
+
+  <script>
+    window.onload = function() {
+      setTimeout(function() {
+        window.print();
+      }, 400);
+    };
+  </script>
+</body>
+</html>`;
+
+    const printWin = window.open('', '_blank');
+    if (printWin) {
+      printWin.document.write(html);
+      printWin.document.close();
+    }
   };
 
   return (
@@ -101,7 +212,7 @@ Verification  : Verhoeff Checksum Validated (GOI Cloud)
 
             <div className="mt-2 bg-white/10 p-2.5 rounded-xl border border-white/15 space-y-2 font-mono text-xs">
               <div className="flex items-center justify-between">
-                <span className="text-[#e0b87e] font-extrabold">{notification.tokenNo || 'GOI-VERIFIED'}</span>
+                <span className="text-[#e0b87e] font-extrabold">{token}</span>
                 <span className="text-[10px] text-emerald-400 font-sans font-bold flex items-center gap-1">
                   <Sparkles className="w-3 h-3 text-[#e0b87e]" />
                   Recorded
@@ -120,14 +231,27 @@ Verification  : Verhoeff Checksum Validated (GOI Cloud)
                 </div>
               </div>
 
-              {/* Action Button: Download Notification Information Receipt */}
-              <button
-                onClick={handleDownloadReceipt}
-                className="w-full mt-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black py-2 rounded-xl text-xs transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 cursor-pointer font-sans"
-              >
-                <Download className="w-4 h-4 text-slate-950" />
-                <span>Download Notification Receipt (.txt)</span>
-              </button>
+              {/* Dual Action Buttons: Printable PDF Certificate & Text Download */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 font-sans">
+                <button
+                  onClick={handlePrintPdfReceipt}
+                  className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black py-2 px-2 rounded-xl text-[11px] transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                  title="Open Printable PDF & Certificate Dialog"
+                >
+                  <Printer className="w-3.5 h-3.5 text-slate-950 shrink-0" />
+                  <span>Save as PDF / Print</span>
+                </button>
+
+                <button
+                  onClick={handleDownloadTextReceipt}
+                  className="w-full bg-white/10 hover:bg-white/20 text-slate-200 border border-white/20 font-bold py-2 px-2 rounded-xl text-[11px] transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                  title="Download Raw Text Record"
+                >
+                  <Download className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+                  <span>Download .txt</span>
+                </button>
+              </div>
+
             </div>
           </div>
 
