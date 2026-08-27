@@ -7,7 +7,9 @@ from .views import (
     ProfileView,
     ChangePasswordView,
     ForgotPasswordView,
-    ResetPasswordView
+    ResetPasswordView,
+    CheckRegistrationView,
+    OtpLoginView
 )
 
 urlpatterns = [
@@ -19,4 +21,6 @@ urlpatterns = [
     path('change-password/', ChangePasswordView.as_view(), name='auth_change_password'),
     path('forgot-password/', ForgotPasswordView.as_view(), name='auth_forgot_password'),
     path('reset-password/', ResetPasswordView.as_view(), name='auth_reset_password'),
+    path('check-registration/', CheckRegistrationView.as_view(), name='auth_check_registration'),
+    path('otp-login/', OtpLoginView.as_view(), name='auth_otp_login'),
 ]

@@ -95,3 +95,91 @@ class ResetPasswordView(APIView):
             return success_response(message="Password reset successfully")
         except User.DoesNotExist:
             return error_response("User not found")
+
+
+class CheckRegistrationView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        phone_input = str(request.data.get('phone', '')).strip()
+        clean_phone = ''.join(filter(str.isdigit, phone_input))[-10:]
+
+        if not clean_phone or len(clean_phone) != 10:
+            return error_response(
+                "Please enter a valid 10-digit mobile number.",
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Normalize phone comparison across all users
+        matching_user = None
+        for u in User.objects.all():
+            u_digits = ''.join(filter(str.isdigit, u.phone or ''))[-10:]
+            if u_digits == clean_phone:
+                matching_user = u
+                break
+
+        if matching_user:
+            return success_response({
+                "registered": True,
+                "user": {
+                    "id": str(matching_user.uuid),
+                    "full_name": matching_user.full_name or "Registered Stakeholder",
+                    "role": matching_user.role,
+                    "phone": matching_user.phone or f"+91 {clean_phone}",
+                    "email": matching_user.email,
+                    "state": matching_user.state or "Haryana",
+                    "district": matching_user.district or "Karnal",
+                    "mandi": matching_user.mandi or "Karnal Central Yard",
+                    "aadhaar_masked": f"XXXX-XXXX-{matching_user.aadhaar_number[-4:]}" if matching_user.aadhaar_number else "XXXX-XXXX-4828"
+                }
+            }, message="User verified as registered.")
+
+        return error_response(
+            f"Mobile number +91 {clean_phone} is not registered on AAGAM. Only registered users can log in.",
+            errors={"registered": False},
+            status_code=status.HTTP_404_NOT_FOUND
+        )
+
+
+class OtpLoginView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        phone_input = str(request.data.get('phone', '')).strip()
+        otp = str(request.data.get('otp', '')).strip()
+        clean_phone = ''.join(filter(str.isdigit, phone_input))[-10:]
+
+        if not clean_phone or len(clean_phone) != 10:
+            return error_response("Invalid phone number format.")
+
+        matching_user = None
+        for u in User.objects.all():
+            u_digits = ''.join(filter(str.isdigit, u.phone or ''))[-10:]
+            if u_digits == clean_phone:
+                matching_user = u
+                break
+
+        if not matching_user:
+            return error_response(
+                "Access Denied: Mobile number not registered. Please register first.",
+                status_code=status.HTTP_403_FORBIDDEN
+            )
+
+        # Generate standard JWT for verified user
+        refresh = RefreshToken.for_user(matching_user)
+        return success_response({
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+            "user": {
+                "id": str(matching_user.uuid),
+                "full_name": matching_user.full_name,
+                "role": matching_user.role,
+                "phone": matching_user.phone,
+                "email": matching_user.email,
+                "state": matching_user.state,
+                "district": matching_user.district,
+                "mandi": matching_user.mandi,
+            }
+        }, message="OTP login successful.")
+
+

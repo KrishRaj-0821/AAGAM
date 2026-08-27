@@ -188,12 +188,56 @@ export default function RegisterPage({
       // Direct call to Django REST backend
       const res = await api.auth.register(payload);
       const generatedId = (res?.data?.user?.uuid && `AAGAM-${res.data.user.uuid.slice(0, 8).toUpperCase()}`) || `AAGAM-REG-2026-${Math.floor(100000 + Math.random() * 900000)}`;
+      
+      // Save locally to persist registration across views
+      const regUserRecord = {
+        name: regForm.fullName.trim(),
+        full_name: regForm.fullName.trim(),
+        mobile: `+91 ${cleanPhone}`,
+        phone: `+91 ${cleanPhone}`,
+        clean_phone: cleanPhone,
+        role: regRole,
+        mandi: regForm.mandi.trim(),
+        state: regForm.state.trim(),
+        district: regForm.district.trim(),
+        aadhaar: cleanAadhaar,
+        id: generatedId
+      };
+      try {
+        const existing = JSON.parse(localStorage.getItem('aagam_registered_users') || '[]');
+        localStorage.setItem('aagam_registered_users', JSON.stringify([
+          ...existing.filter(u => u.clean_phone !== cleanPhone),
+          regUserRecord
+        ]));
+      } catch (e) {}
+
       setRegForm(prev => ({ ...prev, regId: generatedId }));
       setRegStep(5);
     } catch (err) {
       console.warn("Backend registration fallback:", err);
       // If user already exists or network fallback, generate ID and proceed
       const fallbackId = `AAGAM-REG-2026-${Math.floor(100000 + Math.random() * 900000)}`;
+      const regUserRecord = {
+        name: regForm.fullName.trim(),
+        full_name: regForm.fullName.trim(),
+        mobile: `+91 ${cleanPhone}`,
+        phone: `+91 ${cleanPhone}`,
+        clean_phone: cleanPhone,
+        role: regRole,
+        mandi: regForm.mandi.trim(),
+        state: regForm.state.trim(),
+        district: regForm.district.trim(),
+        aadhaar: cleanAadhaar,
+        id: fallbackId
+      };
+      try {
+        const existing = JSON.parse(localStorage.getItem('aagam_registered_users') || '[]');
+        localStorage.setItem('aagam_registered_users', JSON.stringify([
+          ...existing.filter(u => u.clean_phone !== cleanPhone),
+          regUserRecord
+        ]));
+      } catch (e) {}
+
       setRegForm(prev => ({ ...prev, regId: fallbackId }));
       setRegStep(5);
     } finally {

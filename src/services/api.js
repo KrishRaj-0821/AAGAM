@@ -13,6 +13,20 @@ export const api = {
 
   // 2. Authentication & Stakeholder Identity
   auth: {
+    checkRegistration: (phone) => post('/auth/check-registration/', { phone }),
+    otpLogin: async (phone, otp) => {
+      const res = await post('/auth/otp-login/', { phone, otp });
+      if (res?.data?.access) {
+        localStorage.setItem('aagam_access_token', res.data.access);
+        if (res.data.refresh) {
+          localStorage.setItem('aagam_refresh_token', res.data.refresh);
+        }
+        if (res.data.user) {
+          localStorage.setItem('aagam_user', JSON.stringify(res.data.user));
+        }
+      }
+      return res;
+    },
     login: async (email, password) => {
       const res = await post('/auth/login/', { email, password });
       if (res?.data?.access) {

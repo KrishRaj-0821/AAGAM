@@ -111,6 +111,9 @@ def seed_database():
                 "is_active": True
             }
         )
+        if udata["role"] == UserRole.ADMIN:
+            user.is_staff = True
+            user.is_superuser = True
         user.set_password("aagam@2026")
         user.save()
         created_users[udata["email"]] = user
