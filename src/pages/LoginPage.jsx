@@ -46,7 +46,7 @@ export default function LoginPage({
 }) {
   const [loginRole, setLoginRole] = useState('Farmer');
   const [authMethod, setAuthMethod] = useState('google'); // 'google' | 'mobile' | 'staffId'
-  const [loginInput, setLoginInput] = useState('9876543210');
+  const [loginInput, setLoginInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState('');
@@ -629,14 +629,20 @@ export default function LoginPage({
               </label>
               <div className="flex bg-[#f0f4ea] p-1 rounded-xl border border-[#abbe99]/60 text-xs font-bold">
                 <button
-                  onClick={() => setAuthMethod('mobile')}
+                  onClick={() => {
+                    setAuthMethod('mobile');
+                    setLoginInput('');
+                  }}
                   className={`w-1/2 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${authMethod === 'mobile' ? 'bg-[#71873f] text-white shadow' : 'text-[#637554]'}`}
                 >
                   <Smartphone className="w-3.5 h-3.5" />
                   <span>Mobile OTP</span>
                 </button>
                 <button
-                  onClick={() => setAuthMethod('staffId')}
+                  onClick={() => {
+                    setAuthMethod('staffId');
+                    setLoginInput('');
+                  }}
                   className={`w-1/2 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${authMethod === 'staffId' ? 'bg-[#71873f] text-white shadow' : 'text-[#637554]'}`}
                 >
                   <Mail className="w-3.5 h-3.5" />
