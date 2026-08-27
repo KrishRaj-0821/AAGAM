@@ -27,6 +27,7 @@ import QRCode from 'qrcode';
 import { allIndianStatesData, allIndianCropsList } from '../../data/realTimeData';
 import WorkingQRCode from '../common/WorkingQRCode';
 import { api } from '../../services/api';
+import { generateRandomToken } from '../../utils/tokenGenerator';
 
 export default function GatePassModal({
   isOpen,
@@ -186,9 +187,12 @@ export default function GatePassModal({
   };
 
   const handleGenerateQR = async () => {
-    const statePrefix = (currentState || 'GOI').slice(0, 2).toUpperCase();
-    const distPrefix = (currentDistrict || 'MND').slice(0, 3).toUpperCase();
-    let token = `${statePrefix}-${distPrefix}-${Math.floor(1000 + Math.random() * 9000)}`;
+    // Generate randomized token per specification:
+    // First 3 character = Month name (e.g. AUG)
+    // 2-digit year (e.g. 26)
+    // 2-digit month (e.g. 08)
+    // 5-digit slot number (e.g. 48291)
+    let token = generateRandomToken(bookingDetails.date);
 
     const effectiveFarmerName = farmerName.trim() || 'Ram Singh';
     const cleanPhone = phoneNumber.replace(/\D/g, '').slice(-10) || '9876543210';
@@ -204,7 +208,9 @@ export default function GatePassModal({
       crop_name: cropName,
       quantity: quantity,
       mandi_location: mandiLocation,
-      slot_date: formattedSlotDate
+      slot_date: formattedSlotDate,
+      token: token,
+      slot_token: token
     };
 
     setWebhookError(null);
@@ -216,7 +222,7 @@ export default function GatePassModal({
       const webhookRes = await api.notifications.sendBookingSmsWebhook(n8nPayload);
       if (webhookRes?.success && webhookRes?.data) {
         setWebhookSuccess(webhookRes.data);
-        if (webhookRes.data.token) {
+        if (webhookRes.data.token && /^[A-Z]{3}\d{9}$/i.test(webhookRes.data.token)) {
           token = webhookRes.data.token;
         }
       } else {
@@ -299,7 +305,7 @@ export default function GatePassModal({
 
   // Active Real Download & Printable PDF generator with 100% scannable QR Code
   const handleDownloadPdf = async () => {
-    const token = bookingDetails.tokenNo || 'GOI-MND-9921';
+    const token = bookingDetails.tokenNo || generateRandomToken(bookingDetails.date);
     const crop = getEffectiveCropName();
     const mandi = getEffectiveMandiName();
     const qty = bookingDetails.estimatedQty || '150';
@@ -942,7 +948,7 @@ export default function GatePassModal({
                 </span>
                 {webhookSuccess && (
                   <span className="bg-emerald-200/80 text-emerald-900 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold border border-emerald-300">
-                    Webhook Token: {webhookSuccess.token || bookingDetails.tokenNo} • {webhookSuccess.message || 'SMS Dispatched'}
+                    Token: {bookingDetails.tokenNo} • {webhookSuccess.message || 'SMS Dispatched'}
                   </span>
                 )}
               </div>

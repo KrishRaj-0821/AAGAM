@@ -2,6 +2,7 @@ import uuid
 from django.db import models
 from apps.accounts.models import User
 from apps.centers.models import ProcurementCenter
+from common.utils import generate_random_token
 
 class SlotBookingStatus(models.TextChoices):
     BOOKED = 'BOOKED', 'Booked'
@@ -54,7 +55,7 @@ class SlotBooking(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.token_number:
-            self.token_number = f"AGM-TK-{uuid.uuid4().hex[:6].upper()}"
+            self.token_number = generate_random_token(self.booking_date)
         if not self.qr_code_data:
             self.qr_code_data = f"AAGAM-PASS|{self.token_number}|{self.mandi_name}|{self.commodity}|{self.quantity_quintals}QTL|{self.booking_date}"
         super().save(*args, **kwargs)

@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { CheckCircle2, X, Sparkles, ShieldCheck, Smartphone, Mail, Clock, Download, FileText, Printer } from 'lucide-react';
+import { generateRandomToken } from '../../utils/tokenGenerator';
 
 export default function SuccessToast({ notification, onClose, currentUser }) {
   useEffect(() => {
@@ -33,7 +34,7 @@ export default function SuccessToast({ notification, onClose, currentUser }) {
   const userName = notification?.farmerName || notification?.userName || msgNameMatch || currentUser?.name || currentUser?.full_name || 'Verified User';
   const userRole = currentUser?.role || 'Farmer';
   const userEmail = notification?.email || currentUser?.email || `${(userName || 'farmer').toLowerCase().replace(/\s+/g, '.')}@aagam.gov.in`;
-  const token = notification.tokenNo || 'GOI-NTF-' + Math.floor(100000 + Math.random() * 900000);
+  const token = notification.tokenNo || generateRandomToken();
 
   // 1. Text Format Receipt Download
   const handleDownloadTextReceipt = () => {

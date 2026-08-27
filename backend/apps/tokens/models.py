@@ -2,7 +2,7 @@ import uuid
 from django.db import models
 from apps.accounts.models import User
 from apps.slots.models import SlotBooking
-from common.utils import generate_qr_code_base64
+from common.utils import generate_qr_code_base64, generate_random_token
 
 class QRToken(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -22,7 +22,7 @@ class QRToken(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.token_string:
-            self.token_string = f"AGM-TK-{uuid.uuid4().hex[:6].upper()}"
+            self.token_string = generate_random_token(self.date)
         if not self.qr_image_base64:
             payload = f"AAGAM-QR|{self.token_string}|{self.farmer_name}|{self.mandi_name}|{self.crop_name}|{self.quantity_quintals}QTL|{self.date}"
             self.qr_image_base64 = generate_qr_code_base64(payload)
