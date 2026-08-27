@@ -252,7 +252,11 @@ export default function GatePassModal({
           `Token ${token} confirmed for ${effectiveFarmerName} (${cropName}, ${quantity} Qtl) at ${mandiLocation}. SMS notification dispatched to +91 ${cleanPhone} via n8n booking webhook.`,
           `टोकन ${token} जारी: ${effectiveFarmerName} (${cropName}, ${quantity} क्विंटल) - ${mandiLocation}। +91 ${cleanPhone} पर स्वचालित एसएमएस भेजा गया।`
         ),
-        tokenNo: token
+        tokenNo: token,
+        mobile: `+91 ${cleanPhone}`,
+        phone: `+91 ${cleanPhone}`,
+        phoneNumber: cleanPhone,
+        farmerName: effectiveFarmerName
       });
     }
   };

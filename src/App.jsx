@@ -145,12 +145,17 @@ export default function App() {
     type: 'success'
   });
 
-  const triggerSuccessNotification = ({ title, message, tokenNo }) => {
+  const triggerSuccessNotification = ({ title, message, tokenNo, mobile, phone, phoneNumber, farmerName }) => {
+    const targetMobile = mobile || phone || (phoneNumber ? `+91 ${phoneNumber}` : '');
     setNotification({
       isOpen: true,
       title: title || 'Process Completed Successfully!',
       message: message || 'Your request has been verified and recorded in the national database.',
       tokenNo: tokenNo || '',
+      mobile: targetMobile,
+      phone: targetMobile,
+      phoneNumber: phoneNumber || targetMobile,
+      farmerName: farmerName || '',
       type: 'success'
     });
   };

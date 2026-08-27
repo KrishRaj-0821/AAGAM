@@ -13,10 +13,26 @@ export default function SuccessToast({ notification, onClose, currentUser }) {
 
   if (!notification?.isOpen) return null;
 
-  const userMobile = currentUser?.mobile || currentUser?.phone || '+91 98765 43210';
-  const userName = currentUser?.name || currentUser?.full_name || 'Verified User';
+  // Accurately resolve mobile number from notification properties, message string, or currentUser
+  const msgPhoneMatch = notification?.message?.match(/\+91\s*([0-9]{10})/)?.[1]
+    || notification?.message?.match(/([0-9]{10})/)?.[1];
+  
+  const rawMobile = notification?.mobile 
+    || notification?.phone 
+    || notification?.phoneNumber 
+    || (msgPhoneMatch ? `+91 ${msgPhoneMatch}` : null)
+    || currentUser?.mobile 
+    || currentUser?.phone 
+    || '+91 98765 43210';
+
+  const cleanDigits = String(rawMobile).replace(/[^0-9]/g, '').slice(-10);
+  const userMobile = cleanDigits.length === 10 ? `+91 ${cleanDigits}` : rawMobile;
+
+  // Accurately resolve recipient name
+  const msgNameMatch = notification?.message?.match(/confirmed for ([^(]+)/)?.[1]?.trim();
+  const userName = notification?.farmerName || notification?.userName || msgNameMatch || currentUser?.name || currentUser?.full_name || 'Verified User';
   const userRole = currentUser?.role || 'Farmer';
-  const userEmail = currentUser?.email || 'user.kisan@gmail.com';
+  const userEmail = notification?.email || currentUser?.email || `${(userName || 'farmer').toLowerCase().replace(/\s+/g, '.')}@aagam.gov.in`;
   const token = notification.tokenNo || 'GOI-NTF-' + Math.floor(100000 + Math.random() * 900000);
 
   // 1. Text Format Receipt Download
@@ -144,7 +160,7 @@ Verification  : Verhoeff Checksum Validated (GOI Cloud)
 
   <div class="section-header">4. Multi-Channel Dispatch Confirmation</div>
   <table>
-    <tr><th>SMS Gateway Alert</th><td>Sent to +91 ${userMobile}</td></tr>
+    <tr><th>SMS Gateway Alert</th><td>Sent to ${userMobile}</td></tr>
     <tr><th>Email Notification</th><td>Sent to ${userEmail}</td></tr>
     <tr><th>Security Standard</th><td>Verhoeff Aadhaar Checksum & Merkle Ledger Validated</td></tr>
   </table>
