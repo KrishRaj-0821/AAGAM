@@ -13,7 +13,7 @@ export default function TopHeader({
   t
 }) {
   return (
-    <header className="sticky top-0 z-50 shadow-md">
+    <div className="w-full">
       {/* Official Tricolor Top Stripe */}
       <div className="h-1.5 w-full bg-gradient-to-r from-[#FF9933] via-white to-[#138808]" />
 
@@ -158,6 +158,6 @@ export default function TopHeader({
 
         </div>
       </div>
-    </header>
+    </div>
   );
 }

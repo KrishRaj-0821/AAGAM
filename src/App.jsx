@@ -184,27 +184,20 @@ export default function App() {
   // Translation Helper Function (Strict English | हिन्दी)
   const t = (enText, hiText) => (language === 'hi' ? hiText : enText);
 
-  // Auth Guard Helper: Intercepts navigation to any protected portal or workflow
+  // Auth Guard Helper: Intercepts navigation to protected role portals while allowing public pages
   const navigateWithAuth = (viewName, roleKey = null) => {
-    // Public Views: 'home', 'login', 'register'
-    if (viewName === 'home') {
-      setCurrentView('home');
-      return;
-    }
-    if (viewName === 'login' || viewName === 'register') {
-      setAuthView(viewName);
+    // Public Views: freely accessible to all visitors as per GOI transparency guidelines
+    const publicViews = ['home', 'login', 'register', 'marketplace', 'prices', 'eauction', 'procurement', 'logistics', 'analytics'];
+    if (publicViews.includes(viewName)) {
+      if (viewName === 'login' || viewName === 'register') {
+        setAuthView(viewName);
+      }
       setCurrentView(viewName);
       return;
     }
 
-    // Portal & Protected Views Map
+    // Protected Role-Based Persona Portals
     const portalTitles = {
-      marketplace: t('Fasal Marketplace Portal', 'फसल बाजार पोर्टल'),
-      prices: t('MSP Price Directory', 'एमएसपी मूल्य सूची'),
-      eauction: t('e-NAM E-Auction Platform', 'ई-नीलामी प्लेटफॉर्म'),
-      procurement: t('Government Procurement Portal', 'खरीद केंद्र पोर्टल'),
-      logistics: t('Agri Freight Logistics Portal', 'लॉजिस्टिक्स पोर्टल'),
-      analytics: t('National Agri Analytics Portal', 'राष्ट्रीय कृषि विश्लेषण'),
       portal: roleKey ? t(`${roleKey} Persona Portal`, `${roleKey} हितधारक पोर्टल`) : t('Stakeholder Persona Portal', 'हितधारक पोर्टल')
     };
 
@@ -212,7 +205,7 @@ export default function App() {
       if (roleKey) setActiveRole(roleKey);
       setCurrentView(viewName);
     } else {
-      // Unauthenticated visitor trying to access a portal -> Prompt with Login / Register Modal
+      // Unauthenticated visitor trying to access a protected persona portal -> Prompt with Login / Register Modal
       setTargetPortalName(portalTitles[viewName] || t('Stakeholder Portal', 'हितधारक पोर्टल'));
       setPendingRedirect({ view: viewName, role: roleKey });
       setIsAuthRequiredModalOpen(true);
@@ -326,38 +319,39 @@ export default function App() {
   return (
     <div className={`min-h-screen ${highContrast ? 'bg-slate-950 text-yellow-300' : 'bg-[#fcfaf7] text-[#243118]'} ${fontScaleClass} transition-colors duration-200`}>
       
-      {/* Top Header Bar with Language & Accessibility */}
-      <TopHeader
-        language={language}
-        setLanguage={setLanguage}
-        fontSize={fontSize}
-        setFontSize={setFontSize}
-        highContrast={highContrast}
-        setHighContrast={setHighContrast}
-        onOpenHelpdesk={() => setIsHelpdeskOpen(true)}
-        onOpenVoiceAgent={() => setIsVoiceAgentOpen(true)}
-        t={t}
-      />
+      {/* Unified Sticky Header: Tricolor GOI Meta Bar + Main Navbar */}
+      <header className="sticky top-0 z-40 w-full shadow-sm bg-white">
+        <TopHeader
+          language={language}
+          setLanguage={setLanguage}
+          fontSize={fontSize}
+          setFontSize={setFontSize}
+          highContrast={highContrast}
+          setHighContrast={setHighContrast}
+          onOpenHelpdesk={() => setIsHelpdeskOpen(true)}
+          onOpenVoiceAgent={() => setIsVoiceAgentOpen(true)}
+          t={t}
+        />
 
-      {/* Main Navbar with Protected Portal Navigation & User Profile */}
-      <Navbar
-        currentView={currentView}
-        setCurrentView={setCurrentView}
-        navigateWithAuth={navigateWithAuth}
-        activeRole={activeRole}
-        setActiveRole={setActiveRole}
-        highContrast={highContrast}
-        setIsSearchOpen={setIsSearchOpen}
-        openDbtWithAuth={openDbtWithAuth}
-        openGatePassWithAuth={openGatePassWithAuth}
-        onOpenHelpdesk={() => setIsHelpdeskOpen(true)}
-        onOpenVoiceAgent={() => setIsVoiceAgentOpen(true)}
-        onOpenAiCropAnalyzer={() => setIsAiCropAnalyzerOpen(true)}
-        currentUser={currentUser}
-        isAuthenticated={isAuthenticated}
-        onRequestLogout={handleRequestLogout}
-        t={t}
-      />
+        <Navbar
+          currentView={currentView}
+          setCurrentView={setCurrentView}
+          navigateWithAuth={navigateWithAuth}
+          activeRole={activeRole}
+          setActiveRole={setActiveRole}
+          highContrast={highContrast}
+          setIsSearchOpen={setIsSearchOpen}
+          openDbtWithAuth={openDbtWithAuth}
+          openGatePassWithAuth={openGatePassWithAuth}
+          onOpenHelpdesk={() => setIsHelpdeskOpen(true)}
+          onOpenVoiceAgent={() => setIsVoiceAgentOpen(true)}
+          onOpenAiCropAnalyzer={() => setIsAiCropAnalyzerOpen(true)}
+          currentUser={currentUser}
+          isAuthenticated={isAuthenticated}
+          onRequestLogout={handleRequestLogout}
+          t={t}
+        />
+      </header>
 
       {/* Live MSP Commodity Feed Ticker */}
       <LiveTicker highContrast={highContrast} t={t} />
