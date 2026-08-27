@@ -46,7 +46,7 @@ export default function LoginPage({
 }) {
   const [loginRole, setLoginRole] = useState('Farmer');
   const [authMethod, setAuthMethod] = useState('google'); // 'google' | 'mobile' | 'staffId'
-  const [loginInput, setLoginInput] = useState('+91 98765 43210');
+  const [loginInput, setLoginInput] = useState('9876543210');
   const [passwordInput, setPasswordInput] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState('');
@@ -657,8 +657,16 @@ export default function LoginPage({
                   <input
                     type={authMethod === 'mobile' ? 'tel' : 'email'}
                     value={loginInput}
-                    onChange={(e) => setLoginInput(e.target.value)}
-                    placeholder={authMethod === 'mobile' ? '+91 98765 43210' : 'officer@aagam.gov.in'}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (authMethod === 'mobile') {
+                        setLoginInput(val.replace(/\D/g, '').slice(0, 10));
+                      } else {
+                        setLoginInput(val);
+                      }
+                    }}
+                    maxLength={authMethod === 'mobile' ? 10 : 64}
+                    placeholder={authMethod === 'mobile' ? 'Enter 10-digit mobile' : 'officer@aagam.gov.in'}
                     className="w-full bg-[#fcfaf7] border border-[#abbe99] rounded-xl p-3 text-xs font-mono font-bold text-[#243118] focus:border-[#71873f] focus:outline-none shadow-inner"
                   />
                   <div id="recaptcha-container"></div>

@@ -530,12 +530,12 @@ export default function RegisterPage({
                   </label>
                   <div className="relative">
                     <input
-                      type="text"
+                      type="tel"
                       value={regForm.mobile}
-                      onChange={(e) => handleFieldChange('mobile', e.target.value)}
+                      onChange={(e) => handleFieldChange('mobile', e.target.value.replace(/\D/g, '').slice(0, 10))}
                       onBlur={() => handleFieldBlur('mobile')}
                       placeholder="10-digit mobile number"
-                      maxLength={14}
+                      maxLength={10}
                       className={`w-full bg-[#fcfaf7] border rounded-xl p-3 pr-9 text-xs font-bold text-[#243118] focus:outline-none font-mono transition-all ${
                         touched.mobile && !getValidation('mobile').isValid
                           ? 'border-rose-500 bg-rose-50/15'
