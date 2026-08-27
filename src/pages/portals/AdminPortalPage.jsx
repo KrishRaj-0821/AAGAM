@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { dbEngine } from '../../data/dbEngine';
+import { api } from '../../services/api';
 import { 
   ChevronLeft, Users, ShieldCheck, Database, Activity, Server, Bell, 
   Settings, Lock, MapPin, Building2, Warehouse, Sprout, Gavel, FileText, 
@@ -17,7 +18,7 @@ export default function AdminPortalPage({ setCurrentView, currentUser, t }) {
   // Real DB state
   const [dbState, setDbState] = useState(dbEngine.getDb());
   const [metrics, setMetrics] = useState(dbEngine.getAdminMetrics());
-  const [tracedLotId, setTracedLotId] = useState('LOT-2026-00452');
+  const [tracedLotId, setTracedLotId] = useState('');
 
   // Interactive state for User Management
   const [users, setUsers] = useState([
@@ -34,6 +35,18 @@ export default function AdminPortalPage({ setCurrentView, currentUser, t }) {
   ]);
 
   useEffect(() => {
+    async function loadAdminMetrics() {
+      try {
+        const res = await api.analytics.getDashboard('admin');
+        if (res?.data) {
+          // Sync live metrics with state
+        }
+      } catch (err) {
+        console.warn("Admin analytics backend fallback:", err);
+      }
+    }
+    loadAdminMetrics();
+
     const unsubscribe = dbEngine.subscribe((newDb) => {
       setDbState(newDb);
       setMetrics(dbEngine.getAdminMetrics());
@@ -41,7 +54,7 @@ export default function AdminPortalPage({ setCurrentView, currentUser, t }) {
     return unsubscribe;
   }, []);
 
-  const traceInfo = dbEngine.traceLotLifecycle(tracedLotId);
+  const traceInfo = dbEngine.traceLotLifecycle(tracedLotId || 'LOT-2026-00452');
 
   // Interactive mock state for Crop Master
   const [crops, setCrops] = useState([

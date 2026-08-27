@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Coins, Search, CheckCircle2, X } from 'lucide-react';
 
 export default function PaymentDbtModal({ isOpen, onClose, t }) {
-  const [dbtSearchInput, setDbtSearchInput] = useState('PB-FARM-99482');
+  const [dbtSearchInput, setDbtSearchInput] = useState('');
   const [searchedRecord, setSearchedRecord] = useState(null);
 
   if (!isOpen) return null;

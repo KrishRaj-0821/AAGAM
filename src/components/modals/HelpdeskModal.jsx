@@ -39,9 +39,9 @@ export default function HelpdeskModal({
   
   // Form State
   const [formData, setFormData] = useState({
-    name: currentUser?.name || 'Gurpreet Singh',
-    phone: currentUser?.phone || '+91 98765 43210',
-    email: currentUser?.email || 'farmer.kisan@gmail.com',
+    name: currentUser?.name || '',
+    phone: currentUser?.phone || '',
+    email: currentUser?.email || '',
     category: 'Gate Pass & QR Scanner Issue',
     severity: 'Medium (Normal)',
     subject: '',
@@ -297,6 +297,7 @@ Ministry of Agriculture & Farmers Welfare, Govt of India`
                       type="text"
                       name="name"
                       required
+                      placeholder="e.g. Ramesh Kumar"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       className="w-full bg-[#fcfaf7] border border-[#abbe99] rounded-xl p-2.5 text-xs font-bold text-[#243118] focus:border-[#71873f] focus:outline-none"
@@ -309,6 +310,7 @@ Ministry of Agriculture & Farmers Welfare, Govt of India`
                       type="text"
                       name="phone"
                       required
+                      placeholder="e.g. +91 98765 43210"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       className="w-full bg-[#fcfaf7] border border-[#abbe99] rounded-xl p-2.5 text-xs font-mono font-bold text-[#243118] focus:border-[#71873f] focus:outline-none"
@@ -321,6 +323,7 @@ Ministry of Agriculture & Farmers Welfare, Govt of India`
                       type="email"
                       name="email"
                       required
+                      placeholder="e.g. name@domain.com"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="w-full bg-[#fcfaf7] border border-[#abbe99] rounded-xl p-2.5 text-xs font-bold text-[#243118] focus:border-[#71873f] focus:outline-none"

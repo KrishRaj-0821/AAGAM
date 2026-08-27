@@ -1,13 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Search, Filter, ShieldCheck, CheckCircle2, ArrowRight, Coins, MapPin, Tag, X } from 'lucide-react';
 import { marketplaceItems } from '../data/mockData';
+import { api } from '../services/api';
 
 export default function MarketplacePage({ setCurrentView, setIsDbtModalOpen, t }) {
+  const [items, setItems] = useState(marketplaceItems);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCrop, setSelectedCrop] = useState('All');
   const [selectedListing, setSelectedListing] = useState(null);
+  const [offeredPrice, setOfferedPrice] = useState('');
 
-  const filteredItems = marketplaceItems.filter(item => {
+  useEffect(() => {
+    async function loadListings() {
+      try {
+        const res = await api.marketplace.getListings();
+        if (res?.data && res.data.length > 0) {
+          const formatted = res.data.map(item => ({
+            id: item.uuid || item.id,
+            cropEn: item.crop_name,
+            cropHi: item.crop_name_hi || item.crop_name,
+            variety: item.variety,
+            farmerEn: item.farmer_name,
+            farmerHi: item.farmer_name,
+            qty: `${item.quantity_quintals} Qtl`,
+            price: `₹${item.expected_price_per_qtl} / Qtl`,
+            locationEn: `${item.mandi_location}, ${item.state}`,
+            locationHi: `${item.mandi_location}, ${item.state}`,
+            grade: item.quality_grade,
+            moisture: `${item.moisture_pct}%`,
+            verified: true
+          }));
+          setItems(prev => [...formatted, ...prev.filter(p => !formatted.some(f => f.id === p.id))]);
+        }
+      } catch (err) {
+        console.warn("Marketplace backend fallback:", err);
+      }
+    }
+    loadListings();
+  }, []);
+
+  const filteredItems = items.filter(item => {
     const matchesSearch = item.cropEn.toLowerCase().includes(searchTerm.toLowerCase()) || item.farmerEn.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationEn.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCrop = selectedCrop === 'All' || item.cropEn.includes(selectedCrop);
     return matchesSearch && matchesCrop;
@@ -186,7 +218,9 @@ export default function MarketplacePage({ setCurrentView, setIsDbtModalOpen, t }
                   <label className="font-bold text-[#243118]">{t('Your Offered Price (Per Quintal):', 'आपकी प्रस्तावित दर (प्रति कुंतल):')}</label>
                   <input
                     type="text"
-                    defaultValue={selectedListing.price}
+                    value={offeredPrice}
+                    onChange={(e) => setOfferedPrice(e.target.value)}
+                    placeholder={selectedListing?.price ? `e.g. ${selectedListing.price}` : 'e.g. ₹2,425 / Qtl'}
                     className="w-full bg-[#fcfaf7] border border-[#abbe99] rounded-xl p-3 font-mono font-bold text-[#71873f] focus:outline-none"
                   />
                 </div>

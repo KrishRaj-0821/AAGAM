@@ -1,12 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ChevronLeft, Sprout, MapPin, Layers, Plus, Calendar, Clock, DollarSign, 
   FileText, ShieldCheck, CheckCircle2, AlertTriangle, HelpCircle, Bell, 
   Search, Filter, Eye, Download, UserCheck, CreditCard, Building2, ArrowRight
 } from 'lucide-react';
+import { api } from '../../services/api';
 
 export default function FarmerPortalPage({ setCurrentView, currentUser, openGatePassWithAuth, t }) {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [liveStats, setLiveStats] = useState(null);
+
+  useEffect(() => {
+    async function loadFarmerData() {
+      try {
+        const res = await api.farmer.getDashboard();
+        if (res?.data?.statistics) {
+          setLiveStats(res.data.statistics);
+        }
+      } catch (err) {
+        console.warn("Farmer portal backend fallback:", err);
+      }
+    }
+    loadFarmerData();
+  }, []);
 
   // Farmer Profile
   const farmerProfile = {
@@ -60,7 +76,7 @@ export default function FarmerPortalPage({ setCurrentView, currentUser, openGate
   ]);
 
   // Submit Lot Handler
-  const [newLotQty, setNewLotQty] = useState('5000');
+  const [newLotQty, setNewLotQty] = useState('');
   const [newLotCrop, setNewLotCrop] = useState('Wheat');
   const handleCreateLot = (e) => {
     e.preventDefault();
@@ -287,7 +303,7 @@ export default function FarmerPortalPage({ setCurrentView, currentUser, openGate
                 </div>
                 <div className="space-y-1">
                   <label className="font-bold">Produce Quantity (KG)</label>
-                  <input type="number" value={newLotQty} onChange={e => setNewLotQty(e.target.value)} className="w-full border border-[#abbe99] rounded-xl p-2.5 font-bold" />
+                  <input type="number" placeholder="e.g. 5000" value={newLotQty} onChange={e => setNewLotQty(e.target.value)} className="w-full border border-[#abbe99] rounded-xl p-2.5 font-bold" />
                 </div>
                 <button type="submit" className="w-full bg-[#71873f] text-white font-extrabold py-3 rounded-xl shadow-md">
                   Submit Produce Lot & Generate Token →

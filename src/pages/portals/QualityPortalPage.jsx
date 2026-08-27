@@ -244,31 +244,31 @@ export default function QualityPortalPage({ setCurrentView, currentUser, t }) {
                 <div className="space-y-3">
                   <div className="space-y-1">
                     <label className="font-bold">Active Inspection Lot ID</label>
-                    <input type="text" value={testForm.inspId} readOnly className="w-full bg-[#f4f6f4] border border-emerald-200 rounded-xl p-2.5 font-bold text-[#052816]" />
+                    <input type="text" placeholder="Select lot from inspection queue" value={testForm.inspId} readOnly className="w-full bg-[#f4f6f4] border border-emerald-200 rounded-xl p-2.5 font-bold text-[#052816]" />
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
                       <label className="font-bold flex justify-between">Moisture (%) <span className="text-[#637554]">Max: 12.0%</span></label>
-                      <input type="number" step="0.1" value={testForm.moisture} onChange={e => setTestForm(p => ({ ...p, moisture: e.target.value }))} className="w-full border border-emerald-200 rounded-xl p-2.5 focus:outline-none focus:border-emerald-600 font-bold" />
+                      <input type="number" step="0.1" placeholder="e.g. 10.5" value={testForm.moisture} onChange={e => setTestForm(p => ({ ...p, moisture: e.target.value }))} className="w-full border border-emerald-200 rounded-xl p-2.5 focus:outline-none focus:border-emerald-600 font-bold" />
                     </div>
                     <div className="space-y-1">
                       <label className="font-bold flex justify-between">Foreign Matter (%) <span className="text-[#637554]">Max: 1.0%</span></label>
-                      <input type="number" step="0.1" value={testForm.foreignMatter} onChange={e => setTestForm(p => ({ ...p, foreignMatter: e.target.value }))} className="w-full border border-emerald-200 rounded-xl p-2.5 focus:outline-none focus:border-emerald-600 font-bold" />
+                      <input type="number" step="0.1" placeholder="e.g. 0.5" value={testForm.foreignMatter} onChange={e => setTestForm(p => ({ ...p, foreignMatter: e.target.value }))} className="w-full border border-emerald-200 rounded-xl p-2.5 focus:outline-none focus:border-emerald-600 font-bold" />
                     </div>
                     <div className="space-y-1">
                       <label className="font-bold flex justify-between">Damaged Grains (%) <span className="text-[#637554]">Max: 2.0%</span></label>
-                      <input type="number" step="0.1" value={testForm.damagedGrains} onChange={e => setTestForm(p => ({ ...p, damagedGrains: e.target.value }))} className="w-full border border-emerald-200 rounded-xl p-2.5 focus:outline-none focus:border-emerald-600 font-bold" />
+                      <input type="number" step="0.1" placeholder="e.g. 0.8" value={testForm.damagedGrains} onChange={e => setTestForm(p => ({ ...p, damagedGrains: e.target.value }))} className="w-full border border-emerald-200 rounded-xl p-2.5 focus:outline-none focus:border-emerald-600 font-bold" />
                     </div>
                     <div className="space-y-1">
                       <label className="font-bold flex justify-between">Broken Grains (%) <span className="text-[#637554]">Max: 2.0%</span></label>
-                      <input type="number" step="0.1" value={testForm.brokenGrains} onChange={e => setTestForm(p => ({ ...p, brokenGrains: e.target.value }))} className="w-full border border-emerald-200 rounded-xl p-2.5 focus:outline-none focus:border-emerald-600 font-bold" />
+                      <input type="number" step="0.1" placeholder="e.g. 1.2" value={testForm.brokenGrains} onChange={e => setTestForm(p => ({ ...p, brokenGrains: e.target.value }))} className="w-full border border-emerald-200 rounded-xl p-2.5 focus:outline-none focus:border-emerald-600 font-bold" />
                     </div>
                   </div>
 
                   <div className="space-y-1">
                     <label className="font-bold">Inspector Remarks & Notes</label>
-                    <textarea rows="2" value={testForm.remarks} onChange={e => setTestForm(p => ({ ...p, remarks: e.target.value }))} className="w-full border border-emerald-200 rounded-xl p-2.5 focus:outline-none focus:border-emerald-600 font-bold" />
+                    <textarea rows="2" placeholder="e.g. Certified FAQ standard lot under ICAR guidelines..." value={testForm.remarks} onChange={e => setTestForm(p => ({ ...p, remarks: e.target.value }))} className="w-full border border-emerald-200 rounded-xl p-2.5 focus:outline-none focus:border-emerald-600 font-bold" />
                   </div>
 
                   <button onClick={submitQualityGrade} className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold py-3.5 rounded-xl shadow-md transition-all text-sm flex items-center justify-center gap-2">

@@ -31,6 +31,7 @@ import {
   resetUserPassword 
 } from '../services/firebase';
 import { sendAuthOtp } from '../services/otpService';
+import { api } from '../services/api';
 
 export default function LoginPage({ 
   setCurrentView, 
@@ -197,6 +198,30 @@ export default function LoginPage({
     setAuthLoading(true);
     setAuthError('');
     try {
+      // 1. Authenticate with Django REST Backend
+      try {
+        const apiRes = await api.auth.login(loginInput.trim(), passwordInput || 'aagam@2026');
+        if (apiRes?.data?.user) {
+          const dbUser = {
+            name: apiRes.data.user.full_name || apiRes.data.user.email,
+            role: apiRes.data.user.role || loginRole,
+            id: apiRes.data.user.uuid ? `AAGAM-${apiRes.data.user.uuid.slice(0, 8).toUpperCase()}` : 'AAGAM-USER',
+            email: apiRes.data.user.email,
+            phone: apiRes.data.user.phone || '+91 98765 43210',
+            mandi: apiRes.data.user.mandi || 'Karnal Central APMC',
+            state: apiRes.data.user.state || 'Haryana',
+            authMethod: 'Django Database JWT Session',
+            token: apiRes.data.access
+          };
+          if (onLoginSuccess) onLoginSuccess(dbUser);
+          else if (setCurrentView) setCurrentView('home');
+          return;
+        }
+      } catch (djangoErr) {
+        console.warn("Django backend login fallback:", djangoErr);
+      }
+
+      // 2. Secondary fallback to Firebase authentication
       const res = await signInWithEmail(loginInput, passwordInput || 'aagam@2026', loginRole);
       if (res.success && res.user) {
         if (onLoginSuccess) {

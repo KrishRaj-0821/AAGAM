@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from common.validators import validate_aadhaar_verhoeff
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -45,6 +46,13 @@ class User(AbstractUser):
     state = models.CharField(max_length=100, default='Haryana')
     district = models.CharField(max_length=100, default='Karnal')
     mandi = models.CharField(max_length=150, blank=True, null=True)
+    aadhaar_number = models.CharField(
+        max_length=20, 
+        blank=True, 
+        null=True, 
+        validators=[validate_aadhaar_verhoeff],
+        help_text="12-digit UIDAI Aadhaar number validated with Verhoeff algorithm"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -53,11 +61,18 @@ class User(AbstractUser):
 
     objects = UserManager()
 
+    def clean(self):
+        super().clean()
+        if self.aadhaar_number:
+            validate_aadhaar_verhoeff(self.aadhaar_number)
+
     def save(self, *args, **kwargs):
         if not self.username:
             self.username = self.email
         if not self.full_name and self.first_name:
             self.full_name = f"{self.first_name} {self.last_name}".strip()
+        if self.aadhaar_number:
+            self.clean()
         super().save(*args, **kwargs)
 
     def __str__(self):

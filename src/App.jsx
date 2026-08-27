@@ -121,18 +121,18 @@ export default function App() {
   // Slot Booking Details State with State, District, Mandi, and Custom Crop Support
   const [slotStep, setSlotStep] = useState(1);
   const [bookingDetails, setBookingDetails] = useState({
-    farmerId: currentUser?.id || 'PB-FARM-99482',
-    state: 'Haryana',
-    district: 'Karnal',
-    mandi: 'Karnal Central Grain Yard',
+    farmerId: currentUser?.id || '',
+    state: '',
+    district: '',
+    mandi: '',
     customMandi: '',
-    commodity: 'Wheat (Sharbati)',
+    commodity: '',
     customCommodity: '',
     isCustomCrop: false,
-    estimatedQty: '180',
-    date: '2026-08-28',
-    timeSlot: '09:00 AM - 11:00 AM',
-    lane: 'Lane 04 - Weighbridge A',
+    estimatedQty: '',
+    date: '',
+    timeSlot: '',
+    lane: '',
     qrGenerated: false,
     tokenNo: ''
   });

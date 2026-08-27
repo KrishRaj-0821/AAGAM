@@ -36,7 +36,7 @@ export default function GatePassModal({
   if (!isOpen) return null;
 
   const allStatesList = Object.keys(allIndianStatesData);
-  const currentState = bookingDetails.state || 'Haryana';
+  const currentState = bookingDetails.state || allStatesList[0] || 'Haryana';
   
   // Safe district list resolution
   const availableDistricts = allIndianStatesData[currentState]?.districts || ['Karnal', 'Kurukshetra', 'Other District'];

@@ -26,6 +26,7 @@ import {
   X
 } from 'lucide-react';
 import { auctionItems } from '../data/mockData';
+import { api } from '../services/api';
 
 export default function EAuctionPage({ setCurrentView, currentUser, triggerSuccessNotification, t }) {
   const [lots, setLots] = useState(auctionItems);
@@ -40,15 +41,15 @@ export default function EAuctionPage({ setCurrentView, currentUser, triggerSucce
 
   // Bidder Details Form State (Asked first before taking part)
   const [bidderDetails, setBidderDetails] = useState({
-    bidderName: currentUser?.name || 'Gurpreet Singh',
-    licenseId: 'eNAM-TRD-PB-88219',
-    entityName: 'Adani Agri Logistics & Trading Division',
-    phone: currentUser?.phone || '+91 98765 43210',
-    email: currentUser?.email || 'farmer.kisan@gmail.com',
+    bidderName: currentUser?.name || '',
+    licenseId: '',
+    entityName: '',
+    phone: currentUser?.phone || '',
+    email: currentUser?.email || '',
     bidAmount: '',
-    quantity: '450',
-    deliveryMandi: 'Karnal Central Yard',
-    escrowAgreement: true
+    quantity: '',
+    deliveryMandi: '',
+    escrowAgreement: false
   });
 
   // Live Auction Room States
@@ -57,6 +58,39 @@ export default function EAuctionPage({ setCurrentView, currentUser, triggerSucce
   const [isLeadingBidder, setIsLeadingBidder] = useState(true);
   const [quickBidInput, setQuickBidInput] = useState('');
   const [isPlacingBid, setIsPlacingBid] = useState(false);
+
+  // Fetch Live Auctions from Backend
+  useEffect(() => {
+    async function loadAuctions() {
+      try {
+        const res = await api.auctions.getAuctions();
+        if (res?.data && res.data.length > 0) {
+          const formatted = res.data.map(auc => ({
+            id: auc.auction_code || auc.id,
+            cropEn: auc.crop_name,
+            cropHi: auc.crop_name_hi || auc.crop_name,
+            grade: auc.quality_grade,
+            quantity: `${auc.quantity_mt} MT`,
+            basePrice: `₹${auc.reserve_price}`,
+            currentBid: `₹${auc.current_highest_bid}`,
+            minIncrement: `₹${auc.min_increment}`,
+            totalBids: auc.total_bids_count,
+            timeRemaining: '01h 15m',
+            sellerEn: auc.seller_name,
+            sellerHi: auc.seller_name,
+            mandiEn: auc.mandi_location,
+            mandiHi: auc.mandi_location,
+            status: auc.status === 'LIVE' ? 'LIVE' : auc.status,
+            moisture: `${auc.moisture_percentage}%`
+          }));
+          setLots(prev => [...formatted, ...prev.filter(p => !formatted.some(f => f.id === p.id))]);
+        }
+      } catch (err) {
+        console.warn("Auctions backend fallback:", err);
+      }
+    }
+    loadAuctions();
+  }, []);
 
   // Live Timer Countdown Effect
   useEffect(() => {
@@ -75,14 +109,10 @@ export default function EAuctionPage({ setCurrentView, currentUser, triggerSucce
 
   // Open Details Form
   const handleOpenDetailsModal = (lot) => {
-    const currentNumeric = parseInt(lot.currentBid.replace(/[^0-9]/g, ''));
-    const initialBid = currentNumeric + 50;
-    const initialQty = parseInt(lot.quantity.replace(/[^0-9]/g, '')) || 450;
-
     setBidderDetails((prev) => ({
       ...prev,
-      bidAmount: initialBid.toString(),
-      quantity: initialQty.toString(),
+      bidAmount: '',
+      quantity: '',
       deliveryMandi: lot.mandiEn
     }));
     setDetailsModalLot(lot);
@@ -683,6 +713,7 @@ export default function EAuctionPage({ setCurrentView, currentUser, triggerSucce
                     <input
                       type="text"
                       required
+                      placeholder={t('e.g. Ramesh Kumar', 'उदा. रमेश कुमार')}
                       value={bidderDetails.bidderName}
                       onChange={(e) => setBidderDetails({ ...bidderDetails, bidderName: e.target.value })}
                       className="w-full bg-[#fcfaf7] border border-[#abbe99] rounded-xl p-2.5 font-bold text-xs focus:border-[#71873f] focus:outline-none"
@@ -694,6 +725,7 @@ export default function EAuctionPage({ setCurrentView, currentUser, triggerSucce
                     <input
                       type="text"
                       required
+                      placeholder={t('e.g. eNAM-TRD-PB-88219', 'उदा. eNAM-TRD-PB-88219')}
                       value={bidderDetails.licenseId}
                       onChange={(e) => setBidderDetails({ ...bidderDetails, licenseId: e.target.value })}
                       className="w-full bg-[#fcfaf7] border border-[#abbe99] rounded-xl p-2.5 font-mono font-bold text-xs focus:border-[#71873f] focus:outline-none"
@@ -706,6 +738,7 @@ export default function EAuctionPage({ setCurrentView, currentUser, triggerSucce
                   <input
                     type="text"
                     required
+                    placeholder={t('e.g. Adani Agri Logistics / Kisan Agro', 'उदा. कंपनी या व्यापारिक फर्म का नाम')}
                     value={bidderDetails.entityName}
                     onChange={(e) => setBidderDetails({ ...bidderDetails, entityName: e.target.value })}
                     className="w-full bg-[#fcfaf7] border border-[#abbe99] rounded-xl p-2.5 font-bold text-xs focus:border-[#71873f] focus:outline-none"
@@ -718,6 +751,7 @@ export default function EAuctionPage({ setCurrentView, currentUser, triggerSucce
                     <input
                       type="text"
                       required
+                      placeholder="e.g. +91 98765 43210"
                       value={bidderDetails.phone}
                       onChange={(e) => setBidderDetails({ ...bidderDetails, phone: e.target.value })}
                       className="w-full bg-[#fcfaf7] border border-[#abbe99] rounded-xl p-2.5 font-mono font-bold text-xs focus:border-[#71873f] focus:outline-none"
@@ -729,6 +763,7 @@ export default function EAuctionPage({ setCurrentView, currentUser, triggerSucce
                     <input
                       type="email"
                       required
+                      placeholder="e.g. buyer@agricorp.in"
                       value={bidderDetails.email}
                       onChange={(e) => setBidderDetails({ ...bidderDetails, email: e.target.value })}
                       className="w-full bg-[#fcfaf7] border border-[#abbe99] rounded-xl p-2.5 font-bold text-xs focus:border-[#71873f] focus:outline-none"
@@ -745,6 +780,7 @@ export default function EAuctionPage({ setCurrentView, currentUser, triggerSucce
                       <input
                         type="number"
                         required
+                        placeholder={detailsModalLot ? `e.g. ${parseInt(detailsModalLot.currentBid.replace(/[^0-9]/g, '')) + 50}` : 'e.g. 2450'}
                         value={bidderDetails.bidAmount}
                         onChange={(e) => setBidderDetails({ ...bidderDetails, bidAmount: e.target.value })}
                         className="w-full bg-[#fcfaf7] border-2 border-[#71873f] rounded-xl pl-7 pr-3 py-2 font-mono font-extrabold text-sm focus:outline-none"
@@ -757,6 +793,7 @@ export default function EAuctionPage({ setCurrentView, currentUser, triggerSucce
                     <input
                       type="number"
                       required
+                      placeholder={detailsModalLot ? `e.g. ${parseInt(detailsModalLot.quantity.replace(/[^0-9]/g, '')) || 450}` : 'e.g. 450'}
                       value={bidderDetails.quantity}
                       onChange={(e) => setBidderDetails({ ...bidderDetails, quantity: e.target.value })}
                       className="w-full bg-[#fcfaf7] border border-[#abbe99] rounded-xl p-2 font-mono font-bold text-sm focus:border-[#71873f] focus:outline-none"

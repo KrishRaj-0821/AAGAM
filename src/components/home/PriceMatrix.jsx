@@ -30,8 +30,8 @@ export default function PriceMatrix({ highContrast, t }) {
 
   // Live DBT Calculator State
   const [calcCrop, setCalcCrop] = useState('wheat');
-  const [calcQty, setCalcQty] = useState('150');
-  const calcResult = calculateDbtPayout(calcCrop, calcQty);
+  const [calcQty, setCalcQty] = useState('');
+  const calcResult = calculateDbtPayout(calcCrop, calcQty || 0);
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -292,6 +292,7 @@ export default function PriceMatrix({ highContrast, t }) {
                     min="1"
                     value={calcQty}
                     onChange={(e) => setCalcQty(e.target.value)}
+                    placeholder="e.g. 150"
                     className="w-full bg-white/10 border border-white/30 rounded-xl p-3 text-sm font-mono font-bold text-white focus:outline-none focus:border-[#e0b87e]"
                   />
                   <span className="bg-white/20 px-4 py-3 rounded-xl font-mono font-bold text-xs flex items-center justify-center">

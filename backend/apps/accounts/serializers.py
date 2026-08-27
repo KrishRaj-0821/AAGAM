@@ -6,7 +6,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'uuid', 'full_name', 'email', 'phone', 'role',
+            'uuid', 'full_name', 'email', 'phone', 'aadhaar_number', 'role',
             'is_verified', 'is_active', 'state', 'district', 'mandi',
             'created_at', 'updated_at'
         ]
@@ -14,14 +14,14 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True, required=False, default='aagam@2026')
 
     class Meta:
         model = User
-        fields = ['full_name', 'email', 'phone', 'password', 'role', 'state', 'district', 'mandi']
+        fields = ['full_name', 'email', 'phone', 'password', 'role', 'state', 'district', 'mandi', 'aadhaar_number']
 
     def create(self, validated_data):
-        password = validated_data.pop('password')
+        password = validated_data.pop('password', 'aagam@2026')
         email = validated_data.pop('email')
         user = User.objects.create_user(
             email=email,

@@ -1,11 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, MapPin, QrCode, Search, Building2, Truck, Clock, ShieldCheck, ArrowRight } from 'lucide-react';
 import { mandisList } from '../data/mockData';
+import { api } from '../services/api';
 
 export default function ProcurementPage({ setCurrentView, setSlotStep, setIsSlotModalOpen, t }) {
+  const [mandis, setMandis] = useState(mandisList);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredMandis = mandisList.filter(m =>
+  useEffect(() => {
+    async function loadCenters() {
+      try {
+        const res = await api.centers.getCenters();
+        if (res?.data && res.data.length > 0) {
+          const formatted = res.data.map(c => ({
+            id: c.code || c.id,
+            nameEn: c.name,
+            nameHi: c.name_hi || c.name,
+            districtEn: c.district,
+            districtHi: c.district,
+            stateEn: c.state,
+            stateHi: c.state,
+            distance: '3.2 KM',
+            statusEn: c.operational_status === 'ACTIVE' ? 'Active Today' : c.operational_status,
+            statusHi: 'सक्रिय',
+            capacityToday: `${c.daily_capacity_mt} MT`,
+            availableSlots: 45,
+            phone: c.contact_phone
+          }));
+          setMandis(prev => [...formatted, ...prev.filter(p => !formatted.some(f => f.id === p.id))]);
+        }
+      } catch (err) {
+        console.warn("Centers backend fallback:", err);
+      }
+    }
+    loadCenters();
+  }, []);
+
+  const filteredMandis = mandis.filter(m =>
     m.nameEn.toLowerCase().includes(searchQuery.toLowerCase()) ||
     m.districtEn.toLowerCase().includes(searchQuery.toLowerCase()) ||
     m.stateEn.toLowerCase().includes(searchQuery.toLowerCase())
