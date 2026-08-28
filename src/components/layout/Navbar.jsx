@@ -40,7 +40,9 @@ export default function Navbar({
 }) {
   const [isPortalDropdownOpen, setIsPortalDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isServicesDropdownOpen, setIsServicesDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const servicesDropdownRef = useRef(null);
 
   const mainNavItems = [
     { key: 'home', labelEn: 'Home', labelHi: 'मुख्य पृष्ठ' },
@@ -51,6 +53,17 @@ export default function Navbar({
     { key: 'logistics', labelEn: 'Logistics', labelHi: 'लॉजिस्टिक्स' },
     { key: 'analytics', labelEn: 'Analytics', labelHi: 'विश्लेषण' }
   ];
+
+  const serviceItems = [
+    { key: 'marketplace', labelEn: 'Marketplace', labelHi: 'फसल बाजार', icon: '🛒', descEn: 'Direct trade & grain marketplace', descHi: 'अनाज व्यापार बाजार' },
+    { key: 'prices', labelEn: 'Prices', labelHi: 'मूल्य सूची', icon: '📈', descEn: 'Live MSP & local mandi prices', descHi: 'न्यूनतम समर्थन मूल्य व मंडी दर' },
+    { key: 'eauction', labelEn: 'E-Auction', labelHi: 'ई-नीलामी', icon: '⚡', descEn: 'Live grain e-auctions & bidding', descHi: 'लाइव अनाज ई-नीलामी' },
+    { key: 'procurement', labelEn: 'Procurement', labelHi: 'खरीद केंद्र', icon: '🏢', descEn: 'Mandi slot booking & queues', descHi: 'मंडी स्लॉट बुकिंग एवं कतार' },
+    { key: 'logistics', labelEn: 'Logistics', labelHi: 'लॉजिस्टिक्स', icon: '🚚', descEn: 'Transport requests & tracking', descHi: 'परिवहन और जीपीएस ट्रैकिंग' },
+    { key: 'analytics', labelEn: 'Analytics', labelHi: 'विश्लेषण', icon: '📊', descEn: 'AI market forecasts & analytics', descHi: 'एआई पूर्वानुमान और विश्लेषण' }
+  ];
+
+  const isServiceActive = serviceItems.some(item => item.key === currentView);
 
   const portalPersonas = [
     { key: 'Farmer', labelEn: 'Farmer Portal', labelHi: 'किसान पोर्टल', icon: '👨‍🌾' },
@@ -68,14 +81,17 @@ export default function Navbar({
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsPortalDropdownOpen(false);
       }
+      if (servicesDropdownRef.current && !servicesDropdownRef.current.contains(event.target)) {
+        setIsServicesDropdownOpen(false);
+      }
     };
-    if (isPortalDropdownOpen) {
+    if (isPortalDropdownOpen || isServicesDropdownOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isPortalDropdownOpen]);
+  }, [isPortalDropdownOpen, isServicesDropdownOpen]);
 
   // Global keyboard shortcut (Ctrl+K / Cmd+K) for search
   useEffect(() => {
@@ -168,19 +184,66 @@ export default function Navbar({
 
         {/* Center: Desktop Primary Navigation Tabs (Hidden on < lg) */}
         <div className="hidden lg:flex items-center gap-1 font-extrabold text-xs">
-          {mainNavItems.map((nav) => (
+          {/* Home Tab */}
+          <button
+            onClick={() => handleNavClick('home')}
+            className={`px-3 py-1.5 rounded-xl transition-all whitespace-nowrap cursor-pointer ${
+              currentView === 'home' 
+                ? 'bg-[#71873f] text-white shadow-sm font-extrabold' 
+                : 'text-[#243118] hover:bg-[#f0f4ea] hover:text-[#71873f]'
+            }`}
+          >
+            {t('Home', 'मुख्य पृष्ठ')}
+          </button>
+
+          {/* Services Dropdown */}
+          <div className="relative shrink-0" ref={servicesDropdownRef}>
             <button
-              key={nav.key}
-              onClick={() => handleNavClick(nav.key)}
-              className={`px-3 py-1.5 rounded-xl transition-all whitespace-nowrap cursor-pointer ${
-                currentView === nav.key 
-                  ? 'bg-[#71873f] text-white shadow-sm font-extrabold' 
-                  : 'text-[#243118] hover:bg-[#f0f4ea] hover:text-[#71873f]'
+              onClick={() => setIsServicesDropdownOpen(!isServicesDropdownOpen)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all border whitespace-nowrap cursor-pointer ${
+                isServiceActive 
+                  ? 'bg-[#71873f] text-white border-[#71873f]' 
+                  : 'bg-[#fcfaf7] border-[#abbe99]/70 text-[#243118] hover:bg-[#f0f4ea]'
               }`}
             >
-              {t(nav.labelEn, nav.labelHi)}
+              <Layers className={`w-3.5 h-3.5 ${isServiceActive ? 'text-white' : 'text-[#71873f]'}`} />
+              <span>{t('Services', 'सेवाएं')}</span>
+              <ChevronDown className={`w-3 h-3 transition-transform ${isServicesDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
-          ))}
+
+            {isServicesDropdownOpen && (
+              <div className="absolute left-0 mt-2 w-72 bg-white rounded-2xl border border-[#abbe99] shadow-2xl py-2 z-50 animate-in fade-in duration-150">
+                <div className="px-3.5 py-1.5 text-[10px] font-mono font-bold text-[#71873f] uppercase border-b border-[#abbe99]/40 flex items-center justify-between">
+                  <span>{t('AAGAM Core Services', 'अगाम मुख्य सेवाएं')}</span>
+                  <Sparkles className="w-3.5 h-3.5 text-[#a36627]" />
+                </div>
+                <div className="py-1">
+                  {serviceItems.map((s) => (
+                    <button
+                      key={s.key}
+                      onClick={() => {
+                        handleNavClick(s.key);
+                        setIsServicesDropdownOpen(false);
+                      }}
+                      className={`w-full text-left px-3.5 py-2 text-xs font-bold transition-colors flex items-start gap-2.5 cursor-pointer ${
+                        currentView === s.key
+                          ? 'bg-[#f0f4ea] text-[#71873f]'
+                          : 'text-[#243118] hover:bg-[#f7f4ee]'
+                      }`}
+                    >
+                      <span className="text-base mt-0.5">{s.icon}</span>
+                      <div className="flex flex-col">
+                        <span className="font-extrabold text-[12px]">{t(s.labelEn, s.labelHi)}</span>
+                        <span className={`text-[10px] font-normal leading-tight ${currentView === s.key ? 'text-[#71873f]/80' : 'text-slate-500'}`}>
+                          {t(s.descEn, s.descHi)}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Role Portals Dropdown */}
           <div className="relative shrink-0" ref={dropdownRef}>

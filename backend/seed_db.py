@@ -126,7 +126,6 @@ def seed_database():
         f_prof, _ = FarmerProfile.objects.get_or_create(
             user=farmer_user,
             defaults={
-                "aadhaar_number": "994820194828",
                 "kisan_credit_card": "KCC-PB-994821",
                 "total_land_acres": Decimal("8.50"),
                 "bank_account_no": "394820194827",
