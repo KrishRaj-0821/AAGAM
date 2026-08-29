@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AAGAM System Architecture Diagram & Specification — Government of India</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 12mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #1c2713;
+      background: #fff;
+      margin: 0;
+      padding: 15px;
+      line-height: 1.5;
+    }
+    .no-print {
+      margin-bottom: 15px;
+      text-align: right;
+    }
+    .btn-print {
+      background: #71873f;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-weight: 800;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      box-shadow: 0 4px 12px rgba(113, 135, 63, 0.3);
+    }
+    .btn-print:hover {
+      background: #5c6e33;
+    }
+    .header {
+      border-bottom: 3px double #71873f;
+      padding-bottom: 10px;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    .emblem {
+      font-size: 24px;
+      font-weight: 900;
+      color: #71873f;
+      letter-spacing: 1px;
+    }
+    .subtitle {
+      font-size: 12px;
+      font-weight: 700;
+      color: #a36627;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+    .img-container {
+      text-align: center;
+      margin: 15px 0;
+    }
+    .diagram-img {
+      max-width: 100%;
+      height: auto;
+      border: 2px solid #71873f;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 11px;
+    }
+    th, td {
+      padding: 8px 10px;
+      border: 1px solid #abbe99;
+      text-align: left;
+    }
+    th {
+      background: #f0f4ea;
+      font-weight: bold;
+    }
+    .footer-seal {
+      border-top: 2px solid #71873f;
+      padding-top: 12px;
+      margin-top: 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: #637554;
+    }
+    @media print {
+      body { padding: 0; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="no-print">
+    <button onclick="window.print()" class="btn-print">🖨️ Save as PDF / Print Architecture Diagram</button>
+  </div>
+
+  <div class="header">
+    <div class="emblem">🏛️ GOVERNMENT OF INDIA</div>
+    <div class="subtitle">Ministry of Agriculture & Farmers Welfare • National Informatics Centre (NIC)</div>
+    <div style="font-size: 11px; color: #637554; margin-top: 2px;">AAGAM System Architecture Specification (Aadhaar e-KYC Integration)</div>
+  </div>
+
+  <!-- High-Resolution System Architecture Diagram Image with Aadhaar e-KYC -->
+  <div class="img-container">
+    <img src="/aagam_aadhaar_ekyc_architecture_diagram_1787859414034.jpg" alt="AAGAM System Architecture Diagram" class="diagram-img" />
+  </div>
+
+  <!-- Diagram Functional Specification Table -->
+  <table>
+    <thead>
+      <tr>
+        <th>User Persona</th>
+        <th>Accessible Restricted Modules</th>
+        <th>Connected Backend Services & APIs</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Farmer</strong></td>
+        <td>Slot Booking & QR Gate Pass, Produce Lot Creation, Grievance Status Dashboard</td>
+        <td>Aadhaar e-KYC, PM-KISAN Land API, SMS & Email Gateway</td>
+      </tr>
+      <tr>
+        <td><strong>Buyer</strong></td>
+        <td>Live E-Auction Marketplace, Order & Escrow Management</td>
+        <td>Agmarknet MSP Ticker, Payment Gateway, SMS & Email Gateway</td>
+      </tr>
+      <tr>
+        <td><strong>Government Officer</strong></td>
+        <td>Procurement Approvals, Center Load Management, Grievance Desk</td>
+        <td>PM-KISAN Registry, PFMS UTR Tracker, NIC Cloud Services</td>
+      </tr>
+      <tr>
+        <td><strong>Mandi Operator</strong></td>
+        <td>Virtual Queue Tracker, Weighbridge Tola Parchi, Gate Entry Token</td>
+        <td>QR Scanner Service, Local Mandi Scale Hardware API</td>
+      </tr>
+      <tr>
+        <td><strong>Quality Inspector</strong></td>
+        <td>AI NIR Quality Scanner, Moisture & Grade Certification</td>
+        <td>Visual AI Model Engine, Merkle Tree Quality Ledger</td>
+      </tr>
+      <tr>
+        <td><strong>Warehouse Manager</strong></td>
+        <td>WDRA Capacity Tracking, e-NWR Stock Movement</td>
+        <td>WDRA Warehouse API, Truck Dispatch Logistics Gateway</td>
+      </tr>
+      <tr>
+        <td><strong>Admin</strong></td>
+        <td>User Management, Merkle Audit Logs, System Settings</td>
+        <td>Full Database Access, NIC Cloud Management API</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer-seal">
+    <div>
+      <strong>National Informatics Centre (NIC)</strong><br/>
+      Ministry of Agriculture & Farmers Welfare, New Delhi
+    </div>
+    <div style="text-align: right;">
+      <strong>NIC Cloud Verification Seal</strong><br/>
+      REF: DIAG-AAGAM-ARCH-2026-GOI
+    </div>
+  </div>
+
+  <script>
+    window.onload = function() {
+      setTimeout(function() {
+        window.print();
+      }, 500);
+    };
+  </script>
+</body>
+</html>

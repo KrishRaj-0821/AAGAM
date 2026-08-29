@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AAGAM Problem-Solution Architecture Specification — Government of India</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 15mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #1c2713;
+      background: #fff;
+      margin: 0;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .no-print {
+      margin-bottom: 20px;
+      text-align: right;
+    }
+    .btn-print {
+      background: #71873f;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-weight: 800;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      box-shadow: 0 4px 12px rgba(113, 135, 63, 0.3);
+    }
+    .btn-print:hover {
+      background: #5c6e33;
+    }
+    .header {
+      border-bottom: 3px double #71873f;
+      padding-bottom: 15px;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    .emblem {
+      font-size: 26px;
+      font-weight: 900;
+      color: #71873f;
+      letter-spacing: 1.5px;
+    }
+    .subtitle {
+      font-size: 13px;
+      font-weight: 700;
+      color: #a36627;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+    .doc-meta {
+      font-size: 11px;
+      color: #637554;
+      margin-top: 4px;
+    }
+    .title-box {
+      background: #f0f4ea;
+      border: 2px solid #71873f;
+      padding: 15px;
+      text-align: center;
+      border-radius: 12px;
+      margin-bottom: 25px;
+    }
+    .title-box h1 {
+      margin: 0;
+      font-size: 20px;
+      color: #1c2713;
+      text-transform: uppercase;
+    }
+    .title-box p {
+      margin: 4px 0 0;
+      font-size: 11px;
+      font-weight: bold;
+      color: #637554;
+    }
+    .section-header {
+      background: #71873f;
+      color: #fff;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 8px 14px;
+      text-transform: uppercase;
+      border-radius: 8px;
+      margin: 25px 0 12px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      font-size: 12px;
+    }
+    th, td {
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    th {
+      background: #f7f9f4;
+      font-weight: bold;
+      color: #637554;
+    }
+    td {
+      font-weight: 500;
+      color: #1c2713;
+    }
+    .prob-box {
+      background: #fef2f2;
+      border-left: 4px solid #ef4444;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #991b1b;
+      margin-bottom: 4px;
+    }
+    .sol-box {
+      background: #f0fdf4;
+      border-left: 4px solid #22c55e;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #166534;
+    }
+    .footer-seal {
+      border-top: 2px solid #71873f;
+      padding-top: 15px;
+      margin-top: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: #637554;
+    }
+    @media print {
+      body { padding: 0; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="no-print">
+    <button onclick="window.print()" class="btn-print">🖨️ Save as PDF / Print Problem-Solution Architecture</button>
+  </div>
+
+  <div class="header">
+    <div class="emblem">🏛️ GOVERNMENT OF INDIA</div>
+    <div class="subtitle">Ministry of Agriculture & Farmers Welfare • National Informatics Centre (NIC)</div>
+    <div class="doc-meta">AAGAM — Automated Agricultural Grain & Allocation Management System</div>
+  </div>
+
+  <div class="title-box">
+    <h1>AAGAM Problem-Solution Architecture Specification</h1>
+    <p>DIGITAL TRANSFORMATIONAL ROADMAP SPEC-PS-2026-GOI</p>
+  </div>
+
+  <div class="section-header">1. Key Agricultural Challenges vs. AAGAM Technical Solutions</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 45%;">🔴 Traditional Agricultural Bottlenecks (Problems)</th>
+        <th style="width: 55%;">🟢 AAGAM Architectural Solutions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <div class="prob-box">
+            <strong>Long Mandi Queues:</strong> Farmers wait 48+ hours in truck queues outside APMC mandis without arrival visibility.
+          </div>
+        </td>
+        <td>
+          <div class="sol-box">
+            <strong>Virtual Queue & QR Token Engine:</strong> Algorithmic slot booking assigns exact 1-hour arrival windows and issues digital QR Gate Passes.
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div class="prob-box">
+            <strong>Subjective Manual Quality Grading:</strong> Manual grain grading by commission agents leads to unfair price cuts and disputes.
+          </div>
+        </td>
+        <td>
+          <div class="sol-box">
+            <strong>AI Visual Scanner & NIR Spectroscopy:</strong> Objective 15-second visual camera scan & moisture meter grading (Grade A/B/C).
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div class="prob-box">
+            <strong>Payment Delays & Deductions:</strong> Settlements take weeks or months through intermediaries with unauthorized commission cuts.
+          </div>
+        </td>
+        <td>
+          <div class="sol-box">
+            <strong>NPCI-DBT Settlement Engine:</strong> Automatic Direct Bank Transfer credited directly to the farmer's SBI account in 24-48h via PFMS.
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div class="prob-box">
+            <strong>Price Opacity & Distress Sales:</strong> Farmers lack real-time price awareness, selling below Minimum Support Price (MSP).
+          </div>
+        </td>
+        <td>
+          <div class="sol-box">
+            <strong>Agmarknet Live Ticker & Price Matrix:</strong> Real-time APMC price benchmarks comparing regional mandi rates vs GOI MSP floors.
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div class="prob-box">
+            <strong>Unresolved Grievances:</strong> Scale discrepancies or slot issues have no escalation path or tracking.
+          </div>
+        </td>
+        <td>
+          <div class="sol-box">
+            <strong>3-Tier Grievance Status Dashboard:</strong> Categorizes tickets into Problem Solved, Processing, and Open Dispute with SLA tracking.
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div class="prob-box">
+            <strong>Warehouse Spoilage:</strong> Harvested grain rots out in open CAP storage due to lack of warehouse allocation visibility.
+          </div>
+        </td>
+        <td>
+          <div class="sol-box">
+            <strong>Predictive WDRA Warehouse Allocation:</strong> Real-time storage capacity tracking, e-NWR creation, and automated truck dispatching.
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer-seal">
+    <div>
+      <strong>National Informatics Centre (NIC)</strong><br/>
+      Ministry of Agriculture & Farmers Welfare, New Delhi
+    </div>
+    <div style="text-align: right;">
+      <strong>NIC Cloud Verification Seal</strong><br/>
+      REF: SPEC-AAGAM-PS-2026-GOI-88231
+    </div>
+  </div>
+
+  <script>
+    window.onload = function() {
+      setTimeout(function() {
+        window.print();
+      }, 500);
+    };
+  </script>
+</body>
+</html>

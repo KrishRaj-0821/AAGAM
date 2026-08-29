@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AAGAM Feasibility & Viability — SIH 2025 Submission Slide</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 10mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #1c2713;
+      background: #fff;
+      margin: 0;
+      padding: 10px;
+      line-height: 1.4;
+    }
+    .no-print {
+      margin-bottom: 10px;
+      text-align: right;
+    }
+    .btn-print {
+      background: #71873f;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-weight: 800;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      box-shadow: 0 4px 12px rgba(113, 135, 63, 0.3);
+    }
+    .btn-print:hover {
+      background: #5c6e33;
+    }
+    .img-container {
+      text-align: center;
+      margin: 10px 0;
+    }
+    .slide-img {
+      max-width: 100%;
+      height: auto;
+      border: 2px solid #71873f;
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 11px;
+    }
+    th, td {
+      padding: 8px 10px;
+      border: 1px solid #abbe99;
+      text-align: left;
+    }
+    th {
+      background: #f0f4ea;
+      font-weight: bold;
+    }
+    @media print {
+      body { padding: 0; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="no-print">
+    <button onclick="window.print()" class="btn-print">🖨️ Save SIH Slide as PDF / Print</button>
+  </div>
+
+  <!-- SIH Official Format Feasibility & Viability Slide Image -->
+  <div class="img-container">
+    <img src="/aagam_sih_feasibility_viability_slide_1787864811668.jpg" alt="AAGAM FEASIBILITY AND VIABILITY - SIH Slide" class="slide-img" />
+  </div>
+
+  <!-- Text Breakdown Table for PPT Copying -->
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 35%;">FEASIBILITY (Technical & Economic)</th>
+        <th style="width: 65%;">CHALLENGES AND SOLUTIONS MATRIX</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <strong>Technical Feasibility:</strong><br/>
+          1. Built using React 18, Vite 6, Python Django 4.2 REST Framework, PostgreSQL, and LocalStorage.<br/>
+          2. Scalable backend managing farmer profiles, produce lots, slots, and notifications.<br/><br/>
+          <strong>Economic Feasibility:</strong><br/>
+          1. 100% Free for farmers; open-source stack lowers cloud hosting expenses.<br/>
+          2. NIC Government Cloud infrastructure lowers deployment and financial burdens.
+        </td>
+        <td>
+          <strong>1. Mandi Queues:</strong> Farmers wait 48h ➔ <em>Virtual Queue & QR Token Engine</em> (1h slot windows).<br/><br/>
+          <strong>2. Quality Disputes:</strong> Manual grading leads to cuts ➔ <em>AI NIR Quality Scanner</em> (15s assay).<br/><br/>
+          <strong>3. Delayed Payments:</strong> Weeks via agents ➔ <em>NPCI-DBT Payment Terminal</em> (24-48h SBI bank credit).<br/><br/>
+          <strong>4. Price Opacity:</strong> Sales below MSP ➔ <em>Agmarknet Live Price Matrix</em> (Realtime APMC vs MSP).
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <script>
+    window.onload = function() {
+      setTimeout(function() {
+        window.print();
+      }, 500);
+    };
+  </script>
+</body>
+</html>

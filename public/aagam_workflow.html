@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AAGAM Process Workflow Diagram & Specification — Smart Agriculture</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 12mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #1c2713;
+      background: #fff;
+      margin: 0;
+      padding: 15px;
+      line-height: 1.5;
+    }
+    .no-print {
+      margin-bottom: 15px;
+      text-align: right;
+    }
+    .btn-print {
+      background: #71873f;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-weight: 800;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      box-shadow: 0 4px 12px rgba(113, 135, 63, 0.3);
+    }
+    .btn-print:hover {
+      background: #5c6e33;
+    }
+    .header {
+      border-bottom: 3px double #71873f;
+      padding-bottom: 10px;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    .emblem {
+      font-size: 24px;
+      font-weight: 900;
+      color: #71873f;
+      letter-spacing: 1px;
+    }
+    .subtitle {
+      font-size: 12px;
+      font-weight: 700;
+      color: #a36627;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+    .img-container {
+      text-align: center;
+      margin: 15px 0;
+    }
+    .diagram-img {
+      max-width: 100%;
+      height: auto;
+      border: 2px solid #71873f;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 11px;
+    }
+    th, td {
+      padding: 8px 10px;
+      border: 1px solid #abbe99;
+      text-align: left;
+    }
+    th {
+      background: #f0f4ea;
+      font-weight: bold;
+    }
+    .footer-seal {
+      border-top: 2px solid #71873f;
+      padding-top: 12px;
+      margin-top: 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: #637554;
+    }
+    @media print {
+      body { padding: 0; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="no-print">
+    <button onclick="window.print()" class="btn-print">🖨️ Save as PDF / Print Process Workflow Diagram</button>
+  </div>
+
+  <div class="header">
+    <div class="emblem">🏛️ GOVERNMENT OF INDIA</div>
+    <div class="subtitle">Ministry of Agriculture & Farmers Welfare • Smart Agriculture Presentation</div>
+    <div style="font-size: 11px; color: #637554; margin-top: 2px;">AAGAM System Process Workflow Specification</div>
+  </div>
+
+  <!-- High-Resolution Process Workflow Diagram Image -->
+  <div class="img-container">
+    <img src="/aagam_workflow_diagram_1787863422708.jpg" alt="AAGAM Process Workflow Diagram" class="diagram-img" />
+  </div>
+
+  <!-- Detailed Workflow Step Breakdown Table -->
+  <table>
+    <thead>
+      <tr>
+        <th>Workflow Phase</th>
+        <th>System Action & Module</th>
+        <th>Input / Output Data</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>1. Registration & Profile</strong></td>
+        <td>Farmer Registration (Aadhaar e-KYC)</td>
+        <td>12-digit Aadhaar Checksum, PM-KISAN Khatauni land verification.</td>
+      </tr>
+      <tr>
+        <td><strong>2. Produce Lot Creation</strong></td>
+        <td>Produce Lot Creation Module</td>
+        <td>Crop Type, Variety, Harvest Date, Quantity (KG / Qtl).</td>
+      </tr>
+      <tr>
+        <td><strong>3. Smart Slot Booking</strong></td>
+        <td>Smart Slot Booking & QR Gate Pass</td>
+        <td>1-Hour Allocated Time Window, Encrypted QR Gate Pass Token (#HR-KRN-4829).</td>
+      </tr>
+      <tr>
+        <td><strong>4. Mandi Gate Entry</strong></td>
+        <td>Virtual Queue & Gate Entry Monitoring</td>
+        <td>QR Scanner Verification, Mandi Lane Routing, Priority Vehicle Queue.</td>
+      </tr>
+      <tr>
+        <td><strong>5. Quality & Weighment</strong></td>
+        <td>AI NIR Quality Scanner & Tola Parchi Scale</td>
+        <td>15-second Grade A Assay (Moisture %, Broken %), Certified Net Weight.</td>
+      </tr>
+      <tr>
+        <td><strong>6. Procurement & Sales</strong></td>
+        <td>Live E-Auction & FCI Direct Procurement</td>
+        <td>Agmarknet MSP Floor Rate, Bidding Ledger, Procurement Certificate.</td>
+      </tr>
+      <tr>
+        <td><strong>7. Payment & Support</strong></td>
+        <td>NPCI-DBT Payment Terminal & Grievance Desk</td>
+        <td>PFMS UTR Direct Credit (₹1,23,500), 3-Tier Support Ticket Tracking.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer-seal">
+    <div>
+      <strong>National Informatics Centre (NIC)</strong><br/>
+      Ministry of Agriculture & Farmers Welfare, New Delhi
+    </div>
+    <div style="text-align: right;">
+      <strong>NIC Cloud Verification Seal</strong><br/>
+      REF: SPEC-WORKFLOW-AAGAM-2026-GOI
+    </div>
+  </div>
+
+  <script>
+    window.onload = function() {
+      setTimeout(function() {
+        window.print();
+      }, 500);
+    };
+  </script>
+</body>
+</html>

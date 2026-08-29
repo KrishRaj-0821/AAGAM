@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AAGAM Technical Stack Process Workflow Specification — Government of India</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 12mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #1c2713;
+      background: #fff;
+      margin: 0;
+      padding: 15px;
+      line-height: 1.5;
+    }
+    .no-print {
+      margin-bottom: 15px;
+      text-align: right;
+    }
+    .btn-print {
+      background: #71873f;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-weight: 800;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      box-shadow: 0 4px 12px rgba(113, 135, 63, 0.3);
+    }
+    .btn-print:hover {
+      background: #5c6e33;
+    }
+    .header {
+      border-bottom: 3px double #71873f;
+      padding-bottom: 10px;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    .emblem {
+      font-size: 24px;
+      font-weight: 900;
+      color: #71873f;
+      letter-spacing: 1px;
+    }
+    .subtitle {
+      font-size: 12px;
+      font-weight: 700;
+      color: #a36627;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+    .img-container {
+      text-align: center;
+      margin: 15px 0;
+    }
+    .diagram-img {
+      max-width: 100%;
+      height: auto;
+      border: 2px solid #71873f;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 11px;
+    }
+    th, td {
+      padding: 8px 10px;
+      border: 1px solid #abbe99;
+      text-align: left;
+    }
+    th {
+      background: #f0f4ea;
+      font-weight: bold;
+    }
+    .footer-seal {
+      border-top: 2px solid #71873f;
+      padding-top: 12px;
+      margin-top: 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: #637554;
+    }
+    @media print {
+      body { padding: 0; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="no-print">
+    <button onclick="window.print()" class="btn-print">🖨️ Save as PDF / Print Tech Stack Workflow Diagram</button>
+  </div>
+
+  <div class="header">
+    <div class="emblem">🏛️ GOVERNMENT OF INDIA</div>
+    <div class="subtitle">Ministry of Agriculture & Farmers Welfare • Smart Agriculture Presentation</div>
+    <div style="font-size: 11px; color: #637554; margin-top: 2px;">AAGAM Technical Stack Component Process Workflow</div>
+  </div>
+
+  <!-- Tech Stack Process Workflow Diagram Image -->
+  <div class="img-container">
+    <img src="/aagam_tech_stack_workflow_diagram_1787863677327.jpg" alt="AAGAM Technical Stack Process Workflow Diagram" class="diagram-img" />
+  </div>
+
+  <!-- Detailed Tech Stack Interconnection Table -->
+  <table>
+    <thead>
+      <tr>
+        <th>Component Layer</th>
+        <th>Technologies in Codebase</th>
+        <th>Interconnection & Data Pipeline Role</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Frontend Core</strong></td>
+        <td>React 18 + Vite 6, Tailwind CSS 3, Lucide React</td>
+        <td>Renders client UI, handles state management, relative asset bundling (<code>base: './'</code>).</td>
+      </tr>
+      <tr>
+        <td><strong>Client Tools</strong></td>
+        <td>Formspree React, QRCode JS, HTML5 Canvas</td>
+        <td>Client-side helpdesk ticket submission, QR Token rendering, live price chart canvas.</td>
+      </tr>
+      <tr>
+        <td><strong>Backend API Server</strong></td>
+        <td>Python 3 + Django 4.2 REST Framework</td>
+        <td>Central REST API coordinator processing requests, database transactions, and business logic.</td>
+      </tr>
+      <tr>
+        <td><strong>Auth & Security</strong></td>
+        <td>SimpleJWT Middleware, Verhoeff Checksum Engine</td>
+        <td>Bearer token verification, 12-digit Aadhaar identity validation, RBAC security.</td>
+      </tr>
+      <tr>
+        <td><strong>Database & Storage</strong></td>
+        <td>PostgreSQL, SQLite, Firebase Cloud Storage</td>
+        <td>Relational database storage, fallback seed DB, cloud asset storage.</td>
+      </tr>
+      <tr>
+        <td><strong>External APIs</strong></td>
+        <td>Aadhaar e-KYC API, Agmarknet MSP Ticker, NPCI-DBT Gateway</td>
+        <td>National APIs for UID e-KYC, real-time APMC price benchmarks, and PFMS UTR bank credit.</td>
+      </tr>
+      <tr>
+        <td><strong>Document Output</strong></td>
+        <td>Browser Window Print API (<code>window.print()</code>)</td>
+        <td>Generates official PDF receipts and printable certificates directly in browser.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer-seal">
+    <div>
+      <strong>National Informatics Centre (NIC)</strong><br/>
+      Ministry of Agriculture & Farmers Welfare, New Delhi
+    </div>
+    <div style="text-align: right;">
+      <strong>NIC Cloud Verification Seal</strong><br/>
+      REF: SPEC-TECH-WORKFLOW-AAGAM-2026-GOI
+    </div>
+  </div>
+
+  <script>
+    window.onload = function() {
+      setTimeout(function() {
+        window.print();
+      }, 500);
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AAGAM — Research, References & Competitive Superiority Analysis</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 10mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #0f172a;
+      background: #f8fafc;
+      margin: 0;
+      padding: 20px;
+      line-height: 1.5;
+    }
+    .no-print {
+      margin-bottom: 15px;
+      text-align: right;
+    }
+    .btn-print {
+      background: #243118;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-weight: 800;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      box-shadow: 0 4px 12px rgba(36, 49, 24, 0.2);
+    }
+    .btn-print:hover {
+      background: #1c2713;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      border: 1px solid #cbd5e1;
+    }
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #1e3a8a;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    .slide-title {
+      font-size: 22px;
+      font-weight: 900;
+      color: #0f172a;
+      letter-spacing: 0.5px;
+      margin: 0;
+      text-transform: uppercase;
+    }
+    .sih-badge {
+      font-size: 11px;
+      font-weight: 800;
+      color: #1e3a8a;
+      background: #dbeafe;
+      padding: 4px 12px;
+      border-radius: 6px;
+    }
+
+    /* Comparison Section */
+    .comp-box {
+      background: #f1f5f9;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+      border: 1px solid #cbd5e1;
+    }
+    .comp-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .comp-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .comp-card-old {
+      background: #fef2f2;
+      border-left: 4px solid #ef4444;
+      padding: 12px 14px;
+      border-radius: 6px;
+      font-size: 11px;
+    }
+    .comp-card-new {
+      background: #f0fdf4;
+      border-left: 4px solid #22c55e;
+      padding: 12px 14px;
+      border-radius: 6px;
+      font-size: 11px;
+    }
+    .comp-card-title {
+      font-weight: 800;
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+    .comp-card-old .comp-card-title { color: #991b1b; }
+    .comp-card-new .comp-card-title { color: #166534; }
+    
+    .ul-clean {
+      margin: 0;
+      padding-left: 16px;
+    }
+    .ul-clean li {
+      margin-bottom: 4px;
+      line-height: 1.4;
+    }
+
+    /* Research Links Table / Arrow Rows */
+    .ref-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .ref-item {
+      display: grid;
+      grid-template-columns: 50px 2.2fr 3.8fr;
+      gap: 12px;
+      align-items: center;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      padding: 8px 12px;
+      border-radius: 10px;
+    }
+    .num-arrow {
+      background: #1e3a8a;
+      color: white;
+      font-weight: 900;
+      font-size: 13px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      clip-path: polygon(0% 0%, 75% 0%, 100% 50%, 75% 100%, 0% 100%);
+    }
+    .ref-link-box {
+      font-size: 11px;
+    }
+    .ref-name {
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .ref-url {
+      color: #2563eb;
+      font-size: 10px;
+      text-decoration: none;
+      word-break: break-all;
+    }
+    .ref-why {
+      font-size: 11px;
+      color: #334155;
+      line-height: 1.4;
+    }
+    .ref-why strong {
+      color: #166534;
+    }
+
+    .footer-bar {
+      margin-top: 20px;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    @media print {
+      body { padding: 0; background: #fff; }
+      .no-print { display: none !important; }
+      .container { border: none; box-shadow: none; padding: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="no-print">
+    <button onclick="window.print()" class="btn-print">🖨️ Save Presentation Slide as PDF</button>
+  </div>
+
+  <div class="container">
+    
+    <!-- Slide Header -->
+    <div class="slide-header">
+      <h1 class="slide-title">RESEARCH, REFERENCES & COMPETITIVE ADVANTAGE</h1>
+      <div class="sih-badge">SMART INDIA HACKATHON 2025</div>
+    </div>
+
+    <!-- Executive Comparison Summary -->
+    <div class="comp-box">
+      <div class="comp-title">💡 Why AAGAM is 10x Better Than Existing Internet & Government Solutions</div>
+      <div class="comp-grid">
+        
+        <div class="comp-card-old">
+          <div class="comp-card-title">❌ Current Government Portals (MFMB, E-Uparjan, Anaaj Kharid)</div>
+          <ul class="ul-clean">
+            <li><strong>Siloed State Portals:</strong> Fragmented state-by-state with zero nationwide integration.</li>
+            <li><strong>No Mandi Queue Control:</strong> Registrations exist, but physical truck queues take 48+ hours.</li>
+            <li><strong>Manual Quality Assessment:</strong> Agent visual checks cause arbitrary price cuts & disputes.</li>
+            <li><strong>Delayed Payments:</strong> Takes weeks/months through commission agents with cuts.</li>
+          </ul>
+        </div>
+
+        <div class="comp-card-new">
+          <div class="comp-card-title">✅ AAGAM Next-Gen Unified System</div>
+          <ul class="ul-clean">
+            <li><strong>One Unified Platform:</strong> Integrates procurement, e-auctions, price matrix & DBT nationally.</li>
+            <li><strong>Smart QR Queue Engine:</strong> Assigns 1-hour slot windows, cutting wait from 48h to &lt;45 min.</li>
+            <li><strong>AI NIR Quality Scanner:</strong> 15-second visual camera scan & moisture assay (Grade A/B/C).</li>
+            <li><strong>24-48h Direct Bank Credit:</strong> 100% direct settlement into SBI account via PFMS/NPCI.</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SIH Style Research Links Arrow Rows -->
+    <div style="font-weight: 800; font-size: 13px; color: #1e3a8a; margin-bottom: 10px; text-transform: uppercase;">
+      ❖ Key Research Portals & How AAGAM Enhances Them:
+    </div>
+
+    <div class="ref-rows">
+      
+      <!-- Row 1 -->
+      <div class="ref-item">
+        <div class="num-arrow">1</div>
+        <div class="ref-link-box">
+          <div class="ref-name">Meri Fasal Mera Byora & Anaaj Kharid</div>
+          <a href="https://fasal.haryana.gov.in/" target="_blank" class="ref-url">fasal.haryana.gov.in • anaajkharid.in</a>
+        </div>
+        <div class="ref-why">
+          <strong>Why AAGAM is Better:</strong> Replaces static crop registration with <em>dynamic 1-hour slot booking</em> and <em>encrypted QR gate passes</em>, eliminating physical mandi queues.
+        </div>
+      </div>
+
+      <!-- Row 2 -->
+      <div class="ref-item">
+        <div class="num-arrow">2</div>
+        <div class="ref-link-box">
+          <div class="ref-name">MP E-Uparjan & UP FCS Portal</div>
+          <a href="https://euparjan.mp.gov.in/" target="_blank" class="ref-url">euparjan.mp.gov.in • fcs.up.gov.in</a>
+        </div>
+        <div class="ref-why">
+          <strong>Why AAGAM is Better:</strong> Unifies state silos into a single national architecture with <em>Aadhaar e-KYC</em> and <em>PM-KISAN land Khatauni cross-verification</em>.
+        </div>
+      </div>
+
+      <!-- Row 3 -->
+      <div class="ref-item">
+        <div class="num-arrow">3</div>
+        <div class="ref-link-box">
+          <div class="ref-name">e-NAM & Agmarknet Portals</div>
+          <a href="https://www.enam.gov.in/" target="_blank" class="ref-url">enam.gov.in • agmarknet.gov.in</a>
+        </div>
+        <div class="ref-why">
+          <strong>Why AAGAM is Better:</strong> Connects passive price tickers to <em>real-time live e-auctions with escrow safety</em> and <em>AI-verified crop grade certificates</em>.
+        </div>
+      </div>
+
+      <!-- Row 4 -->
+      <div class="ref-item">
+        <div class="num-arrow">4</div>
+        <div class="ref-link-box">
+          <div class="ref-name">PFMS & NPCI Gateway</div>
+          <a href="https://pfms.nic.in/" target="_blank" class="ref-url">pfms.nic.in • npci.org.in</a>
+        </div>
+        <div class="ref-why">
+          <strong>Why AAGAM is Better:</strong> Automates instant UTR financial tracking, guaranteeing <em>direct credit into the farmer's SBI account within 24-48h</em> with 0% agent cuts.
+        </div>
+      </div>
+
+      <!-- Row 5 -->
+      <div class="ref-item">
+        <div class="num-arrow">5</div>
+        <div class="ref-link-box">
+          <div class="ref-name">FCI, CACP & Ministry of Agriculture</div>
+          <a href="https://www.fci.gov.in/" target="_blank" class="ref-url">fci.gov.in • cacp.dacnet.nic.in</a>
+        </div>
+        <div class="ref-why">
+          <strong>Why AAGAM is Better:</strong> Provides <em>100% digital auditability</em> via Merkle audit logs, preventing procurement leakage and grain spoilage.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer Bar -->
+    <div class="footer-bar">
+      <div>AAGAM National Agriculture Platform • Government of India</div>
+      <div>SIH 2025 Submission Research Specification</div>
+    </div>
+
+  </div>
+
+  <script>
+    window.onload = function() {
+      setTimeout(function() {
+        window.print();
+      }, 400);
+    };
+  </script>
+</body>
+</html>

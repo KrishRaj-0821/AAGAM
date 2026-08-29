@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AAGAM — Executive Challenges & Enterprise Architecture Solutions</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 10mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #0f172a;
+      background: #f8fafc;
+      margin: 0;
+      padding: 24px;
+      line-height: 1.5;
+    }
+    .no-print {
+      margin-bottom: 20px;
+      text-align: right;
+    }
+    .btn-print {
+      background: #243118;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-weight: 800;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 12px rgba(36, 49, 24, 0.2);
+    }
+    .btn-print:hover {
+      background: #1c2713;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 36px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      border: 1px solid #cbd5e1;
+    }
+    .header-block {
+      border-bottom: 2px solid #243118;
+      padding-bottom: 16px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .header-title h1 {
+      font-size: 20px;
+      font-weight: 900;
+      color: #1e293b;
+      margin: 0 0 4px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .header-title p {
+      margin: 0;
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 600;
+    }
+    .gov-badge {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .col {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 22px 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      border: 1px solid #e2e8f0;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .tag {
+      font-size: 9.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      width: fit-content;
+      margin-bottom: 12px;
+    }
+    .card-title {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 8px;
+      line-height: 1.35;
+    }
+    .divider {
+      width: 100%;
+      height: 1px;
+      margin: 6px 0 10px;
+    }
+    .card-desc {
+      font-size: 11px;
+      color: #475569;
+      line-height: 1.5;
+      font-weight: 500;
+    }
+
+    /* Professional Formal Palette */
+    .card-challenge {
+      background: #fdf2f2;
+      border-left: 4px solid #dc2626;
+      border-color: #fecaca #fecaca #fecaca #dc2626;
+    }
+    .card-challenge .tag {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .card-challenge .divider {
+      background: #fca5a5;
+    }
+
+    .card-solution {
+      background: #f0fdf4;
+      border-left: 4px solid #16a34a;
+      border-color: #bbf7d0 #bbf7d0 #bbf7d0 #16a34a;
+    }
+    .card-solution .tag {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .card-solution .divider {
+      background: #86efac;
+    }
+
+    .badge-bar {
+      margin-top: 28px;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10.5px;
+      color: #64748b;
+      font-weight: 600;
+    }
+    @media print {
+      body { padding: 0; background: #fff; }
+      .no-print { display: none !important; }
+      .container { border: none; box-shadow: none; padding: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="no-print">
+    <button onclick="window.print()" class="btn-print">🖨️ Save Executive Document as PDF</button>
+  </div>
+
+  <div class="container">
+    <div class="header-block">
+      <div class="header-title">
+        <h1>Agricultural Procurement Challenges & Enterprise Solutions</h1>
+        <p>AAGAM System Specification • National Informatics Centre & Ministry of Agriculture</p>
+      </div>
+      <div class="gov-badge">Official GOI Standard Specification</div>
+    </div>
+
+    <div class="grid">
+      
+      <!-- DOMAIN 1: QUEUE & CAPACITY -->
+      <div class="col">
+        <div class="card card-challenge">
+          <div class="tag">CRITICAL BOTTLENECK</div>
+          <div class="card-title">Unregulated Mandi Congestion</div>
+          <div class="divider"></div>
+          <div class="card-desc">Producers encounter multi-day queue delays outside APMC yards due to uncoordinated physical truck arrivals.</div>
+        </div>
+
+        <div class="card card-solution">
+          <div class="tag">ARCHITECTURAL SOLUTION</div>
+          <div class="card-title">Virtual Queue & QR Token Engine</div>
+          <div class="divider"></div>
+          <div class="card-desc">Establishes automated intake load balancing with 1-hour time windows and encrypted QR Gate Pass credentials.</div>
+        </div>
+      </div>
+
+      <!-- DOMAIN 2: QUALITY ASSAY -->
+      <div class="col">
+        <div class="card card-challenge">
+          <div class="tag">CRITICAL BOTTLENECK</div>
+          <div class="card-title">Subjective Quality Assessment</div>
+          <div class="divider"></div>
+          <div class="card-desc">Manual visual inspection introduces arbitrary price deductions and moisture measurement disputes at procurement gates.</div>
+        </div>
+
+        <div class="card card-solution">
+          <div class="tag">ARCHITECTURAL SOLUTION</div>
+          <div class="card-title">AI NIR Spectroscopy Assay</div>
+          <div class="divider"></div>
+          <div class="card-desc">Executes objective grain quality grading (Grade A/B/C) within 15 seconds backed by Merkle Tree audit logs.</div>
+        </div>
+      </div>
+
+      <!-- DOMAIN 3: FINANCIAL SETTLEMENT -->
+      <div class="col">
+        <div class="card card-challenge">
+          <div class="tag">CRITICAL BOTTLENECK</div>
+          <div class="card-title">Extended Settlement Liquidity Delays</div>
+          <div class="divider"></div>
+          <div class="card-desc">Financial disbursements experience multi-week processing lags through traditional commission agent channels.</div>
+        </div>
+
+        <div class="card card-solution">
+          <div class="tag">ARCHITECTURAL SOLUTION</div>
+          <div class="card-title">NPCI-DBT Settlement Terminal</div>
+          <div class="divider"></div>
+          <div class="card-desc">Automates direct electronic funds credit to beneficiary bank accounts within 24–48 hours via PFMS with UTR tracking.</div>
+        </div>
+      </div>
+
+      <!-- DOMAIN 4: MARKET INTELLIGENCE -->
+      <div class="col">
+        <div class="card card-challenge">
+          <div class="tag">CRITICAL BOTTLENECK</div>
+          <div class="card-title">Market Price Asymmetry</div>
+          <div class="divider"></div>
+          <div class="card-desc">Producers lack real-time price intelligence across regional APMCs, leading to distress transactions below support benchmarks.</div>
+        </div>
+
+        <div class="card card-solution">
+          <div class="tag">ARCHITECTURAL SOLUTION</div>
+          <div class="card-title">Agmarknet Real-Time Matrix</div>
+          <div class="divider"></div>
+          <div class="card-desc">Synchronizes live APMC market rates against Government Minimum Support Price (MSP) regulatory benchmarks.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="badge-bar">
+      <div>🏛️ AAGAM Automated Agricultural Grain & Allocation Management System</div>
+      <div>CONFIDENTIAL & PROPRIETARY • GOI SPECIFICATION SPEC-2026-EXEC</div>
+    </div>
+  </div>
+
+  <script>
+    window.onload = function() {
+      setTimeout(function() {
+        window.print();
+      }, 400);
+    };
+  </script>
+</body>
+</html>
