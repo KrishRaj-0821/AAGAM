@@ -1,9 +1,18 @@
-import React, { useState } from 'react';
-import { ChevronLeft, Truck, MapPin, Navigation, Clock, ShieldCheck, CheckCircle2, ArrowRight, UserCheck, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ChevronLeft, Truck, MapPin, Navigation, Clock, ShieldCheck, CheckCircle2, ArrowRight, UserCheck, X, Sprout } from 'lucide-react';
 import { logisticsVehicles } from '../data/mockData';
+import { dbEngine } from '../data/dbEngine';
 
 export default function LogisticsPage({ setCurrentView, t }) {
   const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [sharedProcurements, setSharedProcurements] = useState(() => dbEngine.getAllSharedProcurements());
+
+  useEffect(() => {
+    const unsub = dbEngine.subscribe((db) => {
+      setSharedProcurements(db.sharedProcurements || []);
+    });
+    return () => unsub();
+  }, []);
 
   return (
     <section className="py-10 bg-[#fcfaf7] min-h-[85vh]">
@@ -51,6 +60,56 @@ export default function LogisticsPage({ setCurrentView, t }) {
             <div className="text-3xl font-extrabold text-white">18,420 Trucks</div>
             <div className="text-[10px] text-slate-300">100% GPS Enabled</div>
           </div>
+        </div>
+
+        {/* UNIFIED 8-ROLE SHARED PROCUREMENT TRANSPORTER DISPATCH MOVEMENT */}
+        <div className="bg-[#243118] text-white rounded-3xl p-6 shadow-xl space-y-4 font-mono text-xs border border-[#abbe99]/40">
+          <div className="flex justify-between items-center border-b border-[#abbe99]/30 pb-3">
+            <div>
+              <h3 className="font-extrabold text-sm text-amber-400 flex items-center gap-2">
+                <Truck className="w-5 h-5 text-amber-400" />
+                <span>UNIFIED SHARED PROCUREMENT TRANSPORTER MOVEMENT JOBS</span>
+              </h3>
+              <p className="text-[11px] text-slate-300">Synchronized live with Procurement Center & Warehouse via ONE shared Procurement ID</p>
+            </div>
+            <span className="bg-[#71873f] text-white font-bold px-2.5 py-0.5 rounded text-[10px]">BALJIT SINGH FLEET</span>
+          </div>
+
+          {sharedProcurements.filter(p => p.approvalStatus === 'APPROVED').length === 0 ? (
+            <div className="text-center py-4 text-slate-400">No active grain movement requests assigned yet.</div>
+          ) : (
+            <div className="space-y-3">
+              {sharedProcurements.filter(p => p.approvalStatus === 'APPROVED').map(proc => (
+                <div key={proc.id} className="bg-[#1c2713] border border-[#abbe99]/40 rounded-xl p-4 space-y-2">
+                  <div className="flex flex-wrap justify-between items-center border-b border-[#abbe99]/20 pb-2">
+                    <div>
+                      <div className="font-black text-amber-300 text-sm flex items-center gap-2">
+                        <span>{proc.id}</span>
+                        <span className="bg-[#28381c] text-amber-200 text-[10px] px-2 py-0.5 rounded border border-[#abbe99]/30">
+                          {proc.crop} ({proc.quantityKg} KG Net Grain Load)
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-slate-300">
+                        Origin: <strong>{proc.procurementCenter}</strong> ➔ Destination: <strong>{proc.warehouseName} ({proc.warehouseId})</strong>
+                      </div>
+                    </div>
+
+                    <div>
+                      <span className="bg-emerald-500 text-slate-950 font-black px-3 py-1 rounded-lg text-[10px] flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> DISPATCH ASSIGNED (Vehicle #HR-10-AB-9981)
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[10px] bg-[#243118] p-2 rounded-lg text-slate-300">
+                    <div>Assigned Transporter: <strong className="text-amber-300">Baljit Singh Transport Fleet</strong></div>
+                    <div>Driver Contact: <strong className="text-emerald-400">+91 98880 44910</strong></div>
+                    <div>Transit GPS Status: <strong className="text-emerald-300 font-black">EN ROUTE TO WAREHOUSE</strong></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Fleet Grid */}

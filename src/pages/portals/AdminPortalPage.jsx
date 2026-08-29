@@ -226,6 +226,59 @@ export default function AdminPortalPage({ setCurrentView, currentUser, t }) {
                 })}
               </div>
 
+              {/* UNIFIED 8-ROLE SHARED PROCUREMENT SYSTEM AUDIT MONITOR */}
+              <div className="bg-[#140e48] text-white rounded-2xl p-5 shadow-xl space-y-4 font-mono text-xs border border-indigo-800">
+                <div className="flex justify-between items-center border-b border-indigo-800 pb-3">
+                  <div>
+                    <h3 className="font-extrabold text-sm text-indigo-300 flex items-center gap-2">
+                      <ShieldCheck className="w-5 h-5 text-indigo-400" />
+                      <span>UNIFIED 8-ROLE SHARED PROCUREMENT REAL-TIME AUDIT MONITOR</span>
+                    </h3>
+                    <p className="text-[11px] text-slate-300">Synchronized end-to-end transaction monitoring across all 8 user role portals.</p>
+                  </div>
+                  <span className="bg-indigo-600 text-white font-bold px-2.5 py-0.5 rounded text-[10px]">SYSTEM ADMIN LEDGER</span>
+                </div>
+
+                {(dbState.sharedProcurements || []).length === 0 ? (
+                  <div className="text-center py-4 text-slate-400">No active shared procurement records logged in system ledger.</div>
+                ) : (
+                  <div className="space-y-3">
+                    {(dbState.sharedProcurements || []).map(proc => (
+                      <div key={proc.id} className="bg-[#1d1663] border border-indigo-700/60 rounded-xl p-4 space-y-2.5">
+                        <div className="flex flex-wrap justify-between items-center border-b border-indigo-800/80 pb-2">
+                          <div>
+                            <div className="font-black text-amber-300 text-sm flex items-center gap-2">
+                              <span>{proc.id}</span>
+                              <span className="bg-indigo-950 text-indigo-300 text-[10px] px-2 py-0.5 rounded border border-indigo-600/40">
+                                {proc.crop} ({proc.quantityKg} KG)
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-slate-300">
+                              Farmer: <strong>{proc.farmerName}</strong> • Center: <strong>{proc.procurementCenter}</strong>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <span className={`px-2.5 py-0.5 rounded text-[10px] font-black ${
+                              proc.paymentStatus === 'SUCCESS' ? 'bg-emerald-500 text-slate-950' : 'bg-amber-500/30 text-amber-300 border border-amber-500/50'
+                            }`}>
+                              PAYMENT: {proc.paymentStatus}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px] bg-[#140e48] p-2.5 rounded-lg text-slate-300">
+                          <div>Quality: <strong className="text-emerald-400">{proc.qualityVerified ? 'VERIFIED ✓' : 'PENDING'}</strong></div>
+                          <div>Weighment: <strong className="text-emerald-400">{proc.weighmentVerified ? `${proc.netWeight} KG ✓` : 'PENDING'}</strong></div>
+                          <div>Approval: <strong className="text-amber-300">{proc.approvalStatus}</strong></div>
+                          <div>Valuation: <strong className="text-emerald-300">₹{proc.estimatedPayable?.toLocaleString('en-IN')}</strong></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {/* CONTROL TOWER: Dynamic 15-Stage Lot Lifecycle Traceability */}
               <div className="bg-white rounded-2xl border border-indigo-200 p-5 shadow-sm space-y-4 font-mono">
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-indigo-100 pb-3">

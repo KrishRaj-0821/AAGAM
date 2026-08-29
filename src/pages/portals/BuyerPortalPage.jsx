@@ -1,14 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ChevronLeft, Gavel, Search, Filter, ShoppingCart, Truck, CreditCard, 
   FileText, ShieldCheck, CheckCircle2, DollarSign, Bell, Layers, Building2, 
-  Heart, Download, ArrowRight, HelpCircle, BarChart3, Coins
+  Heart, Download, ArrowRight, HelpCircle, BarChart3, Coins, Sprout
 } from 'lucide-react';
+import { dbEngine } from '../../data/dbEngine';
 
 export default function BuyerPortalPage({ setCurrentView, currentUser, t }) {
   const [activeTab, setActiveTab] = useState('marketplace');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCrop, setSelectedCrop] = useState('All');
+  const [sharedProcurements, setSharedProcurements] = useState(() => dbEngine.getAllSharedProcurements());
+
+  useEffect(() => {
+    const unsub = dbEngine.subscribe((db) => {
+      setSharedProcurements(db.sharedProcurements || []);
+    });
+    return () => unsub();
+  }, []);
 
   // Buyer Profile
   const buyerProfile = {
@@ -150,6 +159,60 @@ export default function BuyerPortalPage({ setCurrentView, currentUser, t }) {
                 <button onClick={() => setActiveTab('marketplace')} className="bg-sky-700 hover:bg-sky-800 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2">
                   <ShoppingCart className="w-4 h-4" /> Browse Marketplace
                 </button>
+              </div>
+
+              {/* UNIFIED 8-ROLE SHARED PROCUREMENT MARKETPLACE INVENTORY */}
+              <div className="bg-[#0e2a47] text-white rounded-2xl p-5 shadow-xl space-y-4 font-mono text-xs border border-sky-800">
+                <div className="flex justify-between items-center border-b border-sky-800 pb-3">
+                  <div>
+                    <h3 className="font-extrabold text-sm text-sky-300 flex items-center gap-2">
+                      <Sprout className="w-5 h-5 text-sky-400" />
+                      <span>UNIFIED SHARED PROCUREMENT GRAIN MARKETPLACE (AVAILABLE FOR TRADING)</span>
+                    </h3>
+                    <p className="text-[11px] text-slate-300">Procured grain stock from AAGAM direct procurement available for verified buyers & traders.</p>
+                  </div>
+                  <span className="bg-sky-600 text-white font-bold px-2.5 py-0.5 rounded text-[10px]">GOI ASSAYED GRAIN</span>
+                </div>
+
+                {sharedProcurements.filter(p => p.approvalStatus === 'APPROVED').length === 0 ? (
+                  <div className="text-center py-4 text-slate-400">No shared procurement grain stock available for trading yet.</div>
+                ) : (
+                  <div className="space-y-3">
+                    {sharedProcurements.filter(p => p.approvalStatus === 'APPROVED').map(proc => (
+                      <div key={proc.id} className="bg-[#183a5e] border border-sky-700/60 rounded-xl p-4 space-y-2">
+                        <div className="flex flex-wrap justify-between items-center border-b border-sky-800/80 pb-2">
+                          <div>
+                            <div className="font-black text-amber-300 text-sm flex items-center gap-2">
+                              <span>{proc.id}</span>
+                              <span className="bg-sky-950 text-sky-300 text-[10px] px-2 py-0.5 rounded border border-sky-600/40">
+                                {proc.crop} ({proc.quantityKg} KG Available)
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-slate-300">
+                              Storage Warehouse: <strong>{proc.warehouseName} ({proc.warehouseId})</strong>
+                            </div>
+                          </div>
+
+                          <div>
+                            <button
+                              onClick={() => alert(`Purchase Order Request Placed for Lot ${proc.id}!\nQuantity: ${proc.quantityKg} KG\nTotal Value: ₹${proc.estimatedPayable?.toLocaleString('en-IN')}`)}
+                              className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-4 py-1.5 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow-lg"
+                            >
+                              <ShoppingCart className="w-4 h-4" />
+                              <span>Place Buy Offer (₹{proc.aiAnalysis?.mspPerQtl}/Qtl)</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[10px] bg-[#0e2a47] p-2 rounded-lg text-slate-300">
+                          <div>Quality Grade: <strong className="text-emerald-400">{proc.qualityDetails?.grade || 'GRADE A'}</strong></div>
+                          <div>Total Valuation: <strong className="text-amber-300">₹{proc.estimatedPayable?.toLocaleString('en-IN')}</strong></div>
+                          <div>Status: <strong className="text-emerald-300">READY FOR TRADER DISPATCH</strong></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Metric Cards */}

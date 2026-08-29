@@ -165,13 +165,68 @@ const INITIAL_SEED_DB = {
 
   auditLogs: [
     { id: 'AUD-000982', user: 'USR-00512', role: 'QUALITY_INSPECTOR', action: 'QUALITY_FINALIZED', record: 'LOT-2026-00452', oldVal: 'QUALITY_PENDING', newVal: 'QUALITY_PASSED', time: '25 Aug 2026, 11:00 AM', ip: '10.0.4.12' }
+  ],
+
+  sharedProcurements: [
+    {
+      id: 'PRC-2026-88492',
+      farmerId: 'PB-FARM-99482',
+      farmerName: 'Gurpreet Singh',
+      farmerPhone: '+91 98765 43210',
+      crop: 'Wheat',
+      variety: 'HD-2967 (Sharbati)',
+      quantityKg: 5000,
+      quantityQtl: 50,
+      state: 'Haryana',
+      district: 'Karnal',
+      procurementCenter: 'Karnal Central Grain Yard',
+      mandiId: 'MND-HR-001',
+      qualityReportImg: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=600&q=80',
+      aiAnalysis: {
+        moisture: 10.5,
+        foreignMatter: 0.3,
+        damagedGrains: 0.8,
+        grade: 'GRADE A',
+        confidence: '98.5%',
+        mspPerQtl: 2470
+      },
+      estimatedPayable: 123500,
+      qualityVerified: true,
+      qualityDetails: { moisture: 10.5, foreignMatter: 0.3, grade: 'GRADE A', verifiedAt: '2026-08-29T10:00:00Z' },
+      weighmentVerified: true,
+      grossWeight: 5180,
+      tareWeight: 180,
+      netWeight: 5000,
+      weighmentAt: '2026-08-29T10:30:00Z',
+      approvalStatus: 'APPROVED',
+      approvedAt: '2026-08-29T11:00:00Z',
+      officerId: 'GOI-OFF-55012',
+      paymentStatus: 'SUCCESS',
+      paymentId: 'PAY-88942',
+      finalPaidAmount: 123500,
+      utrNo: 'SBIN0048299104',
+      paidAt: '2026-08-29T11:05:00Z',
+      receiptNo: 'RCP-PRC-88492',
+      warehouseStockStatus: 'IN_STOCK',
+      warehouseId: 'WH-HR-001',
+      warehouseName: 'Karnal Granary Silo #04',
+      transporterStatus: 'READY_FOR_MOVEMENT',
+      transporterId: 'TRUCK-FLEET-44910',
+      buyerAvailable: true,
+      createdAt: '2026-08-29T09:00:00Z'
+    }
   ]
 };
 
 class CentralDatabaseEngine {
   constructor() {
     this.listeners = [];
+    this.channel = typeof window !== 'undefined' && 'BroadcastChannel' in window 
+      ? new BroadcastChannel('AAGAM_LIVE_SYNC_CHANNEL') 
+      : null;
+
     this.init();
+    this.setupLiveListeners();
   }
 
   init() {
@@ -183,6 +238,31 @@ class CentralDatabaseEngine {
     } catch (e) {
       console.error('LocalStorage error:', e);
     }
+  }
+
+  setupLiveListeners() {
+    if (typeof window === 'undefined') return;
+
+    // Cross-tab sync via BroadcastChannel
+    if (this.channel) {
+      this.channel.onmessage = (event) => {
+        if (event.data && event.data.type === 'DB_MUTATED') {
+          this.notifyListeners();
+        }
+      };
+    }
+
+    // Cross-tab sync via localStorage storage event
+    window.addEventListener('storage', (e) => {
+      if (e.key === STORAGE_KEY) {
+        this.notifyListeners();
+      }
+    });
+
+    // Automatic heartbeat live sync to keep state synchronized across all views
+    setInterval(() => {
+      this.notifyListeners();
+    }, 2000);
   }
 
   getDb() {
@@ -199,6 +279,9 @@ class CentralDatabaseEngine {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
       this.notifyListeners();
+      if (this.channel) {
+        this.channel.postMessage({ type: 'DB_MUTATED', timestamp: Date.now() });
+      }
     } catch (e) {
       console.error('Save error:', e);
     }
@@ -206,6 +289,10 @@ class CentralDatabaseEngine {
 
   subscribe(listener) {
     this.listeners.push(listener);
+    // Notify immediately on subscription so initial render gets fresh state
+    try {
+      listener(this.getDb());
+    } catch (e) {}
     return () => {
       this.listeners = this.listeners.filter(l => l !== listener);
     };
@@ -213,7 +300,13 @@ class CentralDatabaseEngine {
 
   notifyListeners() {
     const db = this.getDb();
-    this.listeners.forEach(fn => fn(db));
+    this.listeners.forEach(fn => {
+      try {
+        fn(db);
+      } catch (e) {
+        console.error('Listener notification error:', e);
+      }
+    });
   }
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -573,6 +666,271 @@ class CentralDatabaseEngine {
     this.save(db);
     return newOrder;
   }
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // UNIFIED 8-ROLE SHARED PROCUREMENT WORKFLOW ENGINE (Single Procurement ID)
+  // ───────────────────────────────────────────────────────────────────────────
+  getAllSharedProcurements() {
+    const db = this.getDb();
+    return db.sharedProcurements || [];
+  }
+
+  getSharedProcurement(id) {
+    const db = this.getDb();
+    return (db.sharedProcurements || []).find(p => p.id === id);
+  }
+
+  // Stage 1: Farmer Submits "Sell Crop" Request
+  createSharedProcurement(req) {
+    const db = this.getDb();
+    db.sharedProcurements = db.sharedProcurements || [];
+
+    const procurementId = generateId('PRC-2026');
+    const qtyKg = parseFloat(req.quantityKg || (req.quantityQtl * 100) || 5000);
+    const qtyQtl = parseFloat(req.quantityQtl || (qtyKg / 100) || 50);
+    const msp = parseFloat(req.mspPerQtl || 2470);
+    const estPayable = qtyQtl * msp;
+
+    const newProcurement = {
+      id: procurementId,
+      farmerId: req.farmerId || 'PB-FARM-99482',
+      farmerName: req.farmerName || 'Gurpreet Singh',
+      farmerPhone: req.farmerPhone || '+91 98765 43210',
+      crop: req.crop || 'Wheat',
+      variety: req.variety || 'HD-2967 (Sharbati)',
+      quantityKg: qtyKg,
+      quantityQtl: qtyQtl,
+      state: req.state || 'Haryana',
+      district: req.district || 'Karnal',
+      procurementCenter: req.procurementCenter || 'Karnal Central Grain Yard',
+      mandiId: req.mandiId || 'MND-HR-001',
+      qualityReportImg: req.qualityReportImg || 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=600&q=80',
+      aiAnalysis: req.aiAnalysis || {
+        moisture: 10.5,
+        foreignMatter: 0.3,
+        damagedGrains: 0.8,
+        grade: 'GRADE A',
+        confidence: '98.5%',
+        mspPerQtl: msp
+      },
+      estimatedPayable: estPayable,
+      qualityVerified: false,
+      qualityDetails: null,
+      weighmentVerified: false,
+      grossWeight: null,
+      tareWeight: null,
+      netWeight: null,
+      approvalStatus: 'PENDING',
+      approvedAt: null,
+      officerId: null,
+      paymentStatus: 'PENDING',
+      paymentId: null,
+      finalPaidAmount: null,
+      utrNo: null,
+      paidAt: null,
+      receiptNo: null,
+      warehouseStockStatus: 'PENDING',
+      warehouseId: 'WH-HR-001',
+      warehouseName: 'Karnal Granary Silo #04',
+      transporterStatus: 'UNASSIGNED',
+      transporterId: null,
+      buyerAvailable: false,
+      createdAt: new Date().toISOString()
+    };
+
+    db.sharedProcurements.unshift(newProcurement);
+
+    // Also mirror to legacy produceLots collection so old analytics pick it up
+    db.produceLots = db.produceLots || [];
+    db.produceLots.unshift({
+      id: procurementId,
+      farmerId: newProcurement.farmerId,
+      product: newProcurement.crop,
+      variety: newProcurement.variety,
+      quantity: qtyKg,
+      unit: 'KG',
+      mandiId: newProcurement.mandiId,
+      status: 'SUBMITTED',
+      expectedPrice: msp,
+      createdAt: newProcurement.createdAt
+    });
+
+    this.emitEvent(db, 'PROCUREMENT_REQUEST_CREATED', 'SHARED_PROCUREMENT', procurementId, newProcurement.farmerId, {
+      role: 'FARMER',
+      oldVal: 'NONE',
+      newVal: 'SUBMITTED'
+    });
+
+    this.save(db);
+    return newProcurement;
+  }
+
+  // Stage 2: Quality Assayer Verifies Quality
+  verifyQualityByAssayer(procurementId, qualityParams) {
+    const db = this.getDb();
+    const item = (db.sharedProcurements || []).find(p => p.id === procurementId);
+    if (!item) return null;
+
+    item.qualityVerified = true;
+    item.qualityDetails = {
+      inspectorId: qualityParams.inspectorId || 'ASSAY-LAB-77281',
+      inspectorName: qualityParams.inspectorName || 'Dr. Anita Roy',
+      moisture: parseFloat(qualityParams.moisture || item.aiAnalysis?.moisture || 10.5),
+      foreignMatter: parseFloat(qualityParams.foreignMatter || item.aiAnalysis?.foreignMatter || 0.3),
+      grade: qualityParams.grade || item.aiAnalysis?.grade || 'GRADE A',
+      verifiedAt: new Date().toISOString()
+    };
+
+    this.emitEvent(db, 'QUALITY_VERIFIED', 'SHARED_PROCUREMENT', procurementId, item.qualityDetails.inspectorId, {
+      role: 'QUALITY_ASSAYER',
+      oldVal: 'SUBMITTED',
+      newVal: 'QUALITY_PASSED'
+    });
+
+    this.save(db);
+    return item;
+  }
+
+  // Stage 3: Mandi Operator Records Actual Weight
+  recordWeighmentByOperator(procurementId, grossWeight, tareWeight) {
+    const db = this.getDb();
+    const item = (db.sharedProcurements || []).find(p => p.id === procurementId);
+    if (!item) return null;
+
+    const gross = parseFloat(grossWeight);
+    const tare = parseFloat(tareWeight);
+    const net = gross - tare;
+
+    item.weighmentVerified = true;
+    item.grossWeight = gross;
+    item.tareWeight = tare;
+    item.netWeight = net;
+    item.quantityKg = net;
+    item.quantityQtl = net / 100;
+    item.estimatedPayable = (net / 100) * (item.aiAnalysis?.mspPerQtl || 2470);
+    item.weighmentAt = new Date().toISOString();
+
+    this.emitEvent(db, 'WEIGHMENT_RECORDED', 'SHARED_PROCUREMENT', procurementId, 'MANDI-OP-33109', {
+      role: 'MANDI_OPERATOR',
+      oldVal: 'QUALITY_PASSED',
+      newVal: 'WEIGHED'
+    });
+
+    this.save(db);
+    return item;
+  }
+
+  // Stage 4 & 5: Govt Officer Reviews & Approves + Triggers Real-Time Payment + Downstream Portals Sync
+  approveProcurementByOfficer(procurementId, officerId = 'GOI-OFF-55012', decision = 'APPROVED') {
+    const db = this.getDb();
+    const item = (db.sharedProcurements || []).find(p => p.id === procurementId);
+    if (!item) return null;
+
+    if (decision === 'REJECTED') {
+      item.approvalStatus = 'REJECTED';
+      item.paymentStatus = 'FAILED';
+      this.emitEvent(db, 'PROCUREMENT_REJECTED', 'SHARED_PROCUREMENT', procurementId, officerId, {
+        role: 'GOVT_OFFICER',
+        oldVal: 'WEIGHED',
+        newVal: 'REJECTED'
+      });
+      this.save(db);
+      return item;
+    }
+
+    item.approvalStatus = 'APPROVED';
+    item.approvedAt = new Date().toISOString();
+    item.officerId = officerId;
+
+    // Stage 5 Live Payment Transition: PENDING -> PROCESSING -> SUCCESS
+    item.paymentStatus = 'PROCESSING';
+    this.save(db);
+
+    // Live Bank Clearing Simulation (1.2s delay for NPCI DBT Clearing)
+    setTimeout(() => {
+      const freshDb = this.getDb();
+      const currentItem = (freshDb.sharedProcurements || []).find(p => p.id === procurementId);
+      if (currentItem) {
+        currentItem.paymentStatus = 'SUCCESS';
+        currentItem.paymentId = generateId('PAY');
+        currentItem.finalPaidAmount = currentItem.estimatedPayable;
+        currentItem.utrNo = `SBIN00${Math.floor(10000000 + Math.random() * 90000000)}`;
+        currentItem.paidAt = new Date().toISOString();
+        currentItem.receiptNo = `RCP-${currentItem.id}`;
+
+        freshDb.payments = freshDb.payments || [];
+        freshDb.payments.unshift({
+          id: currentItem.paymentId,
+          procurementOrderId: currentItem.id,
+          lotId: currentItem.id,
+          farmerId: currentItem.farmerId,
+          farmerName: currentItem.farmerName,
+          amount: currentItem.finalPaidAmount,
+          status: 'COMPLETED',
+          txnRef: currentItem.utrNo,
+          bank: 'SBI A/C XXXX4892 (NPCI-DBT Verified)',
+          completedAt: currentItem.paidAt
+        });
+
+        this.emitEvent(freshDb, 'PAYMENT_CREDITED', 'SHARED_PROCUREMENT', procurementId, 'SBI_NPCI_GATEWAY', {
+          role: 'SYSTEM',
+          oldVal: 'PROCESSING',
+          newVal: 'SUCCESS'
+        });
+
+        this.save(freshDb);
+      }
+    }, 1200);
+
+    // Downstream Role 1: Warehouse Stock Entry
+    item.warehouseStockStatus = 'IN_STOCK';
+    db.inventoryLots = db.inventoryLots || [];
+    db.inventoryLots.unshift({
+      id: generateId('INV'),
+      warehouseId: item.warehouseId,
+      warehouseName: item.warehouseName,
+      lotId: item.id,
+      receivedQty: item.quantityKg,
+      availableQty: item.quantityKg,
+      reservedQty: 0,
+      dispatchedQty: 0,
+      damagedQty: 0,
+      receivedAt: item.approvedAt,
+      crop: item.crop,
+      farmer: item.farmerName,
+      grade: item.aiAnalysis?.grade || 'GRADE A',
+      status: 'AVAILABLE'
+    });
+
+    // Downstream Role 2: Transporter Dispatch Movement Job
+    item.transporterStatus = 'READY_FOR_MOVEMENT';
+    item.transporterId = 'TRUCK-FLEET-44910';
+    db.dispatches = db.dispatches || [];
+    db.dispatches.unshift({
+      id: generateId('DSP'),
+      lotId: item.id,
+      vehicleNo: 'HR-10-AB-9981',
+      transporter: 'Baljit Singh Transport',
+      origin: item.procurementCenter,
+      destination: item.warehouseName,
+      quantityKg: item.quantityKg,
+      status: 'READY',
+      createdAt: item.approvedAt
+    });
+
+    // Downstream Role 3: Stock Available to Buyer/Trader in Marketplace
+    item.buyerAvailable = true;
+
+    this.emitEvent(db, 'PROCUREMENT_APPROVED', 'SHARED_PROCUREMENT', procurementId, officerId, {
+      role: 'GOVT_OFFICER',
+      oldVal: 'WEIGHED',
+      newVal: 'APPROVED_AND_PAID'
+    });
+
+    this.save(db);
+    return item;
+  }
 }
 
 export const dbEngine = new CentralDatabaseEngine();
+

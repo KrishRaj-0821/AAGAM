@@ -1,13 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ChevronLeft, ShieldCheck, CheckCircle2, XCircle, Clock, AlertTriangle, 
   FileText, ArrowRight, Building2, Warehouse, Coins, DollarSign, Bell, 
   Search, Filter, Plus, Eye, RefreshCw, BarChart3, Users, Lock, Download, Truck, AlertCircle
 } from 'lucide-react';
+import { dbEngine } from '../../data/dbEngine';
 
 export default function OfficerPortalPage({ setCurrentView, currentUser, t }) {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
+  const [sharedProcurements, setSharedProcurements] = useState(() => dbEngine.getAllSharedProcurements());
+
+  useEffect(() => {
+    const unsub = dbEngine.subscribe((db) => {
+      setSharedProcurements(db.sharedProcurements || []);
+    });
+    return () => unsub();
+  }, []);
 
   // 1. Procurement Metrics
   const metrics = {
@@ -156,6 +165,88 @@ export default function OfficerPortalPage({ setCurrentView, currentUser, t }) {
                     <div className="text-[10px] text-[#637554] mt-1">{card.sub}</div>
                   </div>
                 ))}
+              </div>
+
+              {/* UNIFIED 8-ROLE SHARED PROCUREMENT OFFICER APPROVAL QUEUE */}
+              <div className="bg-[#081830] text-white rounded-2xl p-5 shadow-xl space-y-4 font-mono text-xs border border-blue-800">
+                <div className="flex justify-between items-center border-b border-blue-800 pb-3">
+                  <div>
+                    <h3 className="font-extrabold text-sm text-blue-300 flex items-center gap-2">
+                      <ShieldCheck className="w-5 h-5 text-blue-400" />
+                      <span>UNIFIED SHARED PROCUREMENT OFFICER APPROVAL QUEUE</span>
+                    </h3>
+                    <p className="text-[11px] text-slate-300">Review verified NIR quality + net weight + final MSP price. Approving triggers automatic payment & downstream portal sync.</p>
+                  </div>
+                  <span className="bg-blue-600 text-white font-bold px-2.5 py-0.5 rounded text-[10px]">GOI PROCUREMENT DESK</span>
+                </div>
+
+                {sharedProcurements.length === 0 ? (
+                  <div className="text-center py-4 text-slate-400">No active shared procurement requests awaiting officer review.</div>
+                ) : (
+                  <div className="space-y-3">
+                    {sharedProcurements.map(proc => {
+                      const isApproved = proc.approvalStatus === 'APPROVED';
+                      const isRejected = proc.approvalStatus === 'REJECTED';
+
+                      return (
+                        <div key={proc.id} className="bg-[#102444] border border-blue-700/60 rounded-xl p-4 space-y-3">
+                          <div className="flex flex-wrap justify-between items-center border-b border-blue-800/80 pb-2">
+                            <div>
+                              <div className="font-black text-amber-300 text-sm flex items-center gap-2">
+                                <span>{proc.id}</span>
+                                <span className="bg-blue-950 text-blue-300 text-[10px] px-2 py-0.5 rounded border border-blue-600/40">
+                                  {proc.crop} ({proc.quantityKg} KG)
+                                </span>
+                              </div>
+                              <div className="text-[11px] text-slate-300">
+                                Farmer: <strong>{proc.farmerName} ({proc.farmerId})</strong> • Center: <strong>{proc.procurementCenter}</strong>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              {isApproved ? (
+                                <span className="bg-emerald-500 text-slate-950 font-black px-3 py-1 rounded-lg text-[10px] flex items-center gap-1">
+                                  <CheckCircle2 className="w-3.5 h-3.5" /> APPROVED & PAYMENT INITIATED
+                                </span>
+                              ) : isRejected ? (
+                                <span className="bg-red-500 text-white font-black px-3 py-1 rounded-lg text-[10px]">REJECTED</span>
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() => {
+                                      dbEngine.approveProcurementByOfficer(proc.id, currentUser?.id || 'GOI-OFF-55012', 'REJECTED');
+                                      alert(`Procurement ${proc.id} Rejected.`);
+                                    }}
+                                    className="bg-red-600/30 hover:bg-red-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs border border-red-500/50 cursor-pointer"
+                                  >
+                                    Reject
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      dbEngine.approveProcurementByOfficer(proc.id, currentUser?.id || 'GOI-OFF-55012', 'APPROVED');
+                                      alert(`Procurement ${proc.id} Approved!\n\nAutomatic Payment Initiated (₹${proc.estimatedPayable?.toLocaleString('en-IN')}).\nStock entry added to Warehouse Portal.\nTransport job created for Transporter.\nStock available to Buyer/Trader.`);
+                                    }}
+                                    className="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black px-4 py-1.5 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow-lg animate-pulse"
+                                  >
+                                    <CheckCircle2 className="w-4 h-4" />
+                                    <span>Approve Procurement & Pay</span>
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 text-[10px] bg-[#081830] p-2.5 rounded-lg text-slate-300">
+                            <div>Quality Grade: <strong className="text-emerald-400">{proc.qualityVerified ? (proc.qualityDetails?.grade || 'GRADE A') : 'Pending Assay'}</strong></div>
+                            <div>Verified Net Weight: <strong className="text-emerald-400">{proc.weighmentVerified ? `${proc.netWeight} KG` : 'Pending Weight'}</strong></div>
+                            <div>MSP Price: <strong className="text-amber-300">₹{proc.aiAnalysis?.mspPerQtl}/Qtl</strong></div>
+                            <div>Total Payable: <strong className="text-emerald-300 text-xs">₹{proc.estimatedPayable?.toLocaleString('en-IN')}</strong></div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* Operational Alerts */}

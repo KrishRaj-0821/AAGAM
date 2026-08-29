@@ -341,14 +341,15 @@ export default function LoginPage({
       setRegisteredUser(foundUser);
       if (foundUser.role) {
         let roleMapped = foundUser.role;
-        if (roleMapped === 'BUYER') roleMapped = 'Trader';
-        else if (roleMapped === 'LOGISTICS_PROVIDER') roleMapped = 'Logistics';
-        else if (roleMapped === 'WAREHOUSE_MANAGER') roleMapped = 'Warehouse';
-        else if (roleMapped === 'CENTER_OPERATOR') roleMapped = 'Operator';
-        else if (roleMapped === 'QUALITY_INSPECTOR') roleMapped = 'Quality';
-        else if (roleMapped === 'OFFICER') roleMapped = 'Officer';
-        else if (roleMapped === 'ADMIN') roleMapped = 'Admin';
-        else roleMapped = 'Farmer';
+        if (roleMapped === 'BUYER' || roleMapped === 'Buyer' || roleMapped === 'Trader') roleMapped = 'Trader';
+        else if (roleMapped === 'LOGISTICS_PROVIDER' || roleMapped === 'Logistics' || roleMapped === 'Transporter') roleMapped = 'Logistics';
+        else if (roleMapped === 'WAREHOUSE_MANAGER' || roleMapped === 'Warehouse') roleMapped = 'Warehouse';
+        else if (roleMapped === 'CENTER_OPERATOR' || roleMapped === 'Operator') roleMapped = 'Operator';
+        else if (roleMapped === 'QUALITY_INSPECTOR' || roleMapped === 'Quality') roleMapped = 'Quality';
+        else if (roleMapped === 'OFFICER' || roleMapped === 'Officer') roleMapped = 'Officer';
+        else if (roleMapped === 'ADMIN' || roleMapped === 'Admin') roleMapped = 'Admin';
+        else if (roleMapped === 'FARMER' || roleMapped === 'Farmer') roleMapped = 'Farmer';
+        else roleMapped = loginRole || 'Farmer';
         setLoginRole(roleMapped);
       }
 
@@ -726,7 +727,33 @@ export default function LoginPage({
                   return (
                     <button
                       key={item.role}
-                      onClick={() => setLoginRole(item.role)}
+                      onClick={() => {
+                        setLoginRole(item.role);
+                        const defaultPhoneMap = {
+                          Farmer: '9876543210',
+                          Trader: '9811088391',
+                          Officer: '9412055012',
+                          Operator: '9823044918',
+                          Quality: '9871100291',
+                          Logistics: '9829033102',
+                          Warehouse: '9810011029',
+                          Admin: '9999900001'
+                        };
+                        const defaultEmailMap = {
+                          Farmer: 'farmer@aagam.gov.in',
+                          Trader: 'buyer@aagam.gov.in',
+                          Officer: 'officer@aagam.gov.in',
+                          Operator: 'operator@aagam.gov.in',
+                          Quality: 'quality@aagam.gov.in',
+                          Logistics: 'logistics@aagam.gov.in',
+                          Warehouse: 'warehouse@aagam.gov.in',
+                          Admin: 'admin@aagam.gov.in'
+                        };
+                        setLoginInput(authMethod === 'mobile' ? defaultPhoneMap[item.role] || '' : defaultEmailMap[item.role] || '');
+                        if (authMethod === 'staffId') setPasswordInput('aagam@2026');
+                        setNotRegistered(false);
+                        setAuthError('');
+                      }}
                       className={`p-3 rounded-xl border text-left flex flex-col justify-between gap-2 transition-all relative ${
                         isSel 
                           ? 'bg-[#71873f] text-white border-[#71873f] shadow-md scale-[1.02]' 
@@ -888,7 +915,11 @@ export default function LoginPage({
                     {[
                       { role: 'Farmer', label: 'Farmer: 98765 43210', phone: '9876543210', email: 'farmer@aagam.gov.in' },
                       { role: 'Trader', label: 'Buyer: 98110 88391', phone: '9811088391', email: 'buyer@aagam.gov.in' },
+                      { role: 'Officer', label: 'Govt Officer: 94120 55012', phone: '9412055012', email: 'officer@aagam.gov.in' },
                       { role: 'Operator', label: 'Operator: 98230 44918', phone: '9823044918', email: 'operator@aagam.gov.in' },
+                      { role: 'Quality', label: 'Quality Assayer: 98711 00291', phone: '9871100291', email: 'quality@aagam.gov.in' },
+                      { role: 'Logistics', label: 'Transporter: 98290 33102', phone: '9829033102', email: 'logistics@aagam.gov.in' },
+                      { role: 'Warehouse', label: 'Godam Manager: 98100 11029', phone: '9810011029', email: 'warehouse@aagam.gov.in' },
                       { role: 'Admin', label: 'Admin: 99999 00001', phone: '9999900001', email: 'admin@aagam.gov.in' },
                     ].map((item) => (
                       <button
@@ -901,7 +932,7 @@ export default function LoginPage({
                           setNotRegistered(false);
                           setAuthError('');
                         }}
-                        className="bg-white hover:bg-[#71873f] hover:text-white px-2 py-1 rounded-lg border border-[#abbe99] text-[#243118] transition-colors text-[10px] font-bold"
+                        className="bg-white hover:bg-[#71873f] hover:text-white px-2 py-1 rounded-lg border border-[#abbe99] text-[#243118] transition-colors text-[10px] font-bold cursor-pointer"
                       >
                         {item.label}
                       </button>

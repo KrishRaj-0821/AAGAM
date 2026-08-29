@@ -237,10 +237,26 @@ export default function App() {
 
   // Handle Successful Login / Registration
   const handleLoginSuccess = (userData) => {
-    setCurrentUser(userData);
-    setActiveRole(userData.role || 'Farmer');
+    // Normalize role key for App routing
+    let roleKey = userData?.role || activeRole || 'Farmer';
+    if (roleKey === 'Trader' || roleKey === 'BUYER') roleKey = 'Buyer';
+    else if (roleKey === 'Logistics' || roleKey === 'LOGISTICS_PROVIDER' || roleKey === 'Transporter') roleKey = 'Transporter';
+    else if (roleKey === 'QUALITY_INSPECTOR') roleKey = 'Quality';
+    else if (roleKey === 'CENTER_OPERATOR') roleKey = 'Operator';
+    else if (roleKey === 'WAREHOUSE_MANAGER') roleKey = 'Warehouse';
+    else if (roleKey === 'ADMIN') roleKey = 'Admin';
+    else if (roleKey === 'OFFICER') roleKey = 'Officer';
+    else if (roleKey === 'FARMER') roleKey = 'Farmer';
+
+    const normalizedUser = {
+      ...userData,
+      role: roleKey
+    };
+
+    setCurrentUser(normalizedUser);
+    setActiveRole(roleKey);
     try {
-      localStorage.setItem('aagam_auth_user', JSON.stringify(userData));
+      localStorage.setItem('aagam_auth_user', JSON.stringify(normalizedUser));
     } catch (e) {
       console.error(e);
     }
@@ -248,12 +264,12 @@ export default function App() {
     setIsAuthRequiredModalOpen(false);
 
     triggerSuccessNotification({
-      title: t(`Welcome, ${userData.name || 'User'}!`, `स्वागत है, ${userData.name || 'उपयोगकर्ता'}!`),
-      message: t(`Signed in successfully as ${userData.role || activeRole} via GOI Unified SSO.`, `भारत सरकार एसएसओ द्वारा ${userData.role || activeRole} के रूप में सफलतापूर्वक लॉगिन किया गया।`),
-      tokenNo: userData.token || userData.id
+      title: t(`Welcome, ${normalizedUser.name || 'User'}!`, `स्वागत है, ${normalizedUser.name || 'उपयोगकर्ता'}!`),
+      message: t(`Signed in successfully as ${roleKey} via GOI Unified SSO.`, `भारत सरकार एसएसओ द्वारा ${roleKey} के रूप में सफलतापूर्वक लॉगिन किया गया।`),
+      tokenNo: normalizedUser.token || normalizedUser.id
     });
 
-    // Route to pending portal if user was trying to access one
+    // Route directly to the corresponding role portal!
     if (pendingRedirect?.view) {
       if (pendingRedirect.role) setActiveRole(pendingRedirect.role);
       setCurrentView(pendingRedirect.view);
@@ -264,8 +280,10 @@ export default function App() {
     } else if (pendingRedirect?.openDbt) {
       setCurrentView('home');
       setIsDbtModalOpen(true);
+    } else if (roleKey === 'Logistics' || roleKey === 'Transporter') {
+      setCurrentView('logistics');
     } else {
-      setCurrentView('home');
+      setCurrentView('portal');
     }
 
     setPendingRedirect(null);

@@ -3,13 +3,17 @@ import {
   ChevronLeft, Sprout, MapPin, Layers, Plus, Calendar, Clock, DollarSign, 
   FileText, ShieldCheck, CheckCircle2, AlertTriangle, HelpCircle, Bell, 
   Search, Filter, Eye, Download, UserCheck, CreditCard, Building2, ArrowRight,
-  MessageSquare, Send, Check, X, RefreshCw, Smartphone, Mail, Printer, Sparkles, Coins
+  MessageSquare, Send, Check, X, RefreshCw, Smartphone, Mail, Printer, Sparkles, Coins, Upload, CheckCircle
 } from 'lucide-react';
 import { api } from '../../services/api';
+import { dbEngine } from '../../data/dbEngine';
 
 export default function FarmerPortalPage({ setCurrentView, currentUser, openGatePassWithAuth, t }) {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [liveStats, setLiveStats] = useState(null);
+
+  // Real-time Central DB Synchronization across all 8 Connected Portals
+  const [sharedProcurements, setSharedProcurements] = useState(() => dbEngine.getAllSharedProcurements());
 
   useEffect(() => {
     async function loadFarmerData() {
@@ -23,7 +27,89 @@ export default function FarmerPortalPage({ setCurrentView, currentUser, openGate
       }
     }
     loadFarmerData();
+
+    // Subscribe to Central DB Engine
+    const unsubscribe = dbEngine.subscribe((db) => {
+      setSharedProcurements(db.sharedProcurements || []);
+    });
+    return () => unsubscribe();
   }, []);
+
+  // Sell Crop Workflow Modal & AI Analysis State
+  const [isSellCropModalOpen, setIsSellCropModalOpen] = useState(false);
+  const [sellFormStep, setSellFormStep] = useState(1); // 1: Form & Image, 2: AI Analysis & Estimate, 3: Success
+  const [sellForm, setSellForm] = useState({
+    crop: 'Wheat',
+    variety: 'HD-2967 (Sharbati)',
+    quantityKg: '5000',
+    state: currentUser?.state || 'Haryana',
+    district: currentUser?.district || 'Karnal',
+    procurementCenter: 'Karnal Central Grain Yard',
+    imagePreview: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=600&q=80'
+  });
+
+  const [aiAnalysis, setAiAnalysis] = useState({
+    moisture: 10.5,
+    foreignMatter: 0.3,
+    damagedGrains: 0.8,
+    grade: 'GRADE A',
+    confidence: '98.5%',
+    mspPerQtl: 2470
+  });
+
+  const [createdProcurement, setCreatedProcurement] = useState(null);
+  const [selectedReceipt, setSelectedReceipt] = useState(null);
+
+  // Crop MSP Price Mapping
+  const cropMspRates = {
+    'Wheat': 2470,
+    'Paddy Basmati': 2300,
+    'Mustard': 5950,
+    'Chana': 5650,
+    'Maize': 2225,
+    'Soyabean': 4892
+  };
+
+  const handleCropChange = (cropName) => {
+    const rate = cropMspRates[cropName] || 2470;
+    setSellForm(prev => ({ ...prev, crop: cropName }));
+    setAiAnalysis(prev => ({ ...prev, mspPerQtl: rate }));
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setSellForm(prev => ({ ...prev, imagePreview: url }));
+    }
+  };
+
+  const handleFarmerSubmitProcurement = (e) => {
+    e.preventDefault();
+    const qtyKg = parseFloat(sellForm.quantityKg || 5000);
+    const msp = aiAnalysis.mspPerQtl;
+    const newProc = dbEngine.createSharedProcurement({
+      farmerId: currentUser?.id || 'PB-FARM-99482',
+      farmerName: currentUser?.name || 'Gurpreet Singh',
+      farmerPhone: currentUser?.mobile || '+91 98765 43210',
+      crop: sellForm.crop,
+      variety: sellForm.variety,
+      quantityKg: qtyKg,
+      quantityQtl: qtyKg / 100,
+      state: sellForm.state,
+      district: sellForm.district,
+      procurementCenter: sellForm.procurementCenter,
+      qualityReportImg: sellForm.imagePreview,
+      aiAnalysis: {
+        ...aiAnalysis,
+        mspPerQtl: msp
+      },
+      mspPerQtl: msp
+    });
+
+    setCreatedProcurement(newProc);
+    setSellFormStep(3);
+  };
 
   // Dynamic Real User Profile Resolution (No Static Dummy Overrides)
   const farmerProfile = {
@@ -341,9 +427,20 @@ Message       : ${ntf.message}
                   <h2 className="text-xl font-extrabold text-[#243118]">{t('FARMER DASHBOARD', 'किसान डैशबोर्ड')}</h2>
                   <p className="text-xs text-[#637554]">{t('My agricultural produce, active lots, and DBT payment status', 'मेरी कृषि उपज, सक्रिय लॉट, और डीबीटी भुगतान स्थिति')}</p>
                 </div>
-                <button onClick={openGatePassWithAuth} className="bg-[#71873f] hover:bg-[#5c7031] text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2 cursor-pointer shadow-md">
-                  <Plus className="w-4 h-4" /> {t('Book Mandi Slot & QR Gate Pass', 'मंडी स्लॉट एवं क्यूआर गेट पास बुक करें')}
-                </button>
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => {
+                      setSellFormStep(1);
+                      setIsSellCropModalOpen(true);
+                    }}
+                    className="bg-amber-600 hover:bg-amber-700 text-white font-extrabold px-4 py-2 rounded-xl text-xs flex items-center gap-2 cursor-pointer shadow-lg shadow-amber-600/30 animate-bounce"
+                  >
+                    <Sprout className="w-4 h-4 text-amber-200" /> {t('Sell Crop', 'फसल बेचें')}
+                  </button>
+                  <button onClick={openGatePassWithAuth} className="bg-[#71873f] hover:bg-[#5c7031] text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2 cursor-pointer shadow-md">
+                    <Plus className="w-4 h-4" /> {t('Book Mandi Slot & QR Gate Pass', 'मंडी स्लॉट एवं क्यूआर गेट पास बुक करें')}
+                  </button>
+                </div>
               </div>
 
               {/* 7 Core Metric Cards */}
@@ -382,6 +479,119 @@ Message       : ${ntf.message}
                     </div>
                   ))}
                 </div>
+              </div>
+
+              {/* UNIFIED 8-ROLE SHARED PROCUREMENT WORKFLOW TRACKER */}
+              <div className="bg-[#1c2713] text-white rounded-2xl p-5 shadow-xl space-y-4 font-mono">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#abbe99]/30 pb-3">
+                  <div>
+                    <h3 className="font-extrabold text-sm text-amber-400 flex items-center gap-2">
+                      <Sprout className="w-5 h-5 text-amber-400" />
+                      <span>{t('MY UNIFIED PROCUREMENT REQUESTS & LIVE PAYMENT STATUS', 'मेरी एकीकृत फसल खरीद एवं लाइव भुगतान स्थिति')}</span>
+                    </h3>
+                    <p className="text-[11px] text-slate-300">
+                      {t('Synchronized live across all 8 connected portals with ONE shared Procurement ID', 'एक ही खरीद आईडी के साथ सभी 8 पोर्टल पर लाइव सिंक')}
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => { setSellFormStep(1); setIsSellCropModalOpen(true); }}
+                    className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-4 py-1.5 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow-md"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>{t('Sell New Crop', 'नई फसल बेचें')}</span>
+                  </button>
+                </div>
+
+                {sharedProcurements.length === 0 ? (
+                  <div className="text-center py-6 text-slate-400 text-xs border border-dashed border-[#abbe99]/30 rounded-xl">
+                    {t('No active procurement requests yet. Click "Sell Crop" to submit your grain lot.', 'कोई सक्रिय खरीद अनुरोध नहीं। अपनी फसल बेचने के लिए "फसल बेचें" पर क्लिक करें।')}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {sharedProcurements.map(proc => {
+                      const isQualityPassed = proc.qualityVerified;
+                      const isWeighed = proc.weighmentVerified;
+                      const isApproved = proc.approvalStatus === 'APPROVED';
+                      const isPaid = proc.paymentStatus === 'SUCCESS';
+
+                      return (
+                        <div key={proc.id} className="bg-[#28381c] border border-[#abbe99]/40 rounded-xl p-4 space-y-3">
+                          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#abbe99]/20 pb-2">
+                            <div>
+                              <div className="text-sm font-extrabold text-amber-300 flex items-center gap-2">
+                                <span>{proc.id}</span>
+                                <span className="bg-amber-400/20 text-amber-200 text-[10px] px-2 py-0.5 rounded border border-amber-400/40">
+                                  {proc.crop} ({proc.quantityKg} KG / {proc.quantityQtl} Qtl)
+                                </span>
+                              </div>
+                              <div className="text-[11px] text-slate-300 mt-0.5">
+                                {proc.procurementCenter} • {proc.district}, {proc.state}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              {/* Payment Status Badge */}
+                              <div className="text-right">
+                                <div className="text-[10px] uppercase font-bold text-slate-400">{t('Payment Status:', 'भुगतान स्थिति:')}</div>
+                                <span className={`inline-block font-extrabold px-2.5 py-0.5 rounded text-[10px] ${
+                                  isPaid ? 'bg-emerald-500 text-slate-950 font-black' : 
+                                  isApproved ? 'bg-blue-500 text-white' : 'bg-amber-500/30 text-amber-300 border border-amber-500/50'
+                                }`}>
+                                  {isPaid ? 'SUCCESS (CREDITED)' : isApproved ? 'PROCESSING' : 'PENDING APPROVAL'}
+                                </span>
+                              </div>
+
+                              {isPaid && (
+                                <button
+                                  onClick={() => setSelectedReceipt(proc)}
+                                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 cursor-pointer"
+                                >
+                                  <FileText className="w-3.5 h-3.5" />
+                                  <span>{t('Receipt', 'रसीद')}</span>
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Real-time 4-Stage Synchronized Progress Tracker */}
+                          <div className="grid grid-cols-4 gap-1 text-[10px] pt-1">
+                            <div className={`p-2 rounded-lg text-center ${true ? 'bg-emerald-950 border border-emerald-500/50 text-emerald-300' : 'bg-slate-800 text-slate-400'}`}>
+                              <div className="font-extrabold">1. {t('Submitted', 'जमा किया')}</div>
+                              <div className="text-[9px] text-emerald-400">✓ Farmer</div>
+                            </div>
+                            <div className={`p-2 rounded-lg text-center ${isQualityPassed ? 'bg-emerald-950 border border-emerald-500/50 text-emerald-300' : 'bg-amber-950/40 border border-amber-500/30 text-amber-300 animate-pulse'}`}>
+                              <div className="font-extrabold">2. {t('Quality', 'गुणवत्ता')}</div>
+                              <div className="text-[9px]">{isQualityPassed ? '✓ Passed (Assayer)' : '⏳ Testing...'}</div>
+                            </div>
+                            <div className={`p-2 rounded-lg text-center ${isWeighed ? 'bg-emerald-950 border border-emerald-500/50 text-emerald-300' : 'bg-slate-800/80 text-slate-400'}`}>
+                              <div className="font-extrabold">3. {t('Weighment', 'तौल')}</div>
+                              <div className="text-[9px]">{isWeighed ? `✓ ${proc.netWeight} KG` : '⏳ Pending'}</div>
+                            </div>
+                            <div className={`p-2 rounded-lg text-center ${isApproved ? 'bg-emerald-950 border border-emerald-500/50 text-emerald-300' : 'bg-slate-800/80 text-slate-400'}`}>
+                              <div className="font-extrabold">4. {t('Approval', 'स्वीकृति')}</div>
+                              <div className="text-[9px]">{isApproved ? '✓ Officer Approved' : '⏳ Pending'}</div>
+                            </div>
+                          </div>
+
+                          {/* Payable Summary */}
+                          <div className="bg-[#1c2713] p-2.5 rounded-lg flex flex-wrap justify-between items-center text-xs">
+                            <div>
+                              <span className="text-slate-400">{t('Est. Payable:', 'अनुमानित देय:')}</span>{' '}
+                              <strong className="text-amber-300 text-sm">₹{proc.estimatedPayable?.toLocaleString('en-IN')}</strong>
+                              <span className="text-slate-400 text-[10px]"> (@ ₹{proc.aiAnalysis?.mspPerQtl}/Qtl MSP)</span>
+                            </div>
+                            {isPaid && (
+                              <div className="text-emerald-400 font-bold text-[11px] flex items-center gap-1">
+                                <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+                                <span>Paid: ₹{proc.finalPaidAmount?.toLocaleString('en-IN')} • ID: {proc.paymentId}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -930,6 +1140,334 @@ Message       : ${ntf.message}
 
         </main>
       </div>
+
+      {/* ─── SELL CROP WORKFLOW MODAL ─── */}
+      {isSellCropModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 font-mono">
+          <div className="bg-[#1c2713] text-white border border-[#abbe99]/40 rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="flex justify-between items-center border-b border-[#abbe99]/30 pb-3">
+              <div>
+                <h3 className="font-extrabold text-base text-amber-400 flex items-center gap-2">
+                  <Sprout className="w-5 h-5 text-amber-400" />
+                  <span>{t('SELL CROP — AAGAM DIRECT PROCUREMENT', 'फसल बेचें — आगम प्रत्यक्ष सरकारी खरीद')}</span>
+                </h3>
+                <p className="text-[11px] text-slate-300">
+                  {t('Step', 'चरण')} {sellFormStep} {t('of 3: ', 'का 3: ')}
+                  {sellFormStep === 1 ? t('Enter Crop & Location Details', 'फसल और स्थान विवरण दर्ज करें') :
+                   sellFormStep === 2 ? t('AI Quality Scan & Estimated Payable Amount', 'एआई गुणवत्ता जांच एवं अनुमानित देय राशि') :
+                   t('Procurement Submission Successful', 'फसल खरीद अनुरोध सफलतापूर्वक जमा')}
+                </p>
+              </div>
+              <button 
+                onClick={() => setIsSellCropModalOpen(false)} 
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* STEP 1: Enter Crop, Qty, Location & Image */}
+            {sellFormStep === 1 && (
+              <form onSubmit={(e) => { e.preventDefault(); setSellFormStep(2); }} className="space-y-4 text-xs font-sans">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="font-bold text-amber-300">{t('Select Commodity / Crop', 'फसल का चयन करें')}</label>
+                    <select
+                      value={sellForm.crop}
+                      onChange={(e) => handleCropChange(e.target.value)}
+                      className="w-full bg-[#28381c] border border-[#abbe99]/50 rounded-xl p-2.5 font-bold text-white"
+                    >
+                      <option value="Wheat">Wheat (गेहूं) — MSP ₹2,470/Qtl</option>
+                      <option value="Paddy Basmati">Paddy Basmati (धान बासमती) — MSP ₹2,300/Qtl</option>
+                      <option value="Mustard">Mustard (सरसों) — MSP ₹5,950/Qtl</option>
+                      <option value="Chana">Chana Desi (चना) — MSP ₹5,650/Qtl</option>
+                      <option value="Maize">Maize (मक्का) — MSP ₹2,225/Qtl</option>
+                      <option value="Soyabean">Soyabean (सोयाबीन) — MSP ₹4,892/Qtl</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-bold text-amber-300">{t('Variety / Grade Standard', 'किस्म / ग्रेड मानक')}</label>
+                    <input
+                      type="text"
+                      value={sellForm.variety}
+                      onChange={(e) => setSellForm(prev => ({ ...prev, variety: e.target.value }))}
+                      className="w-full bg-[#28381c] border border-[#abbe99]/50 rounded-xl p-2.5 font-bold text-white"
+                      placeholder="e.g. HD-2967 Sharbati"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-bold text-amber-300">{t('Total Quantity (in KG)', 'कुल मात्रा (किलोग्राम में)')}</label>
+                    <input
+                      type="number"
+                      required
+                      min="100"
+                      value={sellForm.quantityKg}
+                      onChange={(e) => setSellForm(prev => ({ ...prev, quantityKg: e.target.value }))}
+                      className="w-full bg-[#28381c] border border-[#abbe99]/50 rounded-xl p-2.5 font-bold text-white text-sm"
+                      placeholder="e.g. 5000"
+                    />
+                    <div className="text-[10px] text-amber-400/90 font-mono">
+                      = {(parseFloat(sellForm.quantityKg || 0) / 100).toFixed(1)} Quintals (Qtl)
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-bold text-amber-300">{t('State', 'राज्य')}</label>
+                    <input
+                      type="text"
+                      value={sellForm.state}
+                      onChange={(e) => setSellForm(prev => ({ ...prev, state: e.target.value }))}
+                      className="w-full bg-[#28381c] border border-[#abbe99]/50 rounded-xl p-2.5 font-bold text-white"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-bold text-amber-300">{t('District', 'जिला')}</label>
+                    <input
+                      type="text"
+                      value={sellForm.district}
+                      onChange={(e) => setSellForm(prev => ({ ...prev, district: e.target.value }))}
+                      className="w-full bg-[#28381c] border border-[#abbe99]/50 rounded-xl p-2.5 font-bold text-white"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-bold text-amber-300">{t('Target Procurement Center', 'लक्ष्य खरीद केंद्र')}</label>
+                    <input
+                      type="text"
+                      value={sellForm.procurementCenter}
+                      onChange={(e) => setSellForm(prev => ({ ...prev, procurementCenter: e.target.value }))}
+                      className="w-full bg-[#28381c] border border-[#abbe99]/50 rounded-xl p-2.5 font-bold text-white"
+                    />
+                  </div>
+                </div>
+
+                {/* Upload Quality Report / Crop Image */}
+                <div className="space-y-2 pt-2">
+                  <label className="font-bold text-amber-300 flex items-center justify-between">
+                    <span>{t('Upload Quality Report / Crop Image', 'गुणवत्ता रिपोर्ट / फसल फोटो अपलोड करें')}</span>
+                    <span className="text-[10px] text-emerald-400 font-mono">AI Visual Scanner Ready</span>
+                  </label>
+                  <div className="flex items-center gap-4 bg-[#28381c] p-3 rounded-xl border border-dashed border-[#abbe99]/50">
+                    <img 
+                      src={sellForm.imagePreview} 
+                      alt="Crop Sample" 
+                      className="w-16 h-16 object-cover rounded-lg border border-amber-400/40 shrink-0" 
+                    />
+                    <div className="space-y-1.5 flex-1">
+                      <div className="text-[11px] text-slate-300">
+                        {t('Upload grain sample photo or lab assay report for instant AI verification.', 'एआई सत्यापन के लिए फसल की फोटो अपलोड करें।')}
+                      </div>
+                      <label className="bg-[#71873f] hover:bg-[#5c7031] text-white font-bold px-3 py-1.5 rounded-lg text-[11px] inline-flex items-center gap-1.5 cursor-pointer">
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>{t('Choose Image / File', 'फोटो चुनें')}</span>
+                        <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-[#abbe99]/30 flex justify-end gap-2">
+                  <button 
+                    type="button" 
+                    onClick={() => setIsSellCropModalOpen(false)}
+                    className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 font-bold"
+                  >
+                    {t('Cancel', 'रद्द करें')}
+                  </button>
+                  <button 
+                    type="submit"
+                    className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black flex items-center gap-2 cursor-pointer shadow-lg shadow-amber-500/30"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    <span>{t('Run AI Quality Analysis →', 'एआई गुणवत्ता विश्लेषण चलाएं →')}</span>
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* STEP 2: AI Quality Analysis & Estimated Payable Amount */}
+            {sellFormStep === 2 && (
+              <div className="space-y-4 font-mono text-xs">
+                <div className="bg-[#28381c] border border-amber-400/50 rounded-2xl p-4 space-y-3">
+                  <div className="flex items-center justify-between border-b border-amber-400/30 pb-2">
+                    <span className="font-extrabold text-amber-300 flex items-center gap-1.5">
+                      <Sparkles className="w-4 h-4 text-amber-400 animate-spin" />
+                      AAGAM NIR Visual Quality Scan Results
+                    </span>
+                    <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold px-2 py-0.5 rounded">
+                      Confidence: {aiAnalysis.confidence}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-[11px]">
+                    <div className="bg-[#1c2713] p-2 rounded-xl border border-[#abbe99]/30">
+                      <div className="text-slate-400 text-[10px]">Moisture Content</div>
+                      <div className="text-base font-extrabold text-emerald-400">{aiAnalysis.moisture}%</div>
+                      <div className="text-[9px] text-emerald-300">✓ Safe (&lt;12%)</div>
+                    </div>
+
+                    <div className="bg-[#1c2713] p-2 rounded-xl border border-[#abbe99]/30">
+                      <div className="text-slate-400 text-[10px]">Foreign Matter</div>
+                      <div className="text-base font-extrabold text-emerald-400">{aiAnalysis.foreignMatter}%</div>
+                      <div className="text-[9px] text-emerald-300">✓ FAQ Passed</div>
+                    </div>
+
+                    <div className="bg-[#1c2713] p-2 rounded-xl border border-[#abbe99]/30">
+                      <div className="text-slate-400 text-[10px]">Damaged Grains</div>
+                      <div className="text-base font-extrabold text-amber-300">{aiAnalysis.damagedGrains}%</div>
+                      <div className="text-[9px] text-amber-200">✓ Minor</div>
+                    </div>
+
+                    <div className="bg-[#1c2713] p-2 rounded-xl border border-emerald-500/50">
+                      <div className="text-slate-400 text-[10px]">Assigned Grade</div>
+                      <div className="text-base font-black text-emerald-300">{aiAnalysis.grade}</div>
+                      <div className="text-[9px] text-emerald-400">Govt Procurement Ready</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Estimated Payable Calculation Box */}
+                <div className="bg-[#0f170a] border border-emerald-500/60 rounded-2xl p-4 text-center space-y-2">
+                  <div className="text-xs text-slate-300 font-bold uppercase tracking-wider">
+                    {t('ESTIMATED PAYABLE AMOUNT', 'अनुमानित देय भुगतान राशि')}
+                  </div>
+                  <div className="text-3xl font-black text-emerald-400">
+                    ₹{((parseFloat(sellForm.quantityKg || 0) / 100) * aiAnalysis.mspPerQtl).toLocaleString('en-IN')}
+                  </div>
+                  <div className="text-[11px] text-slate-300 flex items-center justify-center gap-3 border-t border-emerald-900/60 pt-2">
+                    <span>{sellForm.crop} ({(parseFloat(sellForm.quantityKg || 0)/100).toFixed(1)} Qtl)</span>
+                    <span>×</span>
+                    <span>Official MSP ₹{aiAnalysis.mspPerQtl}/Qtl</span>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center pt-2">
+                  <button 
+                    onClick={() => setSellFormStep(1)}
+                    className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 font-bold"
+                  >
+                    ← {t('Edit Details', 'विवरण बदलें')}
+                  </button>
+                  <button 
+                    onClick={handleFarmerSubmitProcurement}
+                    className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-sm flex items-center gap-2 cursor-pointer shadow-lg shadow-emerald-500/40"
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    <span>{t('Submit Procurement Request', 'खरीद अनुरोध जमा करें')}</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 3: Submission Confirmation & Shared Procurement ID */}
+            {sellFormStep === 3 && createdProcurement && (
+              <div className="space-y-4 text-center font-mono py-3">
+                <div className="w-16 h-16 bg-emerald-500 text-slate-950 rounded-full flex items-center justify-center mx-auto shadow-xl animate-bounce">
+                  <CheckCircle className="w-10 h-10" />
+                </div>
+
+                <div>
+                  <div className="text-xs text-emerald-400 font-extrabold uppercase">{t('SHARED PROCUREMENT ID GENERATED', 'एकीकृत खरीद आईडी तैयार')}</div>
+                  <div className="text-2xl font-black text-amber-300 mt-1">{createdProcurement.id}</div>
+                  <p className="text-xs text-slate-300 mt-2 max-w-md mx-auto">
+                    {t('Your crop procurement request is now registered in the national database.', 'आपका फसल खरीद अनुरोध राष्ट्रीय डेटाबेस में पंजीकृत हो गया है।')}
+                  </p>
+                </div>
+
+                <div className="bg-[#28381c] p-3 rounded-xl border border-emerald-500/40 text-left text-xs space-y-1.5">
+                  <div className="flex justify-between"><span className="text-slate-400">Selected Center:</span> <strong className="text-white">{createdProcurement.procurementCenter}</strong></div>
+                  <div className="flex justify-between"><span className="text-slate-400">Crop & Quantity:</span> <strong className="text-amber-300">{createdProcurement.crop} ({createdProcurement.quantityKg} KG)</strong></div>
+                  <div className="flex justify-between"><span className="text-slate-400">Estimated Value:</span> <strong className="text-emerald-400">₹{createdProcurement.estimatedPayable?.toLocaleString('en-IN')}</strong></div>
+                  <div className="flex justify-between"><span className="text-slate-400">Live Portal Synchronization:</span> <strong className="text-emerald-300">Connected to 8 Portals ✓</strong></div>
+                </div>
+
+                <button 
+                  onClick={() => setIsSellCropModalOpen(false)}
+                  className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs cursor-pointer shadow-lg"
+                >
+                  {t('Close & Track Live Progress', 'बंद करें एवं लाइव प्रगति देखें')}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ─── DIGITAL PROCUREMENT RECEIPT MODAL ─── */}
+      {selectedReceipt && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 font-mono">
+          <div className="bg-white text-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border-2 border-emerald-600 animate-in fade-in zoom-in-95 duration-200">
+            {/* GOI Header */}
+            <div className="text-center border-b-2 border-emerald-800 pb-3 space-y-1">
+              <div className="bg-emerald-800 text-white text-[10px] font-black uppercase tracking-widest py-1 rounded">
+                GOVERNMENT OF INDIA • AAGAM DIRECT PROCUREMENT RECEIPT
+              </div>
+              <h2 className="text-lg font-black text-emerald-900 mt-2">DIGITAL PAYMENT RECEIPT</h2>
+              <div className="text-[11px] text-slate-600 font-bold">Receipt ID: {selectedReceipt.receiptNo}</div>
+            </div>
+
+            <div className="space-y-2 text-xs">
+              <div className="flex justify-between border-b pb-1.5">
+                <span className="text-slate-500">Procurement ID:</span>
+                <strong className="text-emerald-900">{selectedReceipt.id}</strong>
+              </div>
+              <div className="flex justify-between border-b pb-1.5">
+                <span className="text-slate-500">Farmer Name:</span>
+                <strong>{selectedReceipt.farmerName}</strong>
+              </div>
+              <div className="flex justify-between border-b pb-1.5">
+                <span className="text-slate-500">Crop & Variety:</span>
+                <strong>{selectedReceipt.crop} ({selectedReceipt.variety})</strong>
+              </div>
+              <div className="flex justify-between border-b pb-1.5">
+                <span className="text-slate-500">Net Weight Verified:</span>
+                <strong>{selectedReceipt.netWeight || selectedReceipt.quantityKg} KG</strong>
+              </div>
+              <div className="flex justify-between border-b pb-1.5">
+                <span className="text-slate-500">Procurement Center:</span>
+                <strong className="text-right">{selectedReceipt.procurementCenter}</strong>
+              </div>
+              <div className="flex justify-between border-b pb-1.5 bg-emerald-50 p-2 rounded-lg text-emerald-950">
+                <span className="font-extrabold">Final Paid Amount:</span>
+                <strong className="text-base text-emerald-800 font-black">₹{selectedReceipt.finalPaidAmount?.toLocaleString('en-IN')}</strong>
+              </div>
+              <div className="flex justify-between border-b pb-1.5">
+                <span className="text-slate-500">Payment ID:</span>
+                <strong className="text-slate-800">{selectedReceipt.paymentId}</strong>
+              </div>
+              <div className="flex justify-between border-b pb-1.5">
+                <span className="text-slate-500">Bank UTR Ref:</span>
+                <strong className="text-slate-800">{selectedReceipt.utrNo}</strong>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Payment Status:</span>
+                <strong className="text-emerald-700 font-black">SUCCESS (CREDITED TO BANK)</strong>
+              </div>
+            </div>
+
+            {/* Receipt Footer with Print & Close */}
+            <div className="pt-3 border-t flex gap-2">
+              <button 
+                onClick={() => window.print()} 
+                className="flex-1 py-2 rounded-xl bg-slate-900 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <Printer className="w-4 h-4" />
+                <span>Print / Download Receipt</span>
+              </button>
+              <button 
+                onClick={() => setSelectedReceipt(null)} 
+                className="px-4 py-2 rounded-xl bg-slate-200 text-slate-800 font-bold text-xs cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

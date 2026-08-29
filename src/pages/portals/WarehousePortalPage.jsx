@@ -1,13 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ChevronLeft, Warehouse, Package, Truck, Calendar, Clock, AlertTriangle, 
   CheckCircle2, XCircle, FileText, ArrowRight, ShieldCheck, RefreshCw, 
   MapPin, Layers, Ban, Lock, Bell, Search, Filter, Plus, ArrowUpRight, ArrowDownLeft, Download
 } from 'lucide-react';
+import { dbEngine } from '../../data/dbEngine';
 
 export default function WarehousePortalPage({ setCurrentView, currentUser, t }) {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
+  const [sharedProcurements, setSharedProcurements] = useState(() => dbEngine.getAllSharedProcurements());
+
+  useEffect(() => {
+    const unsub = dbEngine.subscribe((db) => {
+      setSharedProcurements(db.sharedProcurements || []);
+    });
+    return () => unsub();
+  }, []);
 
   // 1. Dashboard Metrics
   const metrics = {
@@ -224,7 +233,57 @@ export default function WarehousePortalPage({ setCurrentView, currentUser, t }) 
                   <span>Restriction Rule: The Warehouse Manager verifies physical weight and generates GRN. Quality Grade cannot be altered.</span>
                 </div>
                 <div className="space-y-2">
-                  {incomingProcurement.map(lot => (
+                  {/* UNIFIED 8-ROLE SHARED PROCUREMENT STOCK ENTRY */}
+              <div className="bg-[#142618] text-white rounded-2xl p-5 shadow-xl space-y-4 font-mono text-xs border border-emerald-800">
+                <div className="flex justify-between items-center border-b border-emerald-800 pb-3">
+                  <div>
+                    <h3 className="font-extrabold text-sm text-emerald-300 flex items-center gap-2">
+                      <Warehouse className="w-5 h-5 text-emerald-400" />
+                      <span>UNIFIED SHARED PROCUREMENT STOCK ENTRY & WAREHOUSE INVENTORY</span>
+                    </h3>
+                    <p className="text-[11px] text-slate-300">Approved shared procurement lots are automatically received & logged into inventory.</p>
+                  </div>
+                  <span className="bg-emerald-600 text-white font-bold px-2.5 py-0.5 rounded text-[10px]">CWC SILO COMPLEX #04</span>
+                </div>
+
+                {sharedProcurements.filter(p => p.approvalStatus === 'APPROVED').length === 0 ? (
+                  <div className="text-center py-4 text-slate-400">No approved shared procurement stock received yet.</div>
+                ) : (
+                  <div className="space-y-3">
+                    {sharedProcurements.filter(p => p.approvalStatus === 'APPROVED').map(proc => (
+                      <div key={proc.id} className="bg-[#1c3822] border border-emerald-700/60 rounded-xl p-4 space-y-2">
+                        <div className="flex flex-wrap justify-between items-center border-b border-emerald-800/80 pb-2">
+                          <div>
+                            <div className="font-black text-amber-300 text-sm flex items-center gap-2">
+                              <span>{proc.id}</span>
+                              <span className="bg-emerald-950 text-emerald-300 text-[10px] px-2 py-0.5 rounded border border-emerald-600/40">
+                                {proc.crop} ({proc.quantityKg} KG Net Stock)
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-slate-300">
+                              Farmer: <strong>{proc.farmerName}</strong> • Origin: <strong>{proc.procurementCenter}</strong>
+                            </div>
+                          </div>
+
+                          <div>
+                            <span className="bg-emerald-500 text-slate-950 font-black px-3 py-1 rounded-lg text-[10px] flex items-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5" /> IN STOCK (Zone A - Silo 04)
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[10px] bg-[#142618] p-2 rounded-lg text-slate-300">
+                          <div>Quality Grade: <strong className="text-emerald-400">{proc.qualityDetails?.grade || 'GRADE A'}</strong></div>
+                          <div>Received Qty: <strong className="text-emerald-400">{proc.quantityKg} KG</strong></div>
+                          <div>Status: <strong className="text-amber-300">AVAILABLE FOR TRADING / DISPATCH</strong></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Incoming Procurement Lots */}{incomingProcurement.map(lot => (
                     <div key={lot.lotId} className="border border-emerald-100 rounded-xl p-4 flex flex-wrap justify-between items-center gap-3">
                       <div>
                         <div className="font-extrabold text-sm text-[#142618]">{lot.lotId} — {lot.crop}</div>

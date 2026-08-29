@@ -1,13 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ChevronLeft, QrCode, Truck, UserCheck, Scale, Microscope, Gavel, 
   FileText, ArrowRight, Building2, Bell, Search, Filter, Plus, CheckCircle2, 
   RefreshCw, Clock, Layers, Lock, Download, DollarSign, Trophy
 } from 'lucide-react';
+import { dbEngine } from '../../data/dbEngine';
 
 export default function OperatorPortalPage({ setCurrentView, currentUser, t }) {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
+  const [sharedProcurements, setSharedProcurements] = useState(() => dbEngine.getAllSharedProcurements());
+
+  const [weighInputs, setWeighInputs] = useState({});
+
+  useEffect(() => {
+    const unsub = dbEngine.subscribe((db) => {
+      setSharedProcurements(db.sharedProcurements || []);
+    });
+    return () => unsub();
+  }, []);
 
   // 1. Mandi Metrics
   const metrics = {
@@ -156,6 +167,98 @@ export default function OperatorPortalPage({ setCurrentView, currentUser, t }) {
                     </div>
                   );
                 })}
+              </div>
+
+              {/* UNIFIED 8-ROLE SHARED PROCUREMENT WEIGHMENT QUEUE */}
+              <div className="bg-[#243118] text-white rounded-2xl p-5 shadow-xl space-y-4 font-mono text-xs border border-[#abbe99]/40">
+                <div className="flex justify-between items-center border-b border-[#abbe99]/30 pb-3">
+                  <div>
+                    <h3 className="font-extrabold text-sm text-amber-300 flex items-center gap-2">
+                      <Scale className="w-5 h-5 text-amber-400" />
+                      <span>UNIFIED SHARED PROCUREMENT WEIGHBRIDGE QUEUE</span>
+                    </h3>
+                    <p className="text-[11px] text-slate-300">Synchronized live with Mandi Operator scale using ONE shared Procurement ID</p>
+                  </div>
+                  <span className="bg-[#71873f] text-white font-bold px-2.5 py-0.5 rounded text-[10px]">ELECTRONIC WEIGHBRIDGE #02</span>
+                </div>
+
+                {sharedProcurements.length === 0 ? (
+                  <div className="text-center py-4 text-slate-400">No active shared procurement requests awaiting weighment.</div>
+                ) : (
+                  <div className="space-y-3">
+                    {sharedProcurements.map(proc => {
+                      const isWeighed = proc.weighmentVerified;
+                      const inputGross = weighInputs[proc.id]?.gross || (proc.quantityKg + 180);
+                      const inputTare = weighInputs[proc.id]?.tare || 180;
+
+                      return (
+                        <div key={proc.id} className="bg-[#1c2713] border border-[#abbe99]/40 rounded-xl p-4 space-y-3">
+                          <div className="flex flex-wrap justify-between items-center border-b border-[#abbe99]/20 pb-2">
+                            <div>
+                              <div className="font-black text-amber-300 text-sm flex items-center gap-2">
+                                <span>{proc.id}</span>
+                                <span className="bg-[#28381c] text-amber-200 text-[10px] px-2 py-0.5 rounded border border-[#abbe99]/30">
+                                  {proc.crop} ({proc.quantityKg} KG Estimated)
+                                </span>
+                              </div>
+                              <div className="text-[11px] text-slate-300">
+                                Farmer: <strong>{proc.farmerName}</strong> • Quality Grade: <strong className="text-emerald-400">{proc.qualityVerified ? (proc.qualityDetails?.grade || 'GRADE A') : 'Pending Quality'}</strong>
+                              </div>
+                            </div>
+
+                            <div>
+                              {isWeighed ? (
+                                <span className="bg-emerald-500 text-slate-950 font-black px-3 py-1 rounded-lg text-[10px] flex items-center gap-1">
+                                  <CheckCircle2 className="w-3.5 h-3.5" /> WEIGHMENT RECORDED ({proc.netWeight} KG NET)
+                                </span>
+                              ) : (
+                                <button
+                                  onClick={() => {
+                                    dbEngine.recordWeighmentByOperator(proc.id, inputGross, inputTare);
+                                    alert(`Weighment Recorded for Shared Procurement ID ${proc.id}!\nGross: ${inputGross} KG, Tare: ${inputTare} KG\nNet Weight: ${inputGross - inputTare} KG.`);
+                                  }}
+                                  className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-4 py-1.5 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow-lg animate-pulse"
+                                >
+                                  <Scale className="w-4 h-4" />
+                                  <span>Record Actual Net Weight</span>
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          {!isWeighed && (
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 bg-[#28381c] p-2.5 rounded-lg border border-[#abbe99]/30">
+                              <div>
+                                <label className="text-[10px] text-slate-300 font-bold block mb-1">Gross Weight (KG):</label>
+                                <input
+                                  type="number"
+                                  value={inputGross}
+                                  onChange={(e) => setWeighInputs(prev => ({ ...prev, [proc.id]: { ...prev[proc.id], gross: e.target.value } }))}
+                                  className="w-full bg-[#1c2713] border border-[#abbe99]/50 rounded p-1.5 text-amber-300 font-extrabold text-xs"
+                                />
+                              </div>
+
+                              <div>
+                                <label className="text-[10px] text-slate-300 font-bold block mb-1">Tare Weight (Truck/Bags KG):</label>
+                                <input
+                                  type="number"
+                                  value={inputTare}
+                                  onChange={(e) => setWeighInputs(prev => ({ ...prev, [proc.id]: { ...prev[proc.id], tare: e.target.value } }))}
+                                  className="w-full bg-[#1c2713] border border-[#abbe99]/50 rounded p-1.5 text-amber-300 font-extrabold text-xs"
+                                />
+                              </div>
+
+                              <div className="text-right flex flex-col justify-center">
+                                <div className="text-[10px] text-slate-400 font-bold">Calculated Net Weight:</div>
+                                <div className="text-base font-black text-emerald-400">{inputGross - inputTare} KG</div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* Mandi Arrivals Queue Preview */}

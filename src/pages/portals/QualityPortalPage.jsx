@@ -1,13 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ChevronLeft, Microscope, CheckCircle2, XCircle, AlertTriangle, FileText, 
   RotateCcw, History, Bell, BarChart3, Search, Filter, Camera, ShieldCheck, 
   Sparkles, Check, ArrowRight, Layers, Lock, Download
 } from 'lucide-react';
+import { dbEngine } from '../../data/dbEngine';
 
 export default function QualityPortalPage({ setCurrentView, currentUser, t }) {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
+  const [sharedProcurements, setSharedProcurements] = useState(() => dbEngine.getAllSharedProcurements());
+
+  useEffect(() => {
+    const unsub = dbEngine.subscribe((db) => {
+      setSharedProcurements(db.sharedProcurements || []);
+    });
+    return () => unsub();
+  }, []);
 
   // Inspection Queue & Lots
   const [inspectionQueue, setInspectionQueue] = useState([
@@ -160,6 +169,78 @@ export default function QualityPortalPage({ setCurrentView, currentUser, t }) {
                     <div className="text-lg font-extrabold text-[#052816]">{card.val}</div>
                   </div>
                 ))}
+              </div>
+
+              {/* UNIFIED 8-ROLE SHARED PROCUREMENT QUALITY INSPECTION */}
+              <div className="bg-[#052816] text-white rounded-2xl p-5 shadow-xl space-y-4 font-mono text-xs border border-emerald-800">
+                <div className="flex justify-between items-center border-b border-emerald-800 pb-3">
+                  <div>
+                    <h3 className="font-extrabold text-sm text-emerald-300 flex items-center gap-2">
+                      <Microscope className="w-5 h-5 text-emerald-400" />
+                      <span>UNIFIED SHARED PROCUREMENT QUALITY VERIFICATION QUEUE</span>
+                    </h3>
+                    <p className="text-[11px] text-slate-300">Synchronized live with Farmer Portal via ONE shared Procurement ID</p>
+                  </div>
+                  <span className="bg-emerald-600 text-white font-bold px-2.5 py-0.5 rounded text-[10px]">LIVE NIR ASSAY</span>
+                </div>
+
+                {sharedProcurements.length === 0 ? (
+                  <div className="text-center py-4 text-slate-400">No active shared procurement requests awaiting quality verification.</div>
+                ) : (
+                  <div className="space-y-3">
+                    {sharedProcurements.map(proc => {
+                      const isVerified = proc.qualityVerified;
+                      return (
+                        <div key={proc.id} className="bg-[#0a3820] border border-emerald-700/60 rounded-xl p-4 space-y-2.5">
+                          <div className="flex flex-wrap justify-between items-center border-b border-emerald-800/80 pb-2">
+                            <div>
+                              <div className="font-black text-amber-300 text-sm flex items-center gap-2">
+                                <span>{proc.id}</span>
+                                <span className="bg-emerald-950 text-emerald-300 text-[10px] px-2 py-0.5 rounded border border-emerald-600/40">
+                                  {proc.crop} ({proc.quantityKg} KG)
+                                </span>
+                              </div>
+                              <div className="text-[11px] text-slate-300">
+                                Farmer: <strong>{proc.farmerName}</strong> • Center: <strong>{proc.procurementCenter}</strong>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              {isVerified ? (
+                                <span className="bg-emerald-500 text-slate-950 font-black px-3 py-1 rounded-lg text-[10px] flex items-center gap-1">
+                                  <CheckCircle2 className="w-3.5 h-3.5" /> QUALITY VERIFIED ({proc.qualityDetails?.grade || 'GRADE A'})
+                                </span>
+                              ) : (
+                                <button
+                                  onClick={() => {
+                                    dbEngine.verifyQualityByAssayer(proc.id, {
+                                      inspectorId: currentUser?.id || 'ASSAY-LAB-77281',
+                                      inspectorName: currentUser?.name || 'Dr. Anita Roy',
+                                      moisture: proc.aiAnalysis?.moisture || 10.5,
+                                      foreignMatter: proc.aiAnalysis?.foreignMatter || 0.3,
+                                      grade: proc.aiAnalysis?.grade || 'GRADE A'
+                                    });
+                                    alert(`Quality Verified & Passed for Shared Procurement ID ${proc.id}!\nGrade: GRADE A (Passed GOI FAQ Standard)`);
+                                  }}
+                                  className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-4 py-1.5 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow-lg animate-pulse"
+                                >
+                                  <Sparkles className="w-4 h-4" />
+                                  <span>Verify Quality & Pass</span>
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-3 gap-2 text-[10px] bg-[#052816] p-2 rounded-lg text-slate-300">
+                            <div>Moisture Content: <strong className="text-emerald-400">{proc.aiAnalysis?.moisture || 10.5}%</strong></div>
+                            <div>Foreign Matter: <strong className="text-emerald-400">{proc.aiAnalysis?.foreignMatter || 0.3}%</strong></div>
+                            <div>Estimated Grade: <strong className="text-amber-300">{proc.aiAnalysis?.grade || 'GRADE A'}</strong></div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* Inspection Queue Preview */}
