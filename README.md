@@ -9,8 +9,14 @@
 ![Language](https://img.shields.io/badge/Bilingual-English_%7C_%E0%A4%B9%E0%A4%BF%E0%A4%A8%E0%A5%8D%E0%A4%A6%E0%A5%80-2E7D32?style=for-the-badge)
 
 ---
-📺 Prototype Demo Video
-<iframe width="560" height="315" src="https://www.youtube.com/embed/I3UYwM5ttdg?si=_Xl8NzfIG3NEf8rH" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+## 📺 Product Demo & Walkthrough
+
+[![AAGAM Demo Video](https://img.youtube.com/vi/I3UYwM5ttdg/maxresdefault.jpg)](https://youtu.be/I3UYwM5ttdg)
+
+> 📹 **[Click here to watch the full walkthrough on YouTube](https://youtu.be/I3UYwM5ttdg)**
+
+---
 
 ## 📌 Executive Summary
 
@@ -98,97 +104,3 @@ AAGAM Platform
 ├── 🔗 12. Crop Traceability Pages (Grain Journey Timeline, Transaction Ledger, Audit Trail, Blockchain Records)
 ├── 🛡️ 13. Admin Pages (User RBAC, Procurement Center Registry, Crop Master Data, API & System Settings)
 └── ⚙️ 14. Common Pages (Notifications, Profile & Security Settings, Language Preferences, Support, 404/500 Pages)
-```
-
----
-
-## 💻 Tech Stack & Architecture
-
-- **Frontend Framework**: [React 18](https://react.dev/) + [Vite 6](https://vitejs.dev/)
-- **Styling & UI**: [Tailwind CSS 3.4](https://tailwindcss.com/) with custom accessibility scaling & high-contrast themes
-- **Icons**: [Lucide React](https://lucide.dev/)
-- **Utilities**: `clsx`, `tailwind-merge` for dynamic component styling
-- **Architecture**: Modular component structure with dynamic routing state and contextual modal management
-
----
-
-## 📁 Directory Structure
-
-```text
-AAGAM/
-├── public/                  # Static assets and public media
-├── src/
-│   ├── components/
-│   │   ├── home/            # Homepage hero sliders, statistics counters, feature grids
-│   │   ├── layout/          # TopHeader (accessibility & language), Navbar, LiveTicker, Footer
-│   │   └── modals/          # GatePassModal, PaymentDbtModal, QuickSearchModal
-│   ├── data/
-│   │   └── mockData.js      # Centralized mock datasets (mandi rates, auctions, crops, transactions)
-│   ├── pages/
-│   │   ├── HomePage.jsx         # Landing page & quick actions
-│   │   ├── LoginPage.jsx        # Multi-role authentication & OTP portal
-│   │   ├── RegisterPage.jsx     # Farmer/Buyer registration workflow
-│   │   ├── MarketplacePage.jsx  # Crop trade listings & price comparison matrix
-│   │   ├── EAuctionPage.jsx     # Live e-auction bidding interface
-│   │   ├── ProcurementPage.jsx  # Mandi center slot booking & virtual queue
-│   │   ├── LogisticsPage.jsx    # Transport booking & live delivery tracking
-│   │   ├── AnalyticsPage.jsx    # AI supply forecasting & arrival trends
-│   │   └── PersonaPortalPage.jsx# Interactive multi-role portal switcher (10 personas)
-│   ├── App.jsx              # Main router, global state & theme configuration
-│   ├── index.css            # Tailwind directives, custom font scalers & contrast styles
-│   └── main.jsx             # React entrypoint
-├── .agents/                 # AI guidelines & 171-page architectural specifications
-├── index.html               # Main HTML shell with Google Fonts
-├── package.json             # NPM dependencies & scripts
-├── tailwind.config.js       # Custom theme color tokens (amber, emerald, slate)
-└── vite.config.js           # Vite build settings
-```
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-Make sure you have [Node.js](https://nodejs.org/) (v18 or higher) and `npm` installed.
-
-### Installation
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/KrishRaj-0821/AAGAM.git
-   cd AAGAM
-   ```
-
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
-
-3. **Start the local development server**:
-   ```bash
-   npm run dev
-   ```
-   Open `http://localhost:5173` in your browser to explore the platform.
-
-4. **Build for production**:
-   ```bash
-   npm run build
-   ```
-   The optimized production bundle will be generated in the `dist/` directory.
-
----
-
-## ⌨️ Keyboard Shortcuts & Accessibility
-
-- **`Ctrl + K` / `Cmd + K`**: Open Quick Search & Navigation Modal.
-- **Language Switcher**: Located in top bar header (English / हिन्दी).
-- **Text Scaling**: Quick toggle in header for `A-` (Small), `A` (Default), `A+` (Large).
-- **High Contrast**: Toggle dark high-contrast mode for outdoor sunlight viewing.
-
----
-
-## 🤝 License & Governance
-
-This project is developed under the **Automated Agricultural Grain & Allocation Management Initiative**. 
-
-For inquiry, feedback, or system integration details, please consult the platform documentation or contact the AAGAM Technical Steering Committee.
