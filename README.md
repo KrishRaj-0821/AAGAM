@@ -9,6 +9,8 @@
 ![Language](https://img.shields.io/badge/Bilingual-English_%7C_%E0%A4%B9%E0%A4%BF%E0%A4%A8%E0%A5%8D%E0%A4%A6%E0%A5%80-2E7D32?style=for-the-badge)
 
 ---
+📺 Prototype Demo Video
+<iframe width="560" height="315" src="https://www.youtube.com/embed/I3UYwM5ttdg?si=_Xl8NzfIG3NEf8rH" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ## 📌 Executive Summary
 
