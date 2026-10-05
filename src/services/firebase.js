@@ -43,6 +43,8 @@ export { app, auth };
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 
+import { api } from './api';
+
 /**
  * Maps a Firebase User credential to an AAGAM persona profile
  */
@@ -58,19 +60,58 @@ export const mapFirebaseUserToAagamProfile = (user, selectedRole = 'Farmer') => 
     photoURL: user.photoURL || null,
     mandi: 'Karnal Central Yard (HR)',
     state: 'Haryana',
-    authMethod: 'Firebase Auth',
+    authMethod: 'Firebase Auth + JWT',
     token: `FB-TOKEN-${user.uid.slice(0, 12)}`,
     emailVerified: user.emailVerified
   };
 };
 
 /**
- * Sign in with Google Popup
+ * Exchanges Firebase ID Token (JWT) with AAGAM Backend for Django REST JWT tokens
+ */
+export const syncFirebaseUserWithBackend = async (firebaseUser, selectedRole = 'Farmer') => {
+  if (!firebaseUser) return null;
+  try {
+    const idToken = await firebaseUser.getIdToken();
+    const res = await api.auth.firebaseLogin(idToken, selectedRole, {
+      email: firebaseUser.email,
+      name: firebaseUser.displayName,
+      phone: firebaseUser.phoneNumber,
+      uid: firebaseUser.uid
+    });
+    if (res?.data?.access) {
+      const backendUser = res.data.user || {};
+      const profile = {
+        ...mapFirebaseUserToAagamProfile(firebaseUser, selectedRole),
+        ...backendUser,
+        name: backendUser.full_name || firebaseUser.displayName || firebaseUser.email?.split('@')[0],
+        token: res.data.access,
+        jwtAccess: res.data.access,
+        jwtRefresh: res.data.refresh,
+        authMethod: 'Firebase + Django JWT'
+      };
+      localStorage.setItem('aagam_auth_user', JSON.stringify(profile));
+      return profile;
+    }
+  } catch (err) {
+    console.warn("Backend Firebase JWT sync fallback:", err);
+    try {
+      const idToken = await firebaseUser.getIdToken();
+      localStorage.setItem('aagam_access_token', idToken);
+    } catch (_) {}
+  }
+  const fallbackProfile = mapFirebaseUserToAagamProfile(firebaseUser, selectedRole);
+  localStorage.setItem('aagam_auth_user', JSON.stringify(fallbackProfile));
+  return fallbackProfile;
+};
+
+/**
+ * Sign in with Google Popup and obtain JWT
  */
 export const signInWithGoogle = async (selectedRole = 'Farmer') => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
-    const userProfile = mapFirebaseUserToAagamProfile(result.user, selectedRole);
+    const userProfile = await syncFirebaseUserWithBackend(result.user, selectedRole);
     return { success: true, user: userProfile, firebaseUser: result.user };
   } catch (error) {
     console.error('Firebase Google Sign-In Error:', error);
@@ -79,12 +120,12 @@ export const signInWithGoogle = async (selectedRole = 'Farmer') => {
 };
 
 /**
- * Sign in with Email and Password
+ * Sign in with Email and Password and obtain JWT
  */
 export const signInWithEmail = async (email, password, selectedRole = 'Farmer') => {
   try {
     const result = await signInWithEmailAndPassword(auth, email, password);
-    const userProfile = mapFirebaseUserToAagamProfile(result.user, selectedRole);
+    const userProfile = await syncFirebaseUserWithBackend(result.user, selectedRole);
     return { success: true, user: userProfile, firebaseUser: result.user };
   } catch (error) {
     console.error('Firebase Email Sign-In Error:', error);
@@ -93,7 +134,7 @@ export const signInWithEmail = async (email, password, selectedRole = 'Farmer') 
 };
 
 /**
- * Register with Email and Password
+ * Register with Email and Password and obtain JWT
  */
 export const registerWithEmail = async (email, password, displayName, selectedRole = 'Farmer') => {
   try {
@@ -101,7 +142,7 @@ export const registerWithEmail = async (email, password, displayName, selectedRo
     if (displayName) {
       await updateProfile(result.user, { displayName });
     }
-    const userProfile = mapFirebaseUserToAagamProfile({ ...result.user, displayName }, selectedRole);
+    const userProfile = await syncFirebaseUserWithBackend(result.user, selectedRole);
     return { success: true, user: userProfile, firebaseUser: result.user };
   } catch (error) {
     console.error('Firebase Registration Error:', error);

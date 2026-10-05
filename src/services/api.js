@@ -15,6 +15,23 @@ export const api = {
   auth: {
     checkRegistration: (phone) => post('/auth/check-registration/', { phone }),
     requestOtp: (phone) => post('/auth/request-otp/', { phone }),
+    firebaseLogin: async (idToken, role, profile = {}) => {
+      const res = await post('/auth/firebase/', {
+        id_token: idToken,
+        role,
+        ...profile
+      });
+      if (res?.data?.access) {
+        localStorage.setItem('aagam_access_token', res.data.access);
+        if (res.data.refresh) {
+          localStorage.setItem('aagam_refresh_token', res.data.refresh);
+        }
+        if (res.data.user) {
+          localStorage.setItem('aagam_user', JSON.stringify(res.data.user));
+        }
+      }
+      return res;
+    },
     verifyOtp: async (phone, otp) => {
       const res = await post('/auth/verify-otp/', { phone, otp });
       if (res?.data?.access) {
