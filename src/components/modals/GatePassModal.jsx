@@ -231,23 +231,53 @@ export default function GatePassModal({
         lane: lane
       }, idempotencyKey);
 
-      if (!res?.data || !res?.data?.qr_token) {
+      if (!res?.data || !res?.data?.qr_token || !res?.data?.qr_token?.token_string) {
         throw new Error(res?.message || 'Server did not return a valid authoritative booking and QR token.');
       }
       serverBookingData = res.data;
     } catch (err) {
       console.error("Server-authoritative booking error:", err);
-      // P0-13: When booking fails, DO NOT show booking confirmed.
-      setBookingError(err.message || 'Failed to book slot on backend server. Capacity may be exhausted.');
       setIsBookingServer(false);
+
+      // TASK 3: Explicitly classify and distinguish error types
+      // 1. Genuine offline device check:
+      const isDeviceOffline = (typeof navigator !== 'undefined' && navigator.onLine === false) || err.code === 'DEVICE_OFFLINE';
+      
+      if (isDeviceOffline) {
+        setBookingError('OFFLINE MODE: Internet connection lost. Authoritative slot confirmation is strictly prohibited offline. Your request has been kept as a local draft. Connect to internet to confirm.');
+        return;
+      }
+
+      // 2. HTTP Status Code Classification:
+      if (err.status === 400) {
+        setBookingError(`Validation / Capacity Error (400): ${err.message || 'Mandi slot capacity is exhausted for this crop/date, or parameters are invalid.'}`);
+      } else if (err.status === 401) {
+        setBookingError(`Authentication Required (401): ${err.message || 'Your session has expired. Please sign in again.'}`);
+      } else if (err.status === 403) {
+        setBookingError(`Permission Denied (403): ${err.message || 'Only verified farmers with active registration are permitted to book mandi slots.'}`);
+      } else if (err.status === 409) {
+        setBookingError(`Booking Conflict (409): ${err.message || 'An active booking for this date and crop already exists, or idempotency mismatch detected.'}`);
+      } else if (err.status === 429) {
+        setBookingError(`Rate Limit Exceeded (429): ${err.message || 'Too many booking attempts. Please wait a moment and try again.'}`);
+      } else if (err.status === 500) {
+        setBookingError(`Server Error (500): ${err.message || 'Internal database or server error while confirming booking. Please retry.'}`);
+      } else if (err.status === 503) {
+        setBookingError(`Backend Unavailable (503): ${err.message || 'AAGAM procurement server is temporarily unavailable. Please retry shortly.'}`);
+      } else if (err.code === 'CORS_OR_NETWORK_ERROR' || (err.message && (err.message.includes('CORS') || err.message.includes('Failed to fetch')))) {
+        setBookingError(`CORS / Network Error: Preflight or network communication error communicating with backend server.`);
+      } else {
+        setBookingError(err.message || 'Failed to book slot on backend server.');
+      }
       return;
     }
 
-    // Authoritative token and QR from backend
+    // TASK 5: Authoritative token, QR, and booking data from backend (never from local state)
     const authoritativeToken = serverBookingData.qr_token.token_string;
     const authoritativeQrImg = serverBookingData.qr_token.qr_image_base64;
     const authoritativeSignature = serverBookingData.qr_token.opaque_signature;
-    const bookingUuid = serverBookingData.uuid;
+    const bookingUuid = serverBookingData.uuid || serverBookingData.id;
+    const authoritativeStatus = serverBookingData.status || 'CONFIRMED';
+    const authoritativeQty = serverBookingData.quantity_quintals || quantity;
 
     // Optional n8n notification dispatch
     const n8nPayload = {

@@ -20,9 +20,9 @@ if not SECRET_KEY:
         raise ImproperlyConfigured("SECRET_KEY environment variable must be set when DEBUG is False.")
 
 # Allowed Hosts - Explicit whitelist + Railway domains
-raw_hosts = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,.trycloudflare.com,.railway.app,.up.railway.app')
+raw_hosts = os.getenv('ALLOWED_HOSTS', 'aagam-backend-production.up.railway.app,localhost,127.0.0.1,.trycloudflare.com,.railway.app,.up.railway.app')
 ALLOWED_HOSTS = [h.strip() for h in raw_hosts.split(',') if h.strip()]
-for default_host in ['.trycloudflare.com', '.railway.app', '.up.railway.app']:
+for default_host in ['aagam-backend-production.up.railway.app', '.trycloudflare.com', '.railway.app', '.up.railway.app']:
     if default_host not in ALLOWED_HOSTS:
         ALLOWED_HOSTS.append(default_host)
 
@@ -161,12 +161,19 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS - Configurable via env
-CORS_ALLOW_ALL_ORIGINS = os.getenv('CORS_ALLOW_ALL_ORIGINS', 'False').lower() in ('true', '1')
-raw_cors = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000,https://aagam.up.railway.app')
+from corsheaders.defaults import default_headers
+
+CORS_ALLOW_ALL_ORIGINS = False
+raw_cors = os.getenv('CORS_ALLOWED_ORIGINS', 'https://aagam.up.railway.app,http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000')
 CORS_ALLOWED_ORIGINS = [o.strip() for o in raw_cors.split(',') if o.strip()]
 if 'https://aagam.up.railway.app' not in CORS_ALLOWED_ORIGINS:
     CORS_ALLOWED_ORIGINS.append('https://aagam.up.railway.app')
 CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = [
+    *default_headers,
+    "idempotency-key",
+]
 
 # REST Framework
 REST_FRAMEWORK = {

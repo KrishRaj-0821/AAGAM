@@ -8,7 +8,7 @@
  *    Authoritative slot confirmation strictly requires backend server acknowledgement.
  */
 
-const CACHE_NAME = 'aagam-shell-v2';
+const CACHE_NAME = 'aagam-shell-v4';
 const PRECACHE_ASSETS = [
   './',
   './index.html',
@@ -45,12 +45,14 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // 1. Authoritative Booking Interception (P0-8 Mandatory Security Invariant)
+  // 1. Authoritative Booking Interception (P0-8 / Task 4: Genuine Offline Defense Only)
   if (event.request.method === 'POST' && url.pathname.includes('/api/slots/book')) {
-    event.respondWith(
-      fetch(event.request.clone()).catch(() => {
-        // Offline: Do NOT confirm booking. Return safe offline draft notice.
-        return new Response(
+    // Check if the device is genuinely offline
+    const isOffline = (self.navigator && self.navigator.onLine === false);
+    if (isOffline) {
+      // Offline: Do NOT confirm booking. Return safe offline draft notice.
+      event.respondWith(
+        new Response(
           JSON.stringify({
             success: false,
             offline_mode: true,
@@ -67,9 +69,12 @@ self.addEventListener('fetch', (event) => {
             statusText: "Service Unavailable (Offline Draft Only)",
             headers: { "Content-Type": "application/json" }
           }
-        );
-      })
-    );
+        )
+      );
+      return;
+    }
+    // When ONLINE: Let the request pass directly to the network.
+    // DO NOT intercept or convert online server/network errors into 503 offline drafts.
     return;
   }
 
