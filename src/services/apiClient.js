@@ -22,12 +22,41 @@ if (normalizedBase.startsWith('http') && !normalizedBase.endsWith('/api')) {
 export const API_BASE = normalizedBase;
 
 export class ApiError extends Error {
-  constructor(message, status, errors = null) {
+  /**
+   * @param {string} message
+   * @param {number} status HTTP status, or 0 when no HTTP response was received
+   * @param {object|null} errors Field-level errors from the server
+   * @param {object} context Error classification
+   * @param {boolean} [context.isOffline] Device is genuinely offline (network error + navigator.onLine === false)
+   * @param {boolean} [context.isCorsDenied] Request blocked before a response, while the browser is online (likely CORS)
+   * @param {boolean} [context.isHttpError] Server returned an HTTP error response
+   * @param {boolean} [context.isNetworkError] fetch() threw before any response was received
+   */
+  constructor(message, status, errors = null, context = {}) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
     this.errors = errors;
+    this.isOffline = Boolean(context.isOffline);
+    this.isCorsDenied = Boolean(context.isCorsDenied);
+    this.isHttpError = Boolean(context.isHttpError);
+    this.isNetworkError = Boolean(context.isNetworkError);
   }
+}
+
+/**
+ * True only when the device is offline AND the error is a network-level failure
+ * (no HTTP response). HTTP errors (400, 401, 403, 409, 429, 500, 503, ...) are
+ * server responses and never count as offline.
+ */
+export function isGenuinelyOffline(error) {
+  if (typeof navigator === 'undefined' || navigator.onLine !== false) {
+    return false;
+  }
+  if (error instanceof ApiError) {
+    return error.isNetworkError === true && !error.isHttpError;
+  }
+  return error instanceof TypeError;
 }
 
 export async function request(endpoint, options = {}) {
@@ -57,9 +86,31 @@ export async function request(endpoint, options = {}) {
     config.body = JSON.stringify(options.body);
   }
 
+  let res;
   try {
-    const res = await fetch(url, config);
+    res = await fetch(url, config);
+  } catch (error) {
+    // fetch() threw: no HTTP response was received.
+    const offline = isGenuinelyOffline(error) || (typeof navigator !== 'undefined' && navigator.onLine === false);
+    if (offline) {
+      throw new ApiError(
+        'You appear to be offline. Please check your connection.',
+        0,
+        null,
+        { isOffline: true, isNetworkError: true }
+      );
+    }
+    // Browser reports online: the failure is a CORS rejection, DNS failure, or unreachable server.
+    // Browsers do not expose CORS failures distinctly, so flag it for a configuration/connectivity message.
+    throw new ApiError(
+      'Unable to reach the AAGAM server. This may be a server configuration (CORS) or connectivity issue, not an offline condition.',
+      0,
+      null,
+      { isOffline: false, isCorsDenied: true, isNetworkError: true }
+    );
+  }
 
+  try {
     const contentType = res.headers.get('content-type');
     const isJson = contentType && contentType.includes('application/json');
     const responseData = isJson ? await res.json() : await res.text();
@@ -67,7 +118,7 @@ export async function request(endpoint, options = {}) {
     if (!res.ok) {
       const errMsg = (isJson && responseData.message) || responseData.detail || `Request failed with status ${res.status}`;
       const errErrors = (isJson && responseData.errors) || null;
-      throw new ApiError(errMsg, res.status, errErrors);
+      throw new ApiError(errMsg, res.status, errErrors, { isHttpError: true });
     }
 
     return responseData;
@@ -75,8 +126,13 @@ export async function request(endpoint, options = {}) {
     if (error instanceof ApiError) {
       throw error;
     }
-    // Network or connectivity error
-    throw new ApiError(error.message || 'Unable to connect to AAGAM Backend Server', 0);
+    // Failure while reading/parsing the response body: the server did respond, so not offline.
+    throw new ApiError(
+      error.message || 'Unable to read response from AAGAM Backend Server',
+      res.status,
+      null,
+      { isHttpError: !res.ok }
+    );
   }
 }
 
@@ -94,5 +150,6 @@ export default {
   del,
   request,
   ApiError,
+  isGenuinelyOffline,
   API_BASE
 };
