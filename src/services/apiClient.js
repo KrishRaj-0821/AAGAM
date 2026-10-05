@@ -4,18 +4,22 @@
  * Enforces production backend configuration (P0-15) and authentic JWT transport.
  */
 
-// Production API base URL check (P0-15)
-const ENV_API_BASE = import.meta.env.VITE_API_BASE_URL;
-const isGitHubPages = typeof window !== 'undefined' && window.location.hostname.includes('github.io');
+// Production API base URL check (P0-15, TASK 3)
+const rawBase = import.meta.env.VITE_API_BASE_URL;
 
-if (isGitHubPages && (!ENV_API_BASE || ENV_API_BASE === '/api')) {
-  console.warn(
-    '[AAGAM Configuration] Production frontend is hosted on GitHub Pages but VITE_API_BASE_URL is not configured. ' +
-    'Static hosting does not proxy /api. Configure VITE_API_BASE_URL=https://<your-django-backend-domain> in production.'
+if (import.meta.env.PROD && (!rawBase || rawBase.trim() === '' || rawBase.trim() === '/api')) {
+  throw new Error(
+    'CRITICAL: VITE_API_BASE_URL must be specified for production build. Static GitHub Pages cannot proxy /api'
   );
 }
 
-export const API_BASE = ENV_API_BASE || '/api';
+// Normalize: ensure no trailing slash, and ensure it ends with /api if a domain is provided
+let normalizedBase = (rawBase || '/api').trim().replace(/\/+$/, '');
+if (normalizedBase.startsWith('http') && !normalizedBase.endsWith('/api')) {
+  normalizedBase = `${normalizedBase}/api`;
+}
+
+export const API_BASE = normalizedBase;
 
 export class ApiError extends Error {
   constructor(message, status, errors = null) {
@@ -27,9 +31,10 @@ export class ApiError extends Error {
 }
 
 export async function request(endpoint, options = {}) {
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   const url = endpoint.startsWith('http')
     ? endpoint
-    : `${API_BASE}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+    : `${API_BASE}${cleanEndpoint}`;
 
   const headers = {
     'Content-Type': 'application/json',

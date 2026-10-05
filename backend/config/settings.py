@@ -18,9 +18,11 @@ if not SECRET_KEY:
         from django.core.exceptions import ImproperlyConfigured
         raise ImproperlyConfigured("SECRET_KEY environment variable must be set when DEBUG is False.")
 
-# Allowed Hosts - Explicit whitelist, never wildcard in production
-raw_hosts = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1' if DEBUG else 'localhost,127.0.0.1')
+# Allowed Hosts - Explicit whitelist
+raw_hosts = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,.trycloudflare.com')
 ALLOWED_HOSTS = [h.strip() for h in raw_hosts.split(',') if h.strip()]
+if '.trycloudflare.com' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('.trycloudflare.com')
 
 # Demo & SMS Gateways Configuration
 DEMO_AUTH_MODE = os.getenv('DEMO_AUTH_MODE', 'True').lower() in ('true', '1', 'yes')
@@ -143,8 +145,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS - Strict explicit origins, wildcard strictly prohibited
 CORS_ALLOW_ALL_ORIGINS = False
-raw_cors = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000')
+raw_cors = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000,https://krishraj-0821.github.io')
 CORS_ALLOWED_ORIGINS = [o.strip() for o in raw_cors.split(',') if o.strip()]
+if 'https://krishraj-0821.github.io' not in CORS_ALLOWED_ORIGINS:
+    CORS_ALLOWED_ORIGINS.append('https://krishraj-0821.github.io')
 CORS_ALLOW_CREDENTIALS = True
 
 # REST Framework

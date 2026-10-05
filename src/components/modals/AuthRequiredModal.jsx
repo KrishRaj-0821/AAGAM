@@ -131,19 +131,8 @@ export default function AuthRequiredModal({
 
         {/* Google 1-Click Fast Sign In */}
         <button
-          onClick={() => {
-            const user = demoUsers.Farmer;
-            const googleUser = {
-              ...user,
-              id: `GOOGLE-${Math.floor(10000 + Math.random() * 90000)}`,
-              email: 'farmer.kisan@gmail.com',
-              authMethod: 'Google SSO',
-              token: `GOI-GOOGLE-SSO-${Math.floor(1000 + Math.random() * 9000)}`
-            };
-            if (onLoginSuccess) onLoginSuccess(googleUser);
-            onClose();
-          }}
-          className="w-full bg-white hover:bg-[#f8f9fa] text-[#3c4043] font-extrabold py-3 px-4 rounded-xl border border-[#dadce0] shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-3 text-xs"
+          onClick={() => handleFastLogin('Farmer')}
+          className="w-full bg-white hover:bg-[#f8f9fa] text-[#3c4043] font-extrabold py-3 px-4 rounded-xl border border-[#dadce0] shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-3 text-xs cursor-pointer"
         >
           <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z" />

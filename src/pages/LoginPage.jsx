@@ -28,11 +28,8 @@ import {
 import { 
   signInWithGoogle, 
   signInWithEmail, 
-  resetUserPassword,
-  setupPhoneRecaptcha,
-  sendFirebasePhoneOtp
+  resetUserPassword
 } from '../services/firebase';
-import { sendAuthOtp } from '../services/otpService';
 import { api } from '../services/api';
 
 export default function LoginPage({ 
@@ -51,97 +48,13 @@ export default function LoginPage({
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState('');
   const [authSuccess, setAuthSuccess] = useState('');
-  const [generatedOtp, setGeneratedOtp] = useState('');
+  const [demoOtp, setDemoOtp] = useState('');
   const [otpStep, setOtpStep] = useState(1);
   const [otpValue, setOtpValue] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [confirmationResult, setConfirmationResult] = useState(null);
   const [registeredUser, setRegisteredUser] = useState(null);
   const [notRegistered, setNotRegistered] = useState(false);
-
-  // Demo Persona Profiles for Quick 1-Click Login
-  const demoUsers = {
-    Farmer: {
-      name: 'Gurpreet Singh',
-      role: 'Farmer',
-      id: 'PB-FARM-99482',
-      mobile: '+91 98765 43210',
-      email: 'gurpreet.kisan@gmail.com',
-      mandi: 'Karnal Central Grain Yard (HR)',
-      state: 'Haryana',
-      token: 'GOI-SSO-PB-99482'
-    },
-    Trader: {
-      name: 'Rajesh Agarwal',
-      role: 'Buyer',
-      id: 'TRAD-DL-88391',
-      mobile: '+91 98110 88391',
-      email: 'rajesh.trader@agri-corp.in',
-      mandi: 'Azadpur Mandi (DL)',
-      state: 'Delhi',
-      token: 'GOI-SSO-TR-88391'
-    },
-    Officer: {
-      name: 'Dr. Suresh Verma, IAS',
-      role: 'Officer',
-      id: 'GOI-OFF-55012',
-      mobile: '+91 94120 55012',
-      email: 'suresh.verma@gov.in',
-      mandi: 'FCI Zonal HQ (North)',
-      state: 'National',
-      token: 'GOI-SSO-OFF-55012'
-    },
-    Operator: {
-      name: 'Amit Kumar',
-      role: 'Operator',
-      id: 'MANDI-OP-33109',
-      mobile: '+91 97180 33109',
-      email: 'amit.op@karnalmandi.in',
-      mandi: 'Karnal Mandi Gate #02',
-      state: 'Haryana',
-      token: 'GOI-SSO-OP-33109'
-    },
-    Quality: {
-      name: 'Neha Sharma',
-      role: 'Quality',
-      id: 'ASSAY-LAB-77281',
-      mobile: '+91 99200 77281',
-      email: 'neha.lab@agmarknet.gov.in',
-      mandi: 'Central Grain Lab (HR)',
-      state: 'Haryana',
-      token: 'GOI-SSO-LAB-77281'
-    },
-    Logistics: {
-      name: 'Baljit Singh Transport',
-      role: 'Transporter',
-      id: 'TRUCK-FLEET-44910',
-      mobile: '+91 98880 44910',
-      email: 'baljit.fleet@transagri.com',
-      mandi: 'Northern Agri Freight Corridor',
-      state: 'Punjab',
-      token: 'GOI-SSO-LOG-44910'
-    },
-    Warehouse: {
-      name: 'Sanjay Godam Management',
-      role: 'Warehouse',
-      id: 'SILO-MGR-11029',
-      mobile: '+91 98100 11029',
-      email: 'sanjay.wh@cwcsilos.gov.in',
-      mandi: 'CWC Silo Complex #4',
-      state: 'Haryana',
-      token: 'GOI-SSO-WH-11029'
-    },
-    Admin: {
-      name: 'Vikramaditya Rao, Admin',
-      role: 'Admin',
-      id: 'GOI-ADMIN-001',
-      mobile: '+91 99999 00001',
-      email: 'admin.aagam@gov.in',
-      mandi: 'Ministry HQ (New Delhi)',
-      state: 'National Root',
-      token: 'GOI-SSO-ADMIN-001'
-    }
-  };
 
   const handleQuickLogin = async (roleKey) => {
     setAuthLoading(true);
@@ -247,11 +160,12 @@ export default function LoginPage({
       setOtpStep(2);
 
       let successMsg = res.message || `OTP sent to +91 ${cleanMobile}. Valid for 5 minutes.`;
-      if (res?.data?.demo_otp_code) {
-        setGeneratedOtp(res.data.demo_otp_code);
-        successMsg += ` [SIH DEMO MODE: Test OTP is ${res.data.demo_otp_code}]`;
+      const receivedDemoOtp = res?.data?.demo_otp || res?.data?.demo_otp_code;
+      if (receivedDemoOtp) {
+        setDemoOtp(receivedDemoOtp);
+        successMsg += ` [SIH DEMO MODE: Test OTP is ${receivedDemoOtp}]`;
       } else {
-        setGeneratedOtp('');
+        setDemoOtp('');
       }
       setAuthSuccess(successMsg);
     } catch (err) {
@@ -279,7 +193,6 @@ export default function LoginPage({
       }
 
       // Authoritative Backend OTP Verification (P0-1, P0-2)
-      // Never accepts 849201 or client-side random codes.
       const res = await api.auth.verifyOtp(cleanMobile, cleanOtp);
       if (res?.data?.user) {
         const authenticatedUser = {
@@ -810,7 +723,7 @@ export default function LoginPage({
                     {t(`OTP Sent to Registered Mobile: ${loginInput}`, `पंजीकृत मोबाइल पर 6-अंकों का ओटीपी भेजा गया: ${loginInput}`)}
                   </div>
                   <div className="text-[10px] text-[#637554] mt-0.5">
-                    Valid for 05:00 minutes {generatedOtp ? `[SIH DEMO MODE OTP: ${generatedOtp}]` : ''}
+                    Valid for 05:00 minutes {demoOtp ? `[SIH DEMO MODE OTP: ${demoOtp}]` : ''}
                   </div>
                 </div>
 
@@ -859,7 +772,7 @@ export default function LoginPage({
                     )}
                   </h4>
                   <p className="text-[#688557] font-mono text-xs font-bold">
-                    GOI SSO TOKEN: #{registeredUser?.token || 'GOI-OTP-VERIFIED-2026'}
+                    SimpleJWT Session: #{registeredUser?.token ? `${registeredUser.token.slice(0, 24)}...` : 'ACTIVE-VERIFIED'}
                   </p>
                 </div>
 

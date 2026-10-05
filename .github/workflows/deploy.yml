@@ -36,6 +36,8 @@ jobs:
         run: npm ci || npm install
 
       - name: Build Production Vite App
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL || vars.VITE_API_BASE_URL }}
         run: npm run build
 
       - name: Upload Artifact for GitHub Pages

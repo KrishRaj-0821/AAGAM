@@ -8,14 +8,14 @@
  *    Authoritative slot confirmation strictly requires backend server acknowledgement.
  */
 
-const CACHE_NAME = 'aagam-shell-v1';
+const CACHE_NAME = 'aagam-shell-v2';
 const PRECACHE_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/offline.html',
-  '/images/aagam_logo.png',
-  '/images/goi_emblem.png'
+  './',
+  './index.html',
+  './manifest.json',
+  './offline.html',
+  './images/aagam_logo.png',
+  './images/goi_emblem.png'
 ];
 
 // Install: Pre-cache App Shell
@@ -106,7 +106,7 @@ self.addEventListener('fetch', (event) => {
       if (cached) return cached;
       return fetch(event.request).catch(async () => {
         if (event.request.mode === 'navigate') {
-          return caches.match('/offline.html');
+          return (await caches.match('./offline.html')) || (await caches.match('/offline.html'));
         }
       });
     })
