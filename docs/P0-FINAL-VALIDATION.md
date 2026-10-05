@@ -34,7 +34,7 @@ A total of **44 automated backend unit/integration tests**, **11 adversarial tes
   - Partial Unique Index `unique_active_farmer_booking_date_commodity` on `(farmer_id, booking_date, commodity)` WHERE `status = 'CONFIRMED'`.
 - **Evidence:** In automated multithreaded booking tests, 10 concurrent worker threads attempted to book 20 QTL each on a 100 QTL slot. Exactly 5 threads succeeded (100.00 QTL total) and 5 threads were rejected with HTTP 400. **Final booked quantity was exactly 100.00 QTL with zero oversubscription.**
 
-*Detailed Report:* [`/docs/POSTGRES-CONCURRENCY.md`](file:///c:/Users/kishu/OneDrive/Desktop/Aagam_sih/docs/POSTGRES-CONCURRENCY.md)
+*Detailed Report:* [`docs/POSTGRES-CONCURRENCY.md`](POSTGRES-CONCURRENCY.md)
 
 ---
 
@@ -59,7 +59,7 @@ A total of **44 automated backend unit/integration tests**, **11 adversarial tes
   $$\text{Final Booked Quantity } (100.00\text{ QTL}) \le \text{Max Capacity } (100.00\text{ QTL})$$
   **ZERO OVERSUBSCRIPTION. INVARIANT STRICTLY SATISFIED.**
 
-*Detailed Report:* [`/docs/LOAD-TEST-RESULTS.md`](file:///c:/Users/kishu/OneDrive/Desktop/Aagam_sih/docs/LOAD-TEST-RESULTS.md)
+*Detailed Report:* [`docs/LOAD-TEST-RESULTS.md`](LOAD-TEST-RESULTS.md)
 
 ---
 
@@ -75,7 +75,7 @@ A total of **44 automated backend unit/integration tests**, **11 adversarial tes
   - Device B (Farmer F, Date D, Crop C): Rejected with `HTTP 409 Conflict` (`DUPLICATE_ACTIVE_BOOKING_NOT_PERMITTED`).
   - Cancel Action: Booking A cancelled $\to$ Device B retry succeeds (`HTTP 201 Created`).
 
-*Detailed Report:* [`/docs/IDEMPOTENCY-TESTS.md`](file:///c:/Users/kishu/OneDrive/Desktop/Aagam_sih/docs/IDEMPOTENCY-TESTS.md)
+*Detailed Report:* [`docs/IDEMPOTENCY-TESTS.md`](IDEMPOTENCY-TESTS.md)
 
 ---
 
@@ -108,7 +108,7 @@ All 8 adversarial gate scan scenarios were tested against `POST /api/tokens/scan
   $$\text{Response: } \mathbf{HTTP\ 401\ Unauthorized} \quad (\text{Code 412: "Invalid Authentication, Check Authorization Key"})$$
 - **Verdict:** The key is permanently **revoked and dead**. No valid secrets remain anywhere in the repository or active configuration.
 
-*Detailed Report:* [`/docs/SECRET-SCAN.md`](file:///c:/Users/kishu/OneDrive/Desktop/Aagam_sih/docs/SECRET-SCAN.md)
+*Detailed Report:* [`docs/SECRET-SCAN.md`](SECRET-SCAN.md)
 
 ---
 
@@ -119,7 +119,7 @@ All 8 adversarial gate scan scenarios were tested against `POST /api/tokens/scan
 - **Offline Shell:** Added `public/offline.html`.
 - **Mandatory Security Invariant:** Offline POST requests to `/api/slots/book/` are intercepted by `sw.js` and rejected with `HTTP 503 Service Unavailable` (`OFFLINE_CONFIRMATION_PROHIBITED`). Authoritative slot confirmation strictly requires backend server acknowledgement.
 
-*Detailed Report:* [`/docs/PWA-FOUNDATION.md`](file:///c:/Users/kishu/OneDrive/Desktop/Aagam_sih/docs/PWA-FOUNDATION.md)
+*Detailed Report:* [`docs/PWA-FOUNDATION.md`](PWA-FOUNDATION.md)
 
 ---
 
@@ -138,7 +138,7 @@ The complete 11-step end-to-end user journey was executed through `backend/tests
 10. Center Operator Gate Scan (`POST /api/tokens/scan/` $\to$ 200 OK, GatePass issued)
 11. Farmer Booking Arrival State Update (`GET /api/slots/my-bookings/` $\to$ 200 OK, status `ARRIVED`)
 
-*Detailed Report:* [`/docs/LIVE-E2E-TEST.md`](file:///c:/Users/kishu/OneDrive/Desktop/Aagam_sih/docs/LIVE-E2E-TEST.md)
+*Detailed Report:* [`docs/LIVE-E2E-TEST.md`](LIVE-E2E-TEST.md)
 
 ---
 

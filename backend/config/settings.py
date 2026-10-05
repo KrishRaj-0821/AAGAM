@@ -162,10 +162,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS - Configurable via env
 CORS_ALLOW_ALL_ORIGINS = os.getenv('CORS_ALLOW_ALL_ORIGINS', 'False').lower() in ('true', '1')
-raw_cors = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000,https://krishraj-0821.github.io')
+raw_cors = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000,https://aagam.up.railway.app')
 CORS_ALLOWED_ORIGINS = [o.strip() for o in raw_cors.split(',') if o.strip()]
-if 'https://krishraj-0821.github.io' not in CORS_ALLOWED_ORIGINS:
-    CORS_ALLOWED_ORIGINS.append('https://krishraj-0821.github.io')
+if 'https://aagam.up.railway.app' not in CORS_ALLOWED_ORIGINS:
+    CORS_ALLOWED_ORIGINS.append('https://aagam.up.railway.app')
 CORS_ALLOW_CREDENTIALS = True
 
 # REST Framework

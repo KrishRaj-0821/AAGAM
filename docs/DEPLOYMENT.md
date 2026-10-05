@@ -67,7 +67,7 @@ SECRET_KEY=generate_a_cryptographically_secure_random_key_here_minimum_50_chars
 ALLOWED_HOSTS=api.aagam.org,your-cloudrun-service.run.app
 
 # Cross-Origin Resource Sharing (CORS)
-CORS_ALLOWED_ORIGINS=https://krishraj-0821.github.io,https://aagam.org
+CORS_ALLOWED_ORIGINS=https://aagam.up.railway.app,https://aagam-backend-production.up.railway.app
 CORS_ALLOW_ALL_ORIGINS=False
 
 # Database (Production PostgreSQL)

@@ -7,8 +7,21 @@
 ![Django](https://img.shields.io/badge/Django_REST-5.1-092E20?style=for-the-badge&logo=django&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18.6-336791?style=for-the-badge&logo=postgresql&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Deployed on Railway](https://img.shields.io/badge/Railway-Production_Live-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)
 ![License](https://img.shields.io/badge/License-Government_Open_Access-0056B3?style=for-the-badge)
 ![Language](https://img.shields.io/badge/Bilingual-English_%7C_%E0%A4%B9%E0%A4%BF%E0%A4%A8%E0%A5%8D%E0%A4%A6%E0%A5%80-2E7D32?style=for-the-badge)
+
+---
+
+## 🌐 Live Production Deployments (Railway)
+
+| Service | Technology | Production Live URL | Status |
+| :--- | :--- | :--- | :--- |
+| 🚀 **Frontend Web Application** | React 18 + Vite + PWA | **[https://aagam.up.railway.app](https://aagam.up.railway.app/)** | 🟢 Live |
+| ⚡ **Backend REST API** | Django 5.1 + DRF | **[https://aagam-backend-production.up.railway.app/api/](https://aagam-backend-production.up.railway.app/api/)** | 🟢 Live |
+| 🛡️ **Django Admin Portal** | Secure Management | **[https://aagam-backend-production.up.railway.app/admin/](https://aagam-backend-production.up.railway.app/admin/)** *(admin@aagam.gov.in / aagam@2026)* | 🟢 Live |
+| 🩺 **System Health Check** | API Liveness & DB | **[https://aagam-backend-production.up.railway.app/api/health/](https://aagam-backend-production.up.railway.app/api/health/)** | 🟢 200 OK |
+| 📖 **Interactive API Docs** | Swagger UI | **[https://aagam-backend-production.up.railway.app/api/schema/swagger-ui/](https://aagam-backend-production.up.railway.app/api/schema/swagger-ui/)** | 🟢 Live |
 
 ---
 
@@ -171,10 +184,10 @@ Frontend will run at `http://localhost:5173` with proxy forwarding to `http://lo
 
 Detailed evidence reports for all validation requirements are available in `/docs/`:
 
-* [`/docs/P0-FINAL-VALIDATION.md`](file:///c:/Users/kishu/OneDrive/Desktop/Aagam_sih/docs/P0-FINAL-VALIDATION.md): Overall 11-point validation summary.
-* [`/docs/LOAD-TEST-RESULTS.md`](file:///c:/Users/kishu/OneDrive/Desktop/Aagam_sih/docs/LOAD-TEST-RESULTS.md): 5,000-request HTTP load test metrics.
-* [`/docs/POSTGRES-CONCURRENCY.md`](file:///c:/Users/kishu/OneDrive/Desktop/Aagam_sih/docs/POSTGRES-CONCURRENCY.md): Database locking, isolation levels, and constraints.
-* [`/docs/IDEMPOTENCY-TESTS.md`](file:///c:/Users/kishu/OneDrive/Desktop/Aagam_sih/docs/IDEMPOTENCY-TESTS.md): Canonical fingerprinting and replay defense evidence.
-* [`/docs/SECRET-SCAN.md`](file:///c:/Users/kishu/OneDrive/Desktop/Aagam_sih/docs/SECRET-SCAN.md): Git history secret scan and key revocation verification.
-* [`/docs/PWA-FOUNDATION.md`](file:///c:/Users/kishu/OneDrive/Desktop/Aagam_sih/docs/PWA-FOUNDATION.md): Service worker, cache behavior, and offline booking guard.
-* [`/docs/LIVE-E2E-TEST.md`](file:///c:/Users/kishu/OneDrive/Desktop/Aagam_sih/docs/LIVE-E2E-TEST.md): Complete 11-step end-to-end verification audit log.
+* [`docs/P0-FINAL-VALIDATION.md`](docs/P0-FINAL-VALIDATION.md): Overall 11-point validation summary.
+* [`docs/LOAD-TEST-RESULTS.md`](docs/LOAD-TEST-RESULTS.md): 5,000-request HTTP load test metrics.
+* [`docs/POSTGRES-CONCURRENCY.md`](docs/POSTGRES-CONCURRENCY.md): Database locking, isolation levels, and constraints.
+* [`docs/IDEMPOTENCY-TESTS.md`](docs/IDEMPOTENCY-TESTS.md): Canonical fingerprinting and replay defense evidence.
+* [`docs/SECRET-SCAN.md`](docs/SECRET-SCAN.md): Git history secret scan and key revocation verification.
+* [`docs/PWA-FOUNDATION.md`](docs/PWA-FOUNDATION.md): Service worker, cache behavior, and offline booking guard.
+* [`docs/LIVE-E2E-TEST.md`](docs/LIVE-E2E-TEST.md): Complete 11-step end-to-end verification audit log.
