@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from datetime import timedelta
 import dotenv
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -18,11 +19,16 @@ if not SECRET_KEY:
         from django.core.exceptions import ImproperlyConfigured
         raise ImproperlyConfigured("SECRET_KEY environment variable must be set when DEBUG is False.")
 
-# Allowed Hosts - Explicit whitelist
-raw_hosts = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,.trycloudflare.com')
+# Allowed Hosts - Explicit whitelist + Railway domains
+raw_hosts = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,.trycloudflare.com,.railway.app,.up.railway.app')
 ALLOWED_HOSTS = [h.strip() for h in raw_hosts.split(',') if h.strip()]
-if '.trycloudflare.com' not in ALLOWED_HOSTS:
-    ALLOWED_HOSTS.append('.trycloudflare.com')
+for default_host in ['.trycloudflare.com', '.railway.app', '.up.railway.app']:
+    if default_host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(default_host)
+
+# CSRF Trusted Origins for Railway & local development
+raw_csrf = os.getenv('CSRF_TRUSTED_ORIGINS', 'https://*.railway.app,https://*.up.railway.app,http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173,http://127.0.0.1:3000')
+CSRF_TRUSTED_ORIGINS = [c.strip() for c in raw_csrf.split(',') if c.strip()]
 
 # Demo & SMS Gateways Configuration
 DEMO_AUTH_MODE = os.getenv('DEMO_AUTH_MODE', 'True').lower() in ('true', '1', 'yes')
@@ -68,6 +74,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -96,10 +103,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Database Configuration with PostgreSQL / SQLite fallback
+# Database Configuration with DATABASE_URL (Railway) / PostgreSQL / SQLite fallback
+database_url = os.getenv('DATABASE_URL')
 USE_POSTGRES = os.getenv('USE_POSTGRES', 'False').lower() in ('true', '1')
 
-if USE_POSTGRES:
+if database_url:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=database_url,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+elif USE_POSTGRES:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -137,14 +153,15 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CORS - Strict explicit origins, wildcard strictly prohibited
-CORS_ALLOW_ALL_ORIGINS = False
+# CORS - Configurable via env
+CORS_ALLOW_ALL_ORIGINS = os.getenv('CORS_ALLOW_ALL_ORIGINS', 'False').lower() in ('true', '1')
 raw_cors = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000,https://krishraj-0821.github.io')
 CORS_ALLOWED_ORIGINS = [o.strip() for o in raw_cors.split(',') if o.strip()]
 if 'https://krishraj-0821.github.io' not in CORS_ALLOWED_ORIGINS:
