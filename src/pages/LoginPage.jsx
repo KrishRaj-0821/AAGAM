@@ -143,12 +143,25 @@ export default function LoginPage({
     }
   };
 
-  const handleQuickLogin = (roleKey) => {
-    const user = demoUsers[roleKey] || demoUsers.Farmer;
-    if (onLoginSuccess) {
-      onLoginSuccess(user);
-    } else {
-      if (setCurrentView) setCurrentView('home');
+  const handleQuickLogin = async (roleKey) => {
+    setAuthLoading(true);
+    setAuthError('');
+    try {
+      const res = await api.auth.demoLogin(roleKey);
+      if (res?.data?.user) {
+        if (onLoginSuccess) {
+          onLoginSuccess(res.data.user);
+        } else if (setCurrentView) {
+          setCurrentView('home');
+        }
+        return;
+      }
+      throw new Error(res?.message || 'Authentication failed');
+    } catch (err) {
+      console.error("Demo login failed:", err);
+      setAuthError(err.message || 'Demo authentication failed. Make sure backend is running with DEMO_AUTH_MODE=True.');
+    } finally {
+      setAuthLoading(false);
     }
   };
 
@@ -168,22 +181,7 @@ export default function LoginPage({
         if (res.code === 'auth/popup-closed-by-user') {
           setAuthError(t('Google sign-in popup was closed.', 'गूगल साइन-इन विंडो बंद कर दी गई थी।'));
         } else {
-          // Graceful fallback to verified Google SSO profile
-          const selectedProfile = demoUsers[loginRole] || demoUsers.Farmer;
-          const googleUser = {
-            ...selectedProfile,
-            name: selectedProfile.name || 'Gurpreet Singh',
-            role: loginRole,
-            id: `FB-GOOG-${Math.floor(10000 + Math.random() * 90000)}`,
-            email: selectedProfile.email || 'user.kisan@gmail.com',
-            authMethod: 'Firebase Google SSO',
-            token: `FB-SSO-${Math.floor(1000 + Math.random() * 9000)}`
-          };
-          if (onLoginSuccess) {
-            onLoginSuccess(googleUser);
-          } else if (setCurrentView) {
-            setCurrentView('home');
-          }
+          setAuthError(res.error || t('Google sign-in could not be completed.', 'गूगल साइन-इन पूरा नहीं हो सका।'));
         }
       }
     } catch (err) {
@@ -203,55 +201,27 @@ export default function LoginPage({
     setAuthLoading(true);
     setAuthError('');
     try {
-      // 1. Authenticate with Django REST Backend
-      try {
-        const apiRes = await api.auth.login(loginInput.trim(), passwordInput || 'aagam@2026');
-        if (apiRes?.data?.user) {
-          const dbUser = {
-            name: apiRes.data.user.full_name || apiRes.data.user.email,
-            role: apiRes.data.user.role || loginRole,
-            id: apiRes.data.user.uuid ? `AAGAM-${apiRes.data.user.uuid.slice(0, 8).toUpperCase()}` : 'AAGAM-USER',
-            email: apiRes.data.user.email,
-            phone: apiRes.data.user.phone || '+91 98765 43210',
-            mandi: apiRes.data.user.mandi || 'Karnal Central APMC',
-            state: apiRes.data.user.state || 'Haryana',
-            authMethod: 'Django Database JWT Session',
-            token: apiRes.data.access
-          };
-          if (onLoginSuccess) onLoginSuccess(dbUser);
-          else if (setCurrentView) setCurrentView('home');
-          return;
-        }
-      } catch (djangoErr) {
-        console.warn("Django backend login fallback:", djangoErr);
-      }
-
-      // 2. Secondary fallback to Firebase authentication
-      const res = await signInWithEmail(loginInput, passwordInput || 'aagam@2026', loginRole);
-      if (res.success && res.user) {
-        if (onLoginSuccess) {
-          onLoginSuccess(res.user);
-        } else if (setCurrentView) {
-          setCurrentView('home');
-        }
-      } else {
-        // Fallback demo validation
-        const user = demoUsers[loginRole] || {
-          name: loginInput.split('@')[0].toUpperCase(),
-          role: loginRole,
-          id: `GOI-SSO-${Math.floor(10000 + Math.random() * 90000)}`,
-          email: loginInput,
-          mobile: '+91 98765 43210',
-          mandi: 'Karnal Central Yard (HR)',
-          state: 'Haryana',
-          authMethod: 'Firebase / GOI SSO',
-          token: `GOI-SSO-TOKEN-2026-${Math.floor(1000 + Math.random() * 9000)}`
+      const apiRes = await api.auth.login(loginInput.trim(), passwordInput || 'aagam@2026');
+      if (apiRes?.data?.user) {
+        const dbUser = {
+          name: apiRes.data.user.full_name || apiRes.data.user.email,
+          role: apiRes.data.user.role || loginRole,
+          id: apiRes.data.user.uuid ? `AAGAM-${apiRes.data.user.uuid.slice(0, 8).toUpperCase()}` : 'AAGAM-USER',
+          email: apiRes.data.user.email,
+          phone: apiRes.data.user.phone || '+91 98765 43210',
+          mandi: apiRes.data.user.mandi || 'Karnal Central APMC',
+          state: apiRes.data.user.state || 'Haryana',
+          authMethod: 'Django REST JWT Session',
+          token: apiRes.data.access
         };
-        if (onLoginSuccess) onLoginSuccess(user);
+        if (onLoginSuccess) onLoginSuccess(dbUser);
         else if (setCurrentView) setCurrentView('home');
+        return;
       }
+      throw new Error(apiRes?.message || 'Authentication failed. Please verify credentials.');
     } catch (err) {
-      setAuthError(err.message);
+      console.error("Staff login failed:", err);
+      setAuthError(err.message || 'Authentication failed. Please verify email and password.');
     } finally {
       setAuthLoading(false);
     }
@@ -272,120 +242,24 @@ export default function LoginPage({
         return;
       }
 
-      // Step 1: Strict Registration Verification
-      // ONLY registered stakeholders can receive OTP and log in!
-      let foundUser = null;
-
-      // 1.1 Query Backend Database
-      try {
-        const checkRes = await api.auth.checkRegistration(cleanMobile);
-        if (checkRes?.data?.registered && checkRes?.data?.user) {
-          foundUser = checkRes.data.user;
-        }
-      } catch (checkErr) {
-        console.warn("Backend registration check:", checkErr);
-      }
-
-      // 1.2 Check LocalStorage for users registered in this or recent browser sessions
-      if (!foundUser) {
-        try {
-          const localUsers = JSON.parse(localStorage.getItem('aagam_registered_users') || '[]');
-          const matchLocal = localUsers.find(u => {
-            const uPhone = (u.mobile || u.phone || u.clean_phone || '').replace(/\D/g, '').slice(-10);
-            return uPhone === cleanMobile;
-          });
-          if (matchLocal) foundUser = matchLocal;
-        } catch (e) {}
-      }
-
-      // 1.3 Check Seeded System Registered Stakeholders
-      if (!foundUser) {
-        const seededAccounts = [
-          { role: 'Farmer', phone: '9876543210', name: 'Sardar Harpreet Singh', mandi: 'Khanna Grain Market', state: 'Punjab', email: 'farmer@aagam.gov.in' },
-          { role: 'Trader', phone: '9811088391', name: 'Rajesh Agarwal', mandi: 'Azadpur Mandi', state: 'Delhi', email: 'buyer@aagam.gov.in' },
-          { role: 'Officer', phone: '9412055012', name: 'Dr. Suresh Verma, IAS', mandi: 'FCI Zonal HQ', state: 'National', email: 'officer@aagam.gov.in' },
-          { role: 'Operator', phone: '9823044918', name: 'Amit Kumar', mandi: 'Karnal Central APMC', state: 'Haryana', email: 'operator@aagam.gov.in' },
-          { role: 'Quality', phone: '9871100291', name: 'Dr. Anita Roy', mandi: 'Karnal Central APMC', state: 'Haryana', email: 'quality@aagam.gov.in' },
-          { role: 'Logistics', phone: '9829033102', name: 'Balwinder Singh', mandi: 'Transport Hub', state: 'Punjab', email: 'logistics@aagam.gov.in' },
-          { role: 'Warehouse', phone: '9810011029', name: 'Sanjay Deshmukh', mandi: 'CWC Silo Complex #4', state: 'Haryana', email: 'warehouse@aagam.gov.in' },
-          { role: 'Admin', phone: '9999900001', name: 'Vikramaditya Rao', mandi: 'Ministry HQ', state: 'National Root', email: 'admin@aagam.gov.in' }
-        ];
-        const matchSeed = seededAccounts.find(s => s.phone === cleanMobile);
-        if (matchSeed) {
-          foundUser = {
-            id: `AAGAM-${matchSeed.phone.slice(-5)}`,
-            full_name: matchSeed.name,
-            name: matchSeed.name,
-            role: matchSeed.role,
-            phone: `+91 ${cleanMobile}`,
-            email: matchSeed.email,
-            state: matchSeed.state,
-            district: matchSeed.state,
-            mandi: matchSeed.mandi
-          };
-        }
-      }
-
-      // IF USER IS NOT REGISTERED: STRICTLY BLOCK OTP AND DISPLAY REGISTRATION PROMPT
-      if (!foundUser) {
-        setNotRegistered(true);
-        setAuthError(t(
-          `Mobile number +91 ${cleanMobile} is not registered on AAGAM. Only registered stakeholders can log in via OTP. Please register first.`,
-          `मोबाइल नंबर +91 ${cleanMobile} पंजीकृत नहीं है। केवल पंजीकृत हितधारक ही ओटीपी से लॉगिन कर सकते हैं। कृपया पहले पंजीकरण करें।`
-        ));
-        setAuthLoading(false);
-        return;
-      }
-
-      // User verified as registered!
-      setRegisteredUser(foundUser);
-      if (foundUser.role) {
-        let roleMapped = foundUser.role;
-        if (roleMapped === 'BUYER' || roleMapped === 'Buyer' || roleMapped === 'Trader') roleMapped = 'Trader';
-        else if (roleMapped === 'LOGISTICS_PROVIDER' || roleMapped === 'Logistics' || roleMapped === 'Transporter') roleMapped = 'Logistics';
-        else if (roleMapped === 'WAREHOUSE_MANAGER' || roleMapped === 'Warehouse') roleMapped = 'Warehouse';
-        else if (roleMapped === 'CENTER_OPERATOR' || roleMapped === 'Operator') roleMapped = 'Operator';
-        else if (roleMapped === 'QUALITY_INSPECTOR' || roleMapped === 'Quality') roleMapped = 'Quality';
-        else if (roleMapped === 'OFFICER' || roleMapped === 'Officer') roleMapped = 'Officer';
-        else if (roleMapped === 'ADMIN' || roleMapped === 'Admin') roleMapped = 'Admin';
-        else if (roleMapped === 'FARMER' || roleMapped === 'Farmer') roleMapped = 'Farmer';
-        else roleMapped = loginRole || 'Farmer';
-        setLoginRole(roleMapped);
-      }
-
-      // Step 2: Send OTP
-      if (import.meta.env.VITE_FIREBASE_API_KEY) {
-        try {
-          const recaptchaVerifier = setupPhoneRecaptcha('recaptcha-container');
-          const fbRes = await sendFirebasePhoneOtp(`+91${cleanMobile}`, recaptchaVerifier);
-          if (fbRes.success && fbRes.confirmationResult) {
-            setConfirmationResult(fbRes.confirmationResult);
-            setOtpStep(2);
-            setAuthSuccess(t(
-              `Registered User: ${foundUser.full_name || foundUser.name}. Firebase SMS OTP sent to +91 ${cleanMobile}.`,
-              `पंजीकृत हितधारक: ${foundUser.full_name || foundUser.name}। +91 ${cleanMobile} पर एसएमएस ओटीपी भेजा गया।`
-            ));
-            return;
-          }
-        } catch (fbErr) {
-          console.warn("Firebase Phone Auth attempt:", fbErr);
-        }
-      }
-
-      // Resilient verified OTP
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      setGeneratedOtp(code);
-      try {
-        await sendAuthOtp(cleanMobile, code);
-      } catch (smsErr) {}
-
+      // Authoritative Backend OTP Request (P0-1)
+      const res = await api.auth.requestOtp(cleanMobile);
       setOtpStep(2);
-      setAuthSuccess(t(
-        `Registered User: ${foundUser.full_name || foundUser.name}. OTP sent to +91 ${cleanMobile}. (Security Code: ${code})`,
-        `पंजीकृत हितधारक: ${foundUser.full_name || foundUser.name}। +91 ${cleanMobile} पर ओटीपी भेजा गया। (सत्यापन कोड: ${code})`
-      ));
+
+      let successMsg = res.message || `OTP sent to +91 ${cleanMobile}. Valid for 5 minutes.`;
+      if (res?.data?.demo_otp_code) {
+        setGeneratedOtp(res.data.demo_otp_code);
+        successMsg += ` [SIH DEMO MODE: Test OTP is ${res.data.demo_otp_code}]`;
+      } else {
+        setGeneratedOtp('');
+      }
+      setAuthSuccess(successMsg);
     } catch (err) {
-      setAuthError(err.message || 'Failed to send OTP');
+      console.error("Request OTP error:", err);
+      if (err.message && err.message.toLowerCase().includes('not registered')) {
+        setNotRegistered(true);
+      }
+      setAuthError(err.message || 'Failed to dispatch OTP. Please check your mobile number.');
     } finally {
       setAuthLoading(false);
     }
@@ -395,94 +269,56 @@ export default function LoginPage({
     setAuthLoading(true);
     setAuthError('');
     try {
-      let isVerified = false;
+      const cleanMobile = loginInput.replace(/[^0-9]/g, '').slice(-10);
+      const cleanOtp = otpValue.trim();
 
-      if (confirmationResult) {
-        try {
-          const res = await confirmationResult.confirm(otpValue.trim());
-          if (res.user) {
-            isVerified = true;
-          }
-        } catch (verifyErr) {
-          console.warn("Firebase verify error:", verifyErr);
-        }
+      if (cleanOtp.length !== 6 || !/^\d{6}$/.test(cleanOtp)) {
+        setAuthError(t('Please enter a valid 6-digit verification code.', 'कृपया 6-अंकों का वैध सत्यापन कोड दर्ज करें।'));
+        setAuthLoading(false);
+        return;
       }
 
-      if (!isVerified) {
-        if (otpValue.trim() === generatedOtp || otpValue.trim() === '849201' || (otpValue.trim().length === 6 && !generatedOtp)) {
-          isVerified = true;
-        }
-      }
-
-      if (isVerified) {
-        const cleanMobile = loginInput.replace(/[^0-9]/g, '').slice(-10);
-        try {
-          await api.auth.otpLogin(cleanMobile, otpValue.trim());
-        } catch (e) {}
-
-        const finalUser = registeredUser || {
-          name: 'Registered Stakeholder',
-          full_name: 'Registered Stakeholder',
-          role: loginRole,
-          id: `AAGAM-${cleanMobile}`,
-          mobile: `+91 ${cleanMobile}`,
-          phone: `+91 ${cleanMobile}`,
-          mandi: 'Karnal Central Yard (HR)',
-          state: 'Haryana'
+      // Authoritative Backend OTP Verification (P0-1, P0-2)
+      // Never accepts 849201 or client-side random codes.
+      const res = await api.auth.verifyOtp(cleanMobile, cleanOtp);
+      if (res?.data?.user) {
+        const authenticatedUser = {
+          ...res.data.user,
+          name: res.data.user.full_name || res.data.user.email,
+          role: res.data.user.role || loginRole,
+          mobile: res.data.user.phone || `+91 ${cleanMobile}`,
+          phone: res.data.user.phone || `+91 ${cleanMobile}`,
+          authMethod: 'Authoritative Phone OTP Verified',
+          token: res.data.access
         };
 
-        const sessionUser = {
-          ...finalUser,
-          name: finalUser.full_name || finalUser.name || 'Registered Stakeholder',
-          role: loginRole,
-          mobile: `+91 ${cleanMobile}`,
-          phone: `+91 ${cleanMobile}`,
-          authMethod: 'Firebase OTP Verified',
-          token: `GOI-OTP-TOKEN-2026-${Math.floor(1000 + Math.random() * 9000)}`
-        };
-
-        localStorage.setItem('aagam_auth_user', JSON.stringify(sessionUser));
-        setRegisteredUser(sessionUser);
+        setRegisteredUser(authenticatedUser);
         setIsAuthenticated(true);
         setOtpStep(3);
-      } else {
-        setAuthError(t('Invalid OTP. Please enter the correct 6-digit verification code.', 'गलत ओटीपी। कृपया सही 6-अंकों का सत्यापन कोड दर्ज करें।'));
+
+        if (onLoginSuccess) {
+          onLoginSuccess(authenticatedUser);
+        } else if (setCurrentView) {
+          setCurrentView('home');
+        }
+        return;
       }
+      throw new Error(res?.message || 'OTP verification failed');
+    } catch (err) {
+      console.error("Verify OTP error:", err);
+      setAuthError(err.message || 'Invalid or expired OTP. Please check the code and try again.');
     } finally {
       setAuthLoading(false);
     }
   };
 
   const handleCompleteLogin = () => {
-    const cleanMobile = loginInput.replace(/[^0-9]/g, '').slice(-10);
-    const finalUser = registeredUser || {
-      name: 'Registered Stakeholder',
-      role: loginRole,
-      id: `AAGAM-USER-${cleanMobile || '4829'}`,
-      mobile: `+91 ${cleanMobile}`,
-      email: `${loginRole.toLowerCase()}@aagam-portal.gov.in`,
-      mandi: 'Karnal Central Yard (HR)',
-      state: 'Haryana',
-      authMethod: 'Phone OTP Verified',
-      token: `GOI-OTP-TOKEN-2026-${Math.floor(1000 + Math.random() * 9000)}`
-    };
-
-    const sessionUser = {
-      ...finalUser,
-      name: finalUser.full_name || finalUser.name || 'Registered Stakeholder',
-      role: loginRole,
-      mobile: `+91 ${cleanMobile}`,
-      phone: `+91 ${cleanMobile}`,
-      authMethod: 'Phone OTP Verified',
-      token: `GOI-SSO-TOKEN-2026-${Math.floor(1000 + Math.random() * 9000)}`
-    };
-
-    localStorage.setItem('aagam_auth_user', JSON.stringify(sessionUser));
-
-    if (onLoginSuccess) {
-      onLoginSuccess(sessionUser);
-    } else if (setCurrentView) {
-      setCurrentView('portal');
+    if (registeredUser) {
+      if (onLoginSuccess) {
+        onLoginSuccess(registeredUser);
+      } else if (setCurrentView) {
+        setCurrentView('portal');
+      }
     }
   };
 
@@ -974,7 +810,7 @@ export default function LoginPage({
                     {t(`OTP Sent to Registered Mobile: ${loginInput}`, `पंजीकृत मोबाइल पर 6-अंकों का ओटीपी भेजा गया: ${loginInput}`)}
                   </div>
                   <div className="text-[10px] text-[#637554] mt-0.5">
-                    Valid for 05:00 minutes (Test OTP: {generatedOtp || '849201'})
+                    Valid for 05:00 minutes {generatedOtp ? `[SIH DEMO MODE OTP: ${generatedOtp}]` : ''}
                   </div>
                 </div>
 
@@ -983,9 +819,9 @@ export default function LoginPage({
                   <input
                     type="text"
                     maxLength={6}
-                    placeholder={generatedOtp || "849201"}
+                    placeholder="••••••"
                     value={otpValue}
-                    onChange={(e) => setOtpValue(e.target.value)}
+                    onChange={(e) => setOtpValue(e.target.value.replace(/\D/g, '').slice(0, 6))}
                     className="w-48 mx-auto bg-[#fcfaf7] border-2 border-[#71873f] rounded-xl p-3 text-center text-lg tracking-widest font-mono font-extrabold text-[#243118] focus:outline-none block shadow-inner"
                   />
                 </div>

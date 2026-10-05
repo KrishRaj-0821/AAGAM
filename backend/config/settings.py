@@ -8,10 +8,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Load environment variables
 dotenv.load_dotenv(os.path.join(BASE_DIR, '.env'))
 
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-aagam-national-agricultural-portal-2026-secret-key-prod')
-DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 'yes')
+SECRET_KEY = os.getenv('SECRET_KEY')
+DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 'yes')
 
-ALLOWED_HOSTS = ['*']
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = 'django-insecure-dev-aagam-test-key-do-not-use-in-production'
+    else:
+        from django.core.exceptions import ImproperlyConfigured
+        raise ImproperlyConfigured("SECRET_KEY environment variable must be set when DEBUG is False.")
+
+# Allowed Hosts - Explicit whitelist, never wildcard in production
+raw_hosts = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1' if DEBUG else 'localhost,127.0.0.1')
+ALLOWED_HOSTS = [h.strip() for h in raw_hosts.split(',') if h.strip()]
+
+# Demo & SMS Gateways Configuration
+DEMO_AUTH_MODE = os.getenv('DEMO_AUTH_MODE', 'True').lower() in ('true', '1', 'yes')
+FAST2SMS_API_KEY = os.getenv('FAST2SMS_API_KEY', '')
 
 # Application definition
 INSTALLED_APPS = [
@@ -100,6 +113,9 @@ else:
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'aagam_db.sqlite3',
+            'OPTIONS': {
+                'timeout': 30,
+            },
         }
     }
 
@@ -125,14 +141,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CORS
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS - Strict explicit origins, wildcard strictly prohibited
+CORS_ALLOW_ALL_ORIGINS = False
+raw_cors = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000')
+CORS_ALLOWED_ORIGINS = [o.strip() for o in raw_cors.split(',') if o.strip()]
 CORS_ALLOW_CREDENTIALS = True
 
 # REST Framework
@@ -142,7 +154,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_PAGINATION_CLASS': 'common.pagination.StandardResultsSetPagination',
     'PAGE_SIZE': 20,

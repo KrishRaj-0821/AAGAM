@@ -1,0 +1,110 @@
+[
+  {
+    "step": "1. Production Health Check",
+    "status_code": 200,
+    "details": {
+      "status": "HEALTHY",
+      "database": "CONNECTED",
+      "timestamp": "2026-10-05T08:58:45.217410+00:00"
+    }
+  },
+  {
+    "step": "2. Farmer Registration",
+    "status_code": 201,
+    "details": {
+      "name": "Balwinder Singh",
+      "phone": "+919876543201",
+      "role": "FARMER"
+    }
+  },
+  {
+    "step": "3. Farmer Request OTP (Backend Authoritative)",
+    "status_code": 200,
+    "details": {
+      "phone": "+91 9876543201",
+      "expires_in_seconds": 300,
+      "dispatched": true,
+      "demo_mode": true
+    }
+  },
+  {
+    "step": "4. Farmer Verify OTP & Obtain Authoritative JWT",
+    "status_code": 200,
+    "details": {
+      "user_id": "1e8ee8ab-17b3-4af7-b750-1e6659d1241e",
+      "full_name": "Balwinder Singh",
+      "role": "FARMER",
+      "jwt_received": true
+    }
+  },
+  {
+    "step": "5. Center Selection from Public/Auth Directory",
+    "status_code": 200,
+    "details": {
+      "selected_center_name": "Karnal Load-Testing Grain Mandi",
+      "code": "LOAD-TEST-01",
+      "district": "Karnal",
+      "status": "ACTIVE"
+    }
+  },
+  {
+    "step": "6. Query Center Slot Availability",
+    "status_code": 200,
+    "details": {
+      "query_date": "2026-10-20",
+      "slots_found": 1
+    }
+  },
+  {
+    "step": "7. Authoritative Slot Booking & QR Issuance",
+    "status_code": 201,
+    "details": {
+      "booking_uuid": "026c9fec-bc15-45c1-b374-d0ae5156f27f",
+      "token_number": "OCT261033285",
+      "status": "CONFIRMED",
+      "quantity_quintals": "35.00",
+      "commodity": "Wheat (Kalyansona)",
+      "mandi_name": "Karnal Load-Testing Grain Mandi"
+    }
+  },
+  {
+    "step": "8. Farmer QR Token Verification",
+    "status_code": 200,
+    "details": {
+      "token_string": "OCT261033285",
+      "status": "ISSUED",
+      "has_opaque_signature": true,
+      "signature_sample": "e32301988e714eaf...",
+      "has_qr_image_base64": true
+    }
+  },
+  {
+    "step": "9. Authenticate Mandi Center Operator",
+    "status_code": 201,
+    "details": {
+      "operator_name": "Suresh Inspector",
+      "assigned_mandi": "Karnal Load-Testing Grain Mandi",
+      "jwt_issued": true
+    }
+  },
+  {
+    "step": "10. Center Operator Gate Scan & Token Verification",
+    "status_code": 200,
+    "details": {
+      "access_granted": true,
+      "token_status_after_scan": "USED",
+      "gate_pass_number": "GP-MND-AF3F42",
+      "gate_entry_number": "GEN-3EDC41"
+    }
+  },
+  {
+    "step": "11. Farmer Booking Arrival & Yard State Machine Update",
+    "status_code": 200,
+    "details": {
+      "booking_uuid": "026c9fec-bc15-45c1-b374-d0ae5156f27f",
+      "token_number": "OCT261033285",
+      "final_status": "ARRIVED",
+      "state_transition": "CONFIRMED -> ARRIVED (Authoritative Yard Entry)"
+    }
+  }
+]

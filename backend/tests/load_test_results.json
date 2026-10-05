@@ -1,0 +1,32 @@
+{
+  "test_timestamp": "2026-10-05T08:55:16.622362+00:00",
+  "database": "PostgreSQL 18.6",
+  "concurrency_tool": "aiohttp asynchronous load client",
+  "total_requests": 5000,
+  "concurrency_workers": 40,
+  "total_duration_seconds": 127.13,
+  "throughput_rps": 39.33,
+  "slot_capacity_quintals": 100.0,
+  "final_booked_quintals": 100.0,
+  "confirmed_booking_rows": 10,
+  "invariant_satisfied": true,
+  "response_code_counts": {
+    "201": 10,
+    "200": 7,
+    "400": 4972,
+    "409": 11
+  },
+  "latency_ms": {
+    "avg": 1005.53,
+    "p50": 960.54,
+    "p90": 1464.98,
+    "p95": 1619.66,
+    "p99": 1924.11,
+    "min": 280.71,
+    "max": 2412.04
+  },
+  "adversarial_checks": {
+    "replay_identical_200_count": 7,
+    "replay_tampered_409_count": 10
+  }
+}

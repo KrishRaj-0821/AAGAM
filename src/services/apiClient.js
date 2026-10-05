@@ -1,9 +1,21 @@
 /**
  * AAGAM Unified API Client
  * Coordinates HTTP requests between React Frontend and Django REST Backend
+ * Enforces production backend configuration (P0-15) and authentic JWT transport.
  */
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
+// Production API base URL check (P0-15)
+const ENV_API_BASE = import.meta.env.VITE_API_BASE_URL;
+const isGitHubPages = typeof window !== 'undefined' && window.location.hostname.includes('github.io');
+
+if (isGitHubPages && (!ENV_API_BASE || ENV_API_BASE === '/api')) {
+  console.warn(
+    '[AAGAM Configuration] Production frontend is hosted on GitHub Pages but VITE_API_BASE_URL is not configured. ' +
+    'Static hosting does not proxy /api. Configure VITE_API_BASE_URL=https://<your-django-backend-domain> in production.'
+  );
+}
+
+export const API_BASE = ENV_API_BASE || '/api';
 
 export class ApiError extends Error {
   constructor(message, status, errors = null) {
@@ -15,8 +27,10 @@ export class ApiError extends Error {
 }
 
 export async function request(endpoint, options = {}) {
-  const url = endpoint.startsWith('http') ? endpoint : `${API_BASE}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
-  
+  const url = endpoint.startsWith('http')
+    ? endpoint
+    : `${API_BASE}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+
   const headers = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -40,14 +54,6 @@ export async function request(endpoint, options = {}) {
 
   try {
     const res = await fetch(url, config);
-
-    // Handle token expiration / 401
-    if (res.status === 401 && localStorage.getItem('aagam_access_token')) {
-      // Optional: attempt refresh token or clear on permanent 401
-      if (endpoint !== '/auth/login/' && endpoint !== '/auth/token/refresh/') {
-        // Can trigger token refresh if needed
-      }
-    }
 
     const contentType = res.headers.get('content-type');
     const isJson = contentType && contentType.includes('application/json');
@@ -74,3 +80,14 @@ export const post = (endpoint, body, options = {}) => request(endpoint, { ...opt
 export const put = (endpoint, body, options = {}) => request(endpoint, { ...options, method: 'PUT', body });
 export const patch = (endpoint, body, options = {}) => request(endpoint, { ...options, method: 'PATCH', body });
 export const del = (endpoint, options = {}) => request(endpoint, { ...options, method: 'DELETE' });
+
+export default {
+  get,
+  post,
+  put,
+  patch,
+  del,
+  request,
+  ApiError,
+  API_BASE
+};

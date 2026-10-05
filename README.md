@@ -1,9 +1,11 @@
 # 🌾 AAGAM — Automated Agricultural Grain & Allocation Management
 
-> **Next-Generation National Agricultural Grain Procurement, Live E-Auction, Virtual Queue Management & DBT Payment Platform**
+> **National Agricultural Grain Procurement, Mandi Slot Allocation, Gate Pass Verification & Workflow Platform**
 
 ![React](https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![Vite](https://img.shields.io/badge/Vite-6.0-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![Django](https://img.shields.io/badge/Django_REST-5.1-092E20?style=for-the-badge&logo=django&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18.6-336791?style=for-the-badge&logo=postgresql&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![License](https://img.shields.io/badge/License-Government_Open_Access-0056B3?style=for-the-badge)
 ![Language](https://img.shields.io/badge/Bilingual-English_%7C_%E0%A4%B9%E0%A4%BF%E0%A4%A8%E0%A5%8D%E0%A4%A6%E0%A5%80-2E7D32?style=for-the-badge)
@@ -20,72 +22,84 @@
 
 ## 📌 Executive Summary
 
-**AAGAM (Automated Agricultural Grain & Allocation Management)** is an integrated digital platform designed to transform agricultural grain procurement, marketplace discovery, live e-auctions, mandi queue operations, logistics routing, quality grading, and Direct Benefit Transfer (DBT) payments across India.
-
-By uniting farmers, private buyers, procurement officers, mandi operators, quality inspectors, logistics providers, and warehouse administrators under a single unified portal, AAGAM eliminates mandi bottlenecks, ensures MSP transparency, accelerates farmer payments, and delivers real-time predictive supply chain analytics.
+**AAGAM (Automated Agricultural Grain & Allocation Management)** is a digital procurement platform engineered to solve physical mandi bottlenecks, eliminate excessive truck idling, prevent slot overbooking, and guarantee transparency in grain arrival schedules across Indian agricultural procurement centers.
 
 ---
 
-## 🌟 Key Highlights & Core Features
+## 📊 Feature Implementation Status Matrix
 
-### 🚜 1. Smart Slot Booking & QR Gate Pass Engine
-- **Virtual Queue System**: Farmers can pre-book procurement slots at nearby government centers or mandis to eliminate long queues and truck idling.
-- **Digital QR Gate Pass**: Generates verifiable QR tokens for hassle-free Mandi gate entry, weighbridge priority lanes, and token validation.
-- **Live Queue Monitoring**: Real-time tracking of vehicle status (En-route, Waiting, Weighment, Inspection, Unloading, Complete).
+Every capability in AAGAM is categorized according to its technical maturity:
 
-### ⚡ 2. Real-Time Live E-Auction Engine
-- **Transparent Grain Auctions**: Real-time bidding interface with live countdown timers, minimum increment controls, reserve price matching, and dynamic bid history logs.
-- **Instant Contract Awarding**: Automated winner notification, escrow security, and contract generation for private and bulk buyers.
+### 🟢 1. IMPLEMENTED (Production-Hardened & Server-Authoritative)
 
-### 🛒 3. Direct Grain Marketplace & Price Discovery
-- **MSP vs. Private Market Matrix**: Compare Minimum Support Prices (MSP) against local mandi rates and private buyer bids in real time.
-- **Verified Crop Listings**: Detailed grain profiles complete with moisture percentage, foreign matter content, grain size, quality grade, photo evidence, and location.
+The core procurement pipeline is fully authoritative, running on Django REST Framework and PostgreSQL:
 
-### 🔬 4. AI & Manual Quality Inspection
-- **Dual-Layer Grading**: AI-assisted computer vision quality assessments paired with certified manual lab testing (moisture meter, foreign grain ratio, damage analysis).
-- **Automated Acceptance Certificates**: Instant digital generation of Tola Parchi (weighment slips) and quality approval certificates.
-
-### 🚚 5. Logistics & Warehouse Management
-- **Transport Fleet Dispatch**: Request, assign, and track grain transport trucks with live GPS tracking from mandi to warehouse.
-- **Smart Inventory & Capacity**: Real-time warehouse capacity tracking, stock-in/stock-out logs, automated capacity warnings, and intra-warehouse transfer workflows.
-
-### 💳 6. Direct Benefit Transfer (DBT) & Payment Tracking
-- **Automated Payouts**: Direct integration with PFMS / DBT portals for 48-hour direct-to-bank-account farmer payouts.
-- **UTR & Ledger Verification**: Live tracking of bank transaction references, pending clearances, and historical payout statements.
-
-### 🤖 7. AI Predictive Analytics & Supply Forecasting
-- **Arrival & Overload Forecasting**: Machine learning models predicting crop arrival surges, center congestion risks, and storage capacity shortages.
-- **Price Trend Modeling**: Historical and predictive price charts helping farmers determine optimal sell timing.
-
-### 🌐 8. High Accessibility & Bilingual Support
-- **Dual Language**: One-click instant toggling between **English** and **हिन्दी (Hindi)**.
-- **Visual Accessibility**: Adjustable font scaling (`sm`, `md`, `lg`) and high-contrast dark accessibility mode for outdoors/field use.
-- **Universal Quick Search**: Press `Ctrl + K` or `Cmd + K` anywhere in the app for instant site-wide navigation and command search.
+* **Server-Authoritative Authentication**:
+  - Secure backend-generated 6-digit OTP stored as salted SHA-256 hash with 5-minute expiry.
+  - Strict rate limiting (maximum 3 requests per 10 minutes per phone number).
+  - SimpleJWT tokens issued strictly after backend hash verification.
+* **Concurrency-Safe Mandi Slot Capacity Management**:
+  - Row-level database locking (`select_for_update()`) inside atomic transactions.
+  - Validated under 5,000 concurrent HTTP requests on PostgreSQL 18 with **zero oversubscription**.
+* **Canonical Idempotency Engine**:
+  - SHA-256 canonical request fingerprinting of `center_id:date:time_slot:commodity:quantity`.
+  - Replays with identical parameters safely return the existing booking (HTTP 200).
+  - Replays with altered quantities/parameters are rejected with HTTP 409 (`IDEMPOTENCY_KEY_REUSED_WITH_DIFFERENT_REQUEST`).
+* **Multi-Device Double-Booking Prevention**:
+  - PostgreSQL partial conditional unique constraint (`unique_active_farmer_booking_date_commodity`) preventing a farmer from holding multiple active bookings for the same date and commodity across devices.
+* **Cryptographically Signed QR Gate Pass Tokens**:
+  - Backend HMAC-SHA256 signature generation over `token_string:booking_uuid:date`.
+  - Zero sensitive PII (Aadhaar, bank numbers) stored in QR payload.
+  - Rejects tampered, expired, cancelled, wrong-center, and future-dated tokens.
+* **Gate Entry State Machine & Replay Protection**:
+  - Operator scanning enforces single-use transition: `ISSUED` → `USED`.
+  - Concurrent operator scan attempts are serialized via row locks (one succeeds with HTTP 200, duplicates rejected with HTTP 409).
+* **Progressive Web App (PWA) Foundation**:
+  - `manifest.json`, Service Worker (`sw.js`), and offline app shell (`offline.html`).
+  - **Security Invariant**: Authoritative slot confirmation is strictly prohibited offline; offline requests are held as unconfirmed drafts.
+* **Zero-Trust Role-Based Access Control (RBAC)**:
+  - Default-deny permissions across all endpoints (`IsAuthenticated`, `IsFarmer`, `IsCenterOperator`).
 
 ---
 
-## 👥 Persona Portals (10 Multi-Stakeholder Roles)
+### 🟡 2. DEMO / SIMULATED (Demonstration & Workflow Simulation)
 
-AAGAM provides dedicated workspace interfaces tailored to each stakeholder in the agricultural ecosystem:
+These modules are implemented as interactive demonstrations and user interface simulations for SIH evaluation:
 
-| Persona Role | Primary Capabilities & Functions |
-| :--- | :--- |
-| **🌾 Farmer** | Book mandi slots, view QR gate passes, check MSP prices, list crops for auction, track DBT payouts, and request transport. |
-| **🏢 Private Buyer** | Browse crop marketplace, participate in live e-auctions, place bulk bids, award contracts, and track grain shipments. |
-| **🏛️ Procurement Officer** | Manage procurement center capacity, approve farmer declarations, reschedule delayed slots, and oversee center operations. |
-| **🚜 Mandi Operator** | Scan QR tokens at gate, manage vehicle priority queues, record weighbridge entries (Tola Parchi), and log daily arrivals. |
-| **🔬 Quality Inspector** | Perform moisture & purity checks, record AI vs manual quality reports, assign grades (Grade A, B, Rejection), and sign off certificates. |
-| **🚚 Logistics Provider** | Manage driver fleets, accept transport requests, update pickup status, and provide live GPS delivery tracking. |
-| **🏭 Warehouse Manager** | Monitor grain stock, record stock-in/stock-out transactions, manage warehouse capacity alerts, and issue truck transfer orders. |
-| **💳 Payment & DBT Admin** | Process pending farmer payouts, verify UTR numbers, track DBT status with banks, and generate financial audit reports. |
-| **🤖 AI & Analytics Director** | Analyze nationwide crop supply forecasts, arrival trends, mandi overload warnings, price predictions, and risk dashboards. |
-| **🛡️ System Administrator** | Manage user accounts, role-based access control (RBAC), system settings, security logs, and integration APIs. |
+* **SMS Provider Gateway Simulation**:
+  - `DEMO_AUTH_MODE=True` returns visual demonstration simulation in API response.
+  - In `PRODUCTION_MODE` (`DEMO_AUTH_MODE=False`), failures directly return HTTP 502 with error states (no silent claims).
+* **Mandi Operations UI Workflow**:
+  - Simulated weighbridge Tola Parchi (gross, tare, net weight calculation).
+  - Simulated vehicle priority queue and gate lane assignments.
+* **Quality Inspection UI**:
+  - Simulated lab moisture analysis, foreign matter calculation, and grading (Grade A / Grade B / Rejection).
+* **Warehouse Management Mock**:
+  - Storage bay capacity visualization and simulated stock-in/stock-out movements.
+* **Logistics UI**:
+  - Mock truck dispatch request workflow and simulated delivery progress steps.
+* **Persona Portals**:
+  - Interactive demonstration workspaces for Officer, Operator, Quality Inspector, Warehouse Manager, and Admin.
+
+---
+
+### 🔵 3. FUTURE INTEGRATION (Planned External Enterprise Systems)
+
+The following enterprise integrations represent architectural specifications for subsequent phases and are **not** claimed as live integrations:
+
+* **PFMS / DBT Rail**: Direct integration with Public Financial Management System and core banking payment gateways for automated DBT disbursements.
+* **UIDAI Aadhaar e-KYC**: Direct biometric fingerprint/iris or official UIDAI OTP authentication.
+* **Government SSO**: Single Sign-On integration with National SSO (Jan Parichay / MeriPehchaan).
+* **e-NAM Integration**: Interoperability with the National Agriculture Market electronic trading portal.
+* **Live GPS Telematics**: Real-time hardware IoT tracking on transport fleet trucks.
+* **Live E-Auction Engine**: WebSocket-based dynamic multiplayer bidding engine with financial escrow settlement.
+* **Blockchain Ledger**: Hyperledger Fabric immutable crop provenance ledger.
 
 ---
 
 ## 🏛️ Comprehensive Architecture (171-Page Specification)
 
-The AAGAM platform is structured across **14 Core Modules** encompassing 171 functional page views:
+The AAGAM platform is structured across **14 Core Modules** defined in the **171-page functional/workflow specification**:
 
 ```text
 AAGAM Platform
@@ -104,3 +118,63 @@ AAGAM Platform
 ├── 🔗 12. Crop Traceability Pages (Grain Journey Timeline, Transaction Ledger, Audit Trail, Blockchain Records)
 ├── 🛡️ 13. Admin Pages (User RBAC, Procurement Center Registry, Crop Master Data, API & System Settings)
 └── ⚙️ 14. Common Pages (Notifications, Profile & Security Settings, Language Preferences, Support, 404/500 Pages)
+```
+
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Technologies | Role / Responsibility |
+| :--- | :--- | :--- |
+| **Frontend Web App** | React 18, Vite 6, TailwindCSS, Lucide Icons | Responsive UI, PWA shell, bilingual language toggle |
+| **Backend REST API** | Python 3.13, Django 5.1, Django REST Framework | Authoritative business logic, cryptographic signing, RBAC |
+| **Authoritative Database** | PostgreSQL 18.6 | ACID transactions, row-level locking (`select_for_update`) |
+| **Authentication** | SimpleJWT, SHA-256 hashed OTPs | Stateless token verification, secure credential management |
+| **PWA Foundation** | Service Worker (`sw.js`), Web App Manifest | Offline asset caching, offline booking guard |
+| **Load & Stress Testing** | Locust, aiohttp, Waitress WSGI | 5,000-request concurrency verification |
+
+---
+
+## 🚀 Local Development Setup
+
+### 1. Backend (Django + PostgreSQL)
+
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate  # Or .venv\Scripts\activate on Windows
+
+pip install -r requirements.txt
+
+# Configure PostgreSQL connection in .env
+# USE_POSTGRES=True
+# DATABASE_NAME=aagam_db
+# DATABASE_PORT=5432
+
+python manage.py migrate
+python manage.py test tests
+python manage.py runserver
+```
+
+### 2. Frontend (React + Vite)
+
+```bash
+npm install
+npm run dev
+```
+
+Frontend will run at `http://localhost:5173` with proxy forwarding to `http://localhost:8000/api/`.
+
+---
+
+## 📄 Validation Documentation
+
+Detailed evidence reports for all validation requirements are available in `/docs/`:
+
+* [`/docs/P0-FINAL-VALIDATION.md`](file:///c:/Users/kishu/OneDrive/Desktop/Aagam_sih/docs/P0-FINAL-VALIDATION.md): Overall 11-point validation summary.
+* [`/docs/LOAD-TEST-RESULTS.md`](file:///c:/Users/kishu/OneDrive/Desktop/Aagam_sih/docs/LOAD-TEST-RESULTS.md): 5,000-request HTTP load test metrics.
+* [`/docs/POSTGRES-CONCURRENCY.md`](file:///c:/Users/kishu/OneDrive/Desktop/Aagam_sih/docs/POSTGRES-CONCURRENCY.md): Database locking, isolation levels, and constraints.
+* [`/docs/IDEMPOTENCY-TESTS.md`](file:///c:/Users/kishu/OneDrive/Desktop/Aagam_sih/docs/IDEMPOTENCY-TESTS.md): Canonical fingerprinting and replay defense evidence.
+* [`/docs/SECRET-SCAN.md`](file:///c:/Users/kishu/OneDrive/Desktop/Aagam_sih/docs/SECRET-SCAN.md): Git history secret scan and key revocation verification.
+* [`/docs/PWA-FOUNDATION.md`](file:///c:/Users/kishu/OneDrive/Desktop/Aagam_sih/docs/PWA-FOUNDATION.md): Service worker, cache behavior, and offline booking guard.
+* [`/docs/LIVE-E2E-TEST.md`](file:///c:/Users/kishu/OneDrive/Desktop/Aagam_sih/docs/LIVE-E2E-TEST.md): Complete 11-step end-to-end verification audit log.

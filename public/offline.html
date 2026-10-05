@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AAGAM — Offline App Shell</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background-color: #064e3b;
+        color: #f0fdf4;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 20px;
+        box-sizing: border-box;
+        text-align: center;
+      }
+      .card {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 16px;
+        padding: 32px;
+        max-width: 480px;
+        width: 100%;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+      }
+      .badge {
+        display: inline-block;
+        background: #eab308;
+        color: #713f12;
+        font-weight: 700;
+        font-size: 12px;
+        padding: 4px 12px;
+        border-radius: 9999px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 16px;
+      }
+      h1 {
+        font-size: 24px;
+        margin: 0 0 12px 0;
+        color: #ffffff;
+      }
+      p {
+        font-size: 15px;
+        line-height: 1.6;
+        color: #dcfce7;
+        margin-bottom: 24px;
+      }
+      .notice {
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 13px;
+        color: #fecaca;
+        margin-bottom: 24px;
+      }
+      .btn {
+        background: #22c55e;
+        color: #052e16;
+        font-weight: 600;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        text-decoration: none;
+        display: inline-block;
+        transition: background 0.2s;
+      }
+      .btn:hover {
+        background: #16a34a;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="badge">Offline Mode</div>
+      <h1>AAGAM Mandi Operations</h1>
+      <p>
+        You are currently disconnected from the internet. You can view previously cached center directories, mandi schedules, and your downloaded Gate Passes.
+      </p>
+      <div class="notice">
+        <strong>Authoritative Invariant:</strong> Live procurement slot booking confirmation requires backend server synchronization and cannot be finalized offline.
+      </div>
+      <button class="btn" onclick="window.location.reload()">Check Connection &amp; Retry</button>
+    </div>
+  </body>
+</html>

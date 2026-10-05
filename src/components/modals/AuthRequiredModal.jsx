@@ -15,8 +15,10 @@ import {
   UserPlus, 
   LogIn,
   Mic,
-  Zap
+  Zap,
+  Loader2
 } from 'lucide-react';
+import { api } from '../../services/api';
 
 export default function AuthRequiredModal({
   isOpen,
@@ -27,80 +29,30 @@ export default function AuthRequiredModal({
   onOpenVoiceAgent,
   t
 }) {
+  const [loadingRole, setLoadingRole] = useState(null);
+  const [authError, setAuthError] = useState('');
+
   if (!isOpen) return null;
 
-  const demoUsers = {
-    Farmer: {
-      name: 'Gurpreet Singh',
-      role: 'Farmer',
-      id: 'PB-FARM-99482',
-      aadhaar: '9948-2019-4827',
-      mandi: 'Karnal Central Grain Yard (HR)',
-      state: 'Haryana',
-      token: 'GOI-SSO-PB-99482'
-    },
-    Trader: {
-      name: 'Rajesh Agarwal',
-      role: 'Buyer',
-      id: 'TRAD-DL-88391',
-      aadhaar: '8839-4412-1092',
-      mandi: 'Azadpur Mandi (DL)',
-      state: 'Delhi',
-      token: 'GOI-SSO-TR-88391'
-    },
-    Officer: {
-      name: 'Dr. Suresh Verma, IAS',
-      role: 'Officer',
-      id: 'GOI-OFF-55012',
-      aadhaar: '5501-8899-2341',
-      mandi: 'FCI Zonal HQ (North)',
-      state: 'National',
-      token: 'GOI-SSO-OFF-55012'
-    },
-    Operator: {
-      name: 'Amit Kumar',
-      role: 'Operator',
-      id: 'MANDI-OP-33109',
-      aadhaar: '3310-7721-6654',
-      mandi: 'Karnal Mandi Gate #02',
-      state: 'Haryana',
-      token: 'GOI-SSO-OP-33109'
-    },
-    Quality: {
-      name: 'Neha Sharma',
-      role: 'Quality',
-      id: 'ASSAY-LAB-77281',
-      aadhaar: '7728-1123-9904',
-      mandi: 'Central Grain Lab (HR)',
-      state: 'Haryana',
-      token: 'GOI-SSO-LAB-77281'
-    },
-    Logistics: {
-      name: 'Baljit Singh Transport',
-      role: 'Transporter',
-      id: 'TRUCK-FLEET-44910',
-      aadhaar: '4491-3321-7711',
-      mandi: 'Northern Agri Freight Corridor',
-      state: 'Punjab',
-      token: 'GOI-SSO-LOG-44910'
-    },
-    Warehouse: {
-      name: 'Sanjay Godam Management',
-      role: 'Warehouse',
-      id: 'SILO-MGR-11029',
-      aadhaar: '1102-9988-4455',
-      mandi: 'CWC Silo Complex #4',
-      state: 'Haryana',
-      token: 'GOI-SSO-WH-11029'
+  const handleFastLogin = async (roleKey) => {
+    setLoadingRole(roleKey);
+    setAuthError('');
+    try {
+      const res = await api.auth.demoLogin(roleKey);
+      if (res?.data?.user) {
+        if (onLoginSuccess) {
+          onLoginSuccess(res.data.user);
+        }
+        onClose();
+        return;
+      }
+      throw new Error(res?.message || 'Authentication failed');
+    } catch (err) {
+      console.error("Backend demo login failed:", err);
+      setAuthError(err.message || 'Backend authentication failed. Server may be in production mode without demo auth enabled.');
+    } finally {
+      setLoadingRole(null);
     }
-  };
-
-  const handleFastLogin = (roleKey) => {
-    const user = demoUsers[roleKey] || demoUsers.Farmer;
-    if (onLoginSuccess) {
-      onLoginSuccess(user);
-    }
-    onClose();
   };
 
   return (
@@ -122,11 +74,16 @@ export default function AuthRequiredModal({
           </div>
           <div>
             <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#a36627] bg-[#f7f2ea] px-2.5 py-0.5 rounded-full border border-[#a36627]/30">
-              {t('Official GOI SSO Authentication Required', 'भारत सरकार एसएसओ प्रमाणीकरण आवश्यक')}
+              {t('Demo Authentication / Stakeholder Login', 'डेमो प्रमाणीकरण / हितधारक लॉगिन')}
             </span>
             <h3 className="text-xl font-extrabold text-[#243118] mt-1">
               {t(`Sign In to Access ${targetPortalName}`, `${targetPortalName} में प्रवेश करने के लिए साइन इन करें`)}
             </h3>
+            {authError && (
+              <p className="text-xs text-rose-600 font-bold mt-1 bg-rose-50 p-2 rounded-lg border border-rose-200">
+                {authError}
+              </p>
+            )}
             <p className="text-xs text-[#637554] mt-0.5">
               {t(
                 `To access ${targetPortalName}, digital workflows, real-time rates, and government allocation tools, please sign in or register your stakeholder profile.`,

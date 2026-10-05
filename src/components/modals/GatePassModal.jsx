@@ -54,6 +54,8 @@ export default function GatePassModal({
   const [isSubmittingWebhook, setIsSubmittingWebhook] = useState(false);
   const [webhookSuccess, setWebhookSuccess] = useState(null);
   const [webhookError, setWebhookError] = useState(null);
+  const [bookingError, setBookingError] = useState(null);
+  const [isBookingServer, setIsBookingServer] = useState(false);
 
   // Default values initialization
   if (!bookingDetails.date) {
@@ -187,21 +189,67 @@ export default function GatePassModal({
   };
 
   const handleGenerateQR = async () => {
-    // Generate randomized token per specification:
-    // First 3 character = Month name (e.g. AUG)
-    // 2-digit year (e.g. 26)
-    // 2-digit month (e.g. 08)
-    // 5-digit slot number (e.g. 48291)
-    let token = generateRandomToken(bookingDetails.date);
+    setBookingError(null);
+    setIsBookingServer(true);
 
-    const effectiveFarmerName = farmerName.trim() || 'Ram Singh';
+    const authToken = localStorage.getItem('aagam_access_token');
+    if (!authToken) {
+      setBookingError(t(
+        'Authentication required: Please log in as a Farmer to book an official procurement slot.',
+        'प्रमाणीकरण आवश्यक: कृपया आधिकारिक स्लॉट बुक करने के लिए किसान के रूप में लॉगिन करें।'
+      ));
+      setIsBookingServer(false);
+      return;
+    }
+
+    const effectiveFarmerName = farmerName.trim() || currentUser?.full_name || currentUser?.name || 'Farmer';
     const cleanPhone = phoneNumber.replace(/\D/g, '').slice(-10) || '9876543210';
     const cropName = getEffectiveCropName();
     const mandiLocation = getEffectiveMandiName();
     const quantity = String(bookingDetails.estimatedQty || '40');
-    const formattedSlotDate = formatSlotDateString(bookingDetails.date, bookingDetails.timeSlot);
+    const bookingDate = bookingDetails.date;
+    const timeSlot = bookingDetails.timeSlot || '09:00 AM - 11:00 AM';
+    const lane = bookingDetails.lane || 'Lane 04 - Weighbridge A';
+    const vehicleNumber = bookingDetails.vehicleNumber || 'HR-05-XY-8821';
+    const formattedSlotDate = formatSlotDateString(bookingDate, timeSlot);
 
-    // EXACT JSON BODY REQUIRED BY N8N WEBHOOK
+    // P0-6: Idempotency Key for Safe Network Retries
+    const idempotencyKey = (typeof crypto !== 'undefined' && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : `idem-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
+    let serverBookingData = null;
+    try {
+      // P0-4: Canonical Server-Authoritative Booking Call (POST /api/slots/book/)
+      const res = await api.slots.bookSlot({
+        center_id: mandiLocation,
+        commodity: cropName,
+        quantity_quintals: quantity,
+        vehicle_number: vehicleNumber,
+        booking_date: bookingDate,
+        time_slot: timeSlot,
+        lane: lane
+      }, idempotencyKey);
+
+      if (!res?.data || !res?.data?.qr_token) {
+        throw new Error(res?.message || 'Server did not return a valid authoritative booking and QR token.');
+      }
+      serverBookingData = res.data;
+    } catch (err) {
+      console.error("Server-authoritative booking error:", err);
+      // P0-13: When booking fails, DO NOT show booking confirmed.
+      setBookingError(err.message || 'Failed to book slot on backend server. Capacity may be exhausted.');
+      setIsBookingServer(false);
+      return;
+    }
+
+    // Authoritative token and QR from backend
+    const authoritativeToken = serverBookingData.qr_token.token_string;
+    const authoritativeQrImg = serverBookingData.qr_token.qr_image_base64;
+    const authoritativeSignature = serverBookingData.qr_token.opaque_signature;
+    const bookingUuid = serverBookingData.uuid;
+
+    // Optional n8n notification dispatch
     const n8nPayload = {
       farmer_name: effectiveFarmerName,
       phone_number: cleanPhone,
@@ -209,22 +257,18 @@ export default function GatePassModal({
       quantity: quantity,
       mandi_location: mandiLocation,
       slot_date: formattedSlotDate,
-      token: token,
-      slot_token: token
+      token: authoritativeToken,
+      slot_token: authoritativeToken
     };
 
     setWebhookError(null);
     setWebhookSuccess(null);
     setIsSubmittingWebhook(true);
 
-    // POST request to https://connect-with-me247.app.n8n.cloud/webhook/aagam-sms-booking
     try {
       const webhookRes = await api.notifications.sendBookingSmsWebhook(n8nPayload);
       if (webhookRes?.success && webhookRes?.data) {
         setWebhookSuccess(webhookRes.data);
-        if (webhookRes.data.token && /^[A-Z]{3}\d{9}$/i.test(webhookRes.data.token)) {
-          token = webhookRes.data.token;
-        }
       } else {
         setWebhookError(webhookRes?.error || 'Webhook SMS notification failed to dispatch');
       }
@@ -233,6 +277,7 @@ export default function GatePassModal({
       setWebhookError(err.message || 'Network communication error');
     } finally {
       setIsSubmittingWebhook(false);
+      setIsBookingServer(false);
     }
 
     const updatedDetails = {
@@ -244,7 +289,10 @@ export default function GatePassModal({
       mandi: mandiLocation,
       formattedSlotDate: formattedSlotDate,
       qrGenerated: true,
-      tokenNo: token
+      tokenNo: authoritativeToken,
+      bookingUuid: bookingUuid,
+      qrImageBase64: authoritativeQrImg,
+      opaqueSignature: authoritativeSignature
     };
 
     setBookingDetails(updatedDetails);
@@ -253,12 +301,12 @@ export default function GatePassModal({
     // Trigger rich success notification banner across the website
     if (triggerSuccessNotification) {
       triggerSuccessNotification({
-        title: t('Gate Pass Confirmed & SMS Dispatched!', 'गेट पास बुक हुआ एवं एसएमएस भेजा गया!'),
+        title: t('Gate Pass Confirmed & Recorded!', 'गेट पास बुक हुआ एवं दर्ज हुआ!'),
         message: t(
-          `Token ${token} confirmed for ${effectiveFarmerName} (${cropName}, ${quantity} Qtl) at ${mandiLocation}. SMS notification dispatched to +91 ${cleanPhone} via n8n booking webhook.`,
-          `टोकन ${token} जारी: ${effectiveFarmerName} (${cropName}, ${quantity} क्विंटल) - ${mandiLocation}। +91 ${cleanPhone} पर स्वचालित एसएमएस भेजा गया।`
+          `Authoritative Token ${authoritativeToken} confirmed for ${effectiveFarmerName} (${cropName}, ${quantity} Qtl) at ${mandiLocation}. Verified by AAGAM Server Engine.`,
+          `आधिकारिक टोकन ${authoritativeToken} जारी: ${effectiveFarmerName} (${cropName}, ${quantity} क्विंटल) - ${mandiLocation}। AAGAM सर्वर इंजन द्वारा सत्यापित।`
         ),
-        tokenNo: token,
+        tokenNo: authoritativeToken,
         mobile: `+91 ${cleanPhone}`,
         phone: `+91 ${cleanPhone}`,
         phoneNumber: cleanPhone,
@@ -903,6 +951,16 @@ export default function GatePassModal({
               </div>
             </div>
 
+            {bookingError && (
+              <div className="bg-rose-50 text-rose-800 border border-rose-300 p-3.5 rounded-2xl text-xs space-y-1 text-left shadow-xs">
+                <div className="flex items-center gap-2 font-bold text-rose-900">
+                  <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <span>{t('Booking Denied by Server', 'सर्वर द्वारा बुकिंग अस्वीकृत')}</span>
+                </div>
+                <p className="text-[11px] text-rose-800 font-sans">{bookingError}</p>
+              </div>
+            )}
+
             <div className="flex gap-3">
               <button
                 onClick={() => setSlotStep(1)}
@@ -912,18 +970,23 @@ export default function GatePassModal({
               </button>
               <button
                 onClick={handleGenerateQR}
-                disabled={isSubmittingWebhook}
+                disabled={isBookingServer || isSubmittingWebhook}
                 className="w-2/3 bg-[#a36627] hover:bg-[#804d19] disabled:opacity-70 text-white font-bold py-3.5 rounded-xl text-xs shadow-md transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
-                {isSubmittingWebhook ? (
+                {isBookingServer ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>{t('Dispatching n8n SMS Booking...', 'एसएमएस बुकिंग भेजा जा रहा है...')}</span>
+                    <span>{t('Reserving Slot on Server...', 'सर्वर पर स्लॉट आरक्षित हो रहा है...')}</span>
+                  </>
+                ) : isSubmittingWebhook ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>{t('Dispatching Notification...', 'अधिसूचना भेजी जा रही है...')}</span>
                   </>
                 ) : (
                   <>
                     <Sparkles className="w-4 h-4" />
-                    <span>{t('Generate Official Gate Pass & Send SMS', 'गेट पास बुक करें एवं एसएमएस भेजें')}</span>
+                    <span>{t('Confirm Slot & Generate QR Pass', 'स्लॉट पुष्टि करें एवं क्यूआर प्राप्त करें')}</span>
                   </>
                 )}
               </button>
@@ -998,23 +1061,20 @@ export default function GatePassModal({
                 </span>
               </div>
 
-              {/* 100% Mathematically Scannable Working QR Code */}
+              {/* Authoritative Scannable Working QR Code (P0-7) */}
               <WorkingQRCode
                 value={{
-                  system: "GOI AAGAM National Grain Procurement",
+                  system: "AAGAM Automated Agricultural Grain & Allocation Management",
                   token: bookingDetails.tokenNo,
-                  farmer: bookingDetails.farmerName || 'Ram Singh',
-                  farmerId: bookingDetails.farmerId || 'PB-FARM-99482',
-                  mandi: getEffectiveMandiName(),
-                  state: currentState,
-                  district: currentDistrict,
+                  signature: bookingDetails.opaqueSignature || 'AAGAM-HMAC-VERIFIED',
+                  booking_id: bookingDetails.bookingUuid,
+                  center: getEffectiveMandiName(),
                   crop: getEffectiveCropName(),
                   quantity: `${bookingDetails.estimatedQty || '40'} Qtl`,
                   date: bookingDetails.date,
                   slot: bookingDetails.timeSlot,
                   lane: bookingDetails.lane,
-                  status: "VERIFIED_ACTIVE",
-                  verifyUrl: `https://aagam.gov.in/verify?token=${bookingDetails.tokenNo}`
+                  status: "ISSUED"
                 }}
                 size={160}
                 tokenNo={bookingDetails.tokenNo}

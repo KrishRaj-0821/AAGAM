@@ -10,12 +10,17 @@ def success_response(data=None, message="Operation successful", status_code=stat
     }, status=status_code)
 
 
-def error_response(message="An error occurred", errors=None, status_code=status.HTTP_400_BAD_REQUEST):
-    return Response({
+def error_response(message="An error occurred", errors=None, status_code=status.HTTP_400_BAD_REQUEST, code=None):
+    payload = {
         "success": False,
         "message": message,
         "errors": errors if errors is not None else {}
-    }, status=status_code)
+    }
+    if code:
+        payload["code"] = code
+        if isinstance(payload["errors"], dict):
+            payload["errors"]["code"] = code
+    return Response(payload, status=status_code)
 
 
 def custom_exception_handler(exc, context):

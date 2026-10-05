@@ -11,11 +11,12 @@ export const api = {
     check: () => get('/health/'),
   },
 
-  // 2. Authentication & Stakeholder Identity
+  // 2. Authentication & Stakeholder Identity (P0-1, P0-2, P0-11)
   auth: {
     checkRegistration: (phone) => post('/auth/check-registration/', { phone }),
-    otpLogin: async (phone, otp) => {
-      const res = await post('/auth/otp-login/', { phone, otp });
+    requestOtp: (phone) => post('/auth/request-otp/', { phone }),
+    verifyOtp: async (phone, otp) => {
+      const res = await post('/auth/verify-otp/', { phone, otp });
       if (res?.data?.access) {
         localStorage.setItem('aagam_access_token', res.data.access);
         if (res.data.refresh) {
@@ -26,6 +27,23 @@ export const api = {
         }
       }
       return res;
+    },
+    demoLogin: async (role) => {
+      const res = await post('/auth/demo-login/', { role });
+      if (res?.data?.access) {
+        localStorage.setItem('aagam_access_token', res.data.access);
+        if (res.data.refresh) {
+          localStorage.setItem('aagam_refresh_token', res.data.refresh);
+        }
+        if (res.data.user) {
+          localStorage.setItem('aagam_user', JSON.stringify(res.data.user));
+        }
+      }
+      return res;
+    },
+    otpLogin: async (phone, otp) => {
+      // Legacy wrapper routing to authoritative verifyOtp
+      return api.auth.verifyOtp(phone, otp);
     },
     login: async (email, password) => {
       const res = await post('/auth/login/', { email, password });
@@ -53,6 +71,8 @@ export const api = {
       }
       return res;
     },
+    requestPasswordReset: (email) => post('/auth/request-password-reset/', { email }),
+    resetPassword: (email, token, newPassword) => post('/auth/reset-password/', { email, token, new_password: newPassword }),
     getProfile: () => get('/auth/profile/'),
     updateProfile: (data) => put('/auth/profile/', data),
     logout: () => {
@@ -109,19 +129,24 @@ export const api = {
     getCapacities: (params = '') => get(`/centers/capacity/${params ? `?${params}` : ''}`),
   },
 
-  // 9. Slot Booking & Queue Scheduling
+  // 9. Slot Booking & Queue Scheduling (P0-4, P0-5, P0-6)
   slots: {
     getBookings: (params = '') => get(`/slots/${params ? `?${params}` : ''}`),
     getBooking: (id) => get(`/slots/${id}/`),
-    bookSlot: (data) => post('/slots/', data),
+    bookSlot: (data, idempotencyKey = null) => {
+      const headers = idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {};
+      return post('/slots/book/', data, { headers });
+    },
+    cancelBooking: (id) => post(`/slots/${id}/cancel/`),
     getAvailableSlots: (params = '') => get(`/slots/available/${params ? `?${params}` : ''}`),
   },
 
-  // 10. QR Tokens & Gate Pass
+  // 10. QR Tokens & Gate Pass (P0-7, P0-8)
   tokens: {
     getTokens: (params = '') => get(`/tokens/${params ? `?${params}` : ''}`),
     getToken: (id) => get(`/tokens/${id}/`),
     generateToken: (data) => post('/tokens/', data),
+    scanToken: (tokenString, vehicleNumber = null) => post('/tokens/scan/', { token: tokenString, vehicle_number: vehicleNumber }),
     verifyToken: (tokenString) => post('/tokens/verify/', { token_string: tokenString }),
     getGatePasses: (params = '') => get(`/tokens/gate-pass/${params ? `?${params}` : ''}`),
   },

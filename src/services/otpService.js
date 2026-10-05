@@ -1,47 +1,52 @@
 // src/services/otpService.js
-// Fast2SMS Official Indian Gateway Integration
+// Client-side OTP Service: Delegates entirely to server-authoritative backend (P0-1, P0-3)
+// No API keys or credentials are stored or executed on the client.
 
-const FAST2SMS_API_KEY = "sSZHqtaTv1nXbD0ReCliAUjBFuGPJw6WV8chQy7zo2x53YrOLglxfMG5Hi2VIwATdE1FzhNJc98vq3uK";
+import apiClient from './apiClient';
 
 /**
- * Sends a real 4-6 digit OTP SMS to an Indian mobile number via Fast2SMS API
- * @param {string|number} phoneNumber - 10-digit Indian Mobile Number
- * @param {string|number} otpCode - 4-6 digit numeric OTP
- * @returns {Promise<{success: boolean, data: any}>}
+ * Requests an authoritative OTP to be generated and dispatched by the backend.
+ * The raw OTP is NEVER returned to the client in production mode.
+ * 
+ * @param {string} phone - 10-digit Indian Mobile Number
+ * @returns {Promise<{success: boolean, message: string, data?: any}>}
  */
-export const sendAuthOtp = async (phoneNumber, otpCode) => {
-  // Extract clean 10-digit Indian mobile number
-  let cleanNumber = String(phoneNumber).replace(/[^0-9]/g, '');
+export const sendAuthOtp = async (phone) => {
+  let cleanNumber = String(phone).replace(/[^0-9]/g, '');
   if (cleanNumber.length > 10) {
     cleanNumber = cleanNumber.slice(-10);
   }
 
   if (cleanNumber.length !== 10) {
-    throw new Error("Invalid 10-digit mobile number provided.");
+    throw new Error('Please enter a valid 10-digit mobile number.');
   }
 
-  try {
-    const response = await fetch("https://www.fast2sms.com/dev/bulkV2", {
-      method: "POST",
-      headers: {
-        "authorization": FAST2SMS_API_KEY,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        route: "otp",
-        variables_values: String(otpCode), // e.g. "4821"
-        numbers: cleanNumber
-      })
-    });
+  // Authoritative backend request (P0-1, P0-3)
+  const response = await apiClient.post('/auth/request-otp/', { phone: cleanNumber });
+  return response.data;
+};
 
-    const data = await response.json();
-    return { 
-      success: data.return === true, 
-      data,
-      message: data.message ? data.message[0] : 'OTP sent successfully'
-    };
-  } catch (error) {
-    console.error("Fast2SMS OTP Dispatch Error:", error);
-    throw error;
+/**
+ * Verifies an entered OTP on the backend and exchanges it for genuine JWT tokens.
+ * 
+ * @param {string} phone - 10-digit Indian Mobile Number
+ * @param {string} otp - 6-digit numeric OTP entered by user
+ * @returns {Promise<{success: boolean, message: string, data: {access: string, refresh: string, user: object}}>}
+ */
+export const verifyAuthOtp = async (phone, otp) => {
+  let cleanNumber = String(phone).replace(/[^0-9]/g, '');
+  if (cleanNumber.length > 10) {
+    cleanNumber = cleanNumber.slice(-10);
   }
+
+  const cleanOtp = String(otp).trim();
+  if (cleanOtp.length !== 6 || !/^\d{6}$/.test(cleanOtp)) {
+    throw new Error('Please enter a valid 6-digit OTP code.');
+  }
+
+  const response = await apiClient.post('/auth/verify-otp/', {
+    phone: cleanNumber,
+    otp: cleanOtp
+  });
+  return response.data;
 };

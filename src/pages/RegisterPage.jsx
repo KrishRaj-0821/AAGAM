@@ -214,32 +214,11 @@ export default function RegisterPage({
       setRegForm(prev => ({ ...prev, regId: generatedId }));
       setRegStep(5);
     } catch (err) {
-      console.warn("Backend registration fallback:", err);
-      // If user already exists or network fallback, generate ID and proceed
-      const fallbackId = `AAGAM-REG-2026-${Math.floor(100000 + Math.random() * 900000)}`;
-      const regUserRecord = {
-        name: regForm.fullName.trim(),
-        full_name: regForm.fullName.trim(),
-        mobile: `+91 ${cleanPhone}`,
-        phone: `+91 ${cleanPhone}`,
-        clean_phone: cleanPhone,
-        role: regRole,
-        mandi: regForm.mandi.trim(),
-        state: regForm.state.trim(),
-        district: regForm.district.trim(),
-        aadhaar: cleanAadhaar,
-        id: fallbackId
-      };
-      try {
-        const existing = JSON.parse(localStorage.getItem('aagam_registered_users') || '[]');
-        localStorage.setItem('aagam_registered_users', JSON.stringify([
-          ...existing.filter(u => u.clean_phone !== cleanPhone),
-          regUserRecord
-        ]));
-      } catch (e) {}
-
-      setRegForm(prev => ({ ...prev, regId: fallbackId }));
-      setRegStep(5);
+      console.error("Backend registration error:", err);
+      setStepErrorBanner(err.message || t(
+        'Registration failed on backend server. Please verify your details and try again.',
+        'बैकएंड सर्वर पर पंजीकरण विफल रहा। कृपया अपने विवरण की जाँच करें और पुनः प्रयास करें।'
+      ));
     } finally {
       setAuthLoading(false);
     }

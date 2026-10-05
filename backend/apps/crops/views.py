@@ -2,19 +2,20 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from common.responses import success_response, error_response
+from common.permissions import IsFarmer, IsOwnerOrAdmin, IsAdminUserOrReadOnly
 from .models import CropCategory, Crop, CropImage
 from .serializers import CropCategorySerializer, CropSerializer, CropImageSerializer
 
 class CropCategoryViewSet(viewsets.ModelViewSet):
     queryset = CropCategory.objects.all()
     serializer_class = CropCategorySerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAdminUserOrReadOnly]
 
 
 class CropViewSet(viewsets.ModelViewSet):
     queryset = Crop.objects.all().order_by('-created_at')
     serializer_class = CropSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -51,32 +52,34 @@ class CropViewSet(viewsets.ModelViewSet):
         return success_response(serializer.data)
 
     def create(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return error_response("Authentication required to list crops.", status_code=status.HTTP_401_UNAUTHORIZED)
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
-            return error_response("Validation error", errors=serializer.errors)
-        farmer = request.user if request.user.is_authenticated else None
-        crop = serializer.save(farmer=farmer)
+            return error_response("Validation error", errors=serializer.errors, status_code=status.HTTP_400_BAD_REQUEST)
+        crop = serializer.save(farmer=request.user)
         return success_response(CropSerializer(crop).data, message="Crop registered successfully", status_code=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
+        if instance.farmer != request.user and request.user.role not in ['ADMIN', 'SUPER_ADMIN']:
+            return error_response("Permission denied", status_code=status.HTTP_403_FORBIDDEN)
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         if not serializer.is_valid():
-            return error_response("Update failed", errors=serializer.errors)
+            return error_response("Update failed", errors=serializer.errors, status_code=status.HTTP_400_BAD_REQUEST)
         serializer.save()
         return success_response(serializer.data, message="Crop updated successfully")
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
+        if instance.farmer != request.user and request.user.role not in ['ADMIN', 'SUPER_ADMIN']:
+            return error_response("Permission denied", status_code=status.HTTP_403_FORBIDDEN)
         instance.delete()
         return success_response(message="Crop deleted successfully")
 
-    @action(detail=False, methods=['get'], url_path='my-crops')
+    @action(detail=False, methods=['get'], url_path='my-crops', permission_classes=[permissions.IsAuthenticated])
     def my_crops(self, request):
-        if request.user.is_authenticated:
-            qs = Crop.objects.filter(farmer=request.user)
-        else:
-            qs = Crop.objects.all()
+        qs = Crop.objects.filter(farmer=request.user)
         serializer = self.get_serializer(qs, many=True)
         return success_response(serializer.data)

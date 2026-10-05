@@ -1,12 +1,13 @@
 from rest_framework import viewsets, permissions
 from common.responses import success_response
+from common.permissions import IsAdminUserOrReadOnly, IsOfficer
 from .models import ProcurementCenter, CenterCapacity
 from .serializers import ProcurementCenterSerializer, CenterCapacitySerializer
 
 class ProcurementCenterViewSet(viewsets.ModelViewSet):
     queryset = ProcurementCenter.objects.all().order_by('name')
     serializer_class = ProcurementCenterSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAdminUserOrReadOnly]
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -30,4 +31,4 @@ class ProcurementCenterViewSet(viewsets.ModelViewSet):
 class CenterCapacityViewSet(viewsets.ModelViewSet):
     queryset = CenterCapacity.objects.all().order_by('-date')
     serializer_class = CenterCapacitySerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAdminUserOrReadOnly]

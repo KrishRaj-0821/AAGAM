@@ -1,12 +1,13 @@
 from rest_framework import viewsets, permissions, status
 from common.responses import success_response, error_response
+from common.permissions import IsCenterOperator
 from .models import GateEntry, WeighmentSlip
 from .serializers import GateEntrySerializer, WeighmentSlipSerializer
 
 class GateEntryViewSet(viewsets.ModelViewSet):
     queryset = GateEntry.objects.all().order_by('-entry_timestamp')
     serializer_class = GateEntrySerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated, IsCenterOperator]
 
     def list(self, request, *args, **kwargs):
         qs = self.get_queryset()
@@ -17,7 +18,7 @@ class GateEntryViewSet(viewsets.ModelViewSet):
 class WeighmentSlipViewSet(viewsets.ModelViewSet):
     queryset = WeighmentSlip.objects.all().order_by('-gross_time')
     serializer_class = WeighmentSlipSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated, IsCenterOperator]
 
     def list(self, request, *args, **kwargs):
         qs = self.get_queryset()
@@ -27,6 +28,10 @@ class WeighmentSlipViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
-            return error_response("Invalid weighment data", errors=serializer.errors)
+            return error_response("Invalid weighment data", errors=serializer.errors, status_code=status.HTTP_400_BAD_REQUEST)
         slip = serializer.save()
-        return success_response(WeighmentSlipSerializer(slip).data, message="Tola Parchi weighment slip issued successfully", status_code=status.HTTP_201_CREATED)
+        return success_response(
+            WeighmentSlipSerializer(slip).data,
+            message="Tola Parchi weighment slip issued successfully",
+            status_code=status.HTTP_201_CREATED
+        )

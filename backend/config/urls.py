@@ -5,18 +5,30 @@ from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from django.shortcuts import redirect
 from rest_framework.views import APIView
+from rest_framework import permissions
 from common.responses import success_response
 
 def root_redirect_view(request):
     return redirect('swagger-ui')
 
 class HealthCheckView(APIView):
+    permission_classes = [permissions.AllowAny]
+
     def get(self, request):
+        from django.db import connection
+        from django.utils import timezone
+        db_status = "CONNECTED"
+        try:
+            connection.ensure_connection()
+        except Exception as e:
+            db_status = f"ERROR: {str(e)}"
+
         return success_response({
             "service": "AAGAM National Agricultural Grain & Allocation Management Backend",
             "version": "1.0.0",
             "status": "HEALTHY",
-            "database": "CONNECTED",
+            "database": db_status,
+            "timestamp": timezone.now().isoformat(),
             "engine": "Django 4.2 REST Framework",
             "docs_url": "/api/docs/",
             "redoc_url": "/api/redoc/",
