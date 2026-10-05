@@ -31,11 +31,11 @@ class Slot(models.Model):
         ordering = ['date', 'time_slot']
         constraints = [
             models.CheckConstraint(
-                condition=models.Q(booked_quintals__lte=models.F('max_capacity_quintals')),
+                check=models.Q(booked_quintals__lte=models.F('max_capacity_quintals')),
                 name='slot_capacity_not_exceeded'
             ),
             models.CheckConstraint(
-                condition=models.Q(booked_quintals__gte=0),
+                check=models.Q(booked_quintals__gte=0),
                 name='slot_booked_non_negative'
             ),
         ]

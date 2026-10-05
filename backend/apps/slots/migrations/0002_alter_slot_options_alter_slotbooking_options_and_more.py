@@ -79,10 +79,10 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='slot',
-            constraint=models.CheckConstraint(condition=models.Q(('booked_quintals__lte', models.F('max_capacity_quintals'))), name='slot_capacity_not_exceeded'),
+            constraint=models.CheckConstraint(check=models.Q(('booked_quintals__lte', models.F('max_capacity_quintals'))), name='slot_capacity_not_exceeded'),
         ),
         migrations.AddConstraint(
             model_name='slot',
-            constraint=models.CheckConstraint(condition=models.Q(('booked_quintals__gte', 0)), name='slot_booked_non_negative'),
+            constraint=models.CheckConstraint(check=models.Q(('booked_quintals__gte', 0)), name='slot_booked_non_negative'),
         ),
     ]
