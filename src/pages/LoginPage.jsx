@@ -49,6 +49,7 @@ export default function LoginPage({
   const [authError, setAuthError] = useState('');
   const [authSuccess, setAuthSuccess] = useState('');
   const [demoOtp, setDemoOtp] = useState('');
+  const [sentMobile, setSentMobile] = useState('');
   const [otpStep, setOtpStep] = useState(1);
   const [otpValue, setOtpValue] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -157,6 +158,7 @@ export default function LoginPage({
 
       // Authoritative Backend OTP Request (P0-1)
       const res = await api.auth.requestOtp(cleanMobile);
+      setSentMobile(cleanMobile);
       setOtpStep(2);
 
       let successMsg = res.message || `OTP sent to +91 ${cleanMobile}. Valid for 5 minutes.`;
@@ -183,7 +185,7 @@ export default function LoginPage({
     setAuthLoading(true);
     setAuthError('');
     try {
-      const cleanMobile = loginInput.replace(/[^0-9]/g, '').slice(-10);
+      const cleanMobile = (sentMobile || loginInput).replace(/[^0-9]/g, '').slice(-10);
       const cleanOtp = otpValue.trim();
 
       if (cleanOtp.length !== 6 || !/^\d{6}$/.test(cleanOtp)) {
@@ -577,7 +579,7 @@ export default function LoginPage({
                 <button
                   onClick={() => {
                     setAuthMethod('mobile');
-                    setLoginInput('');
+                    if (loginInput.includes('@')) setLoginInput('');
                   }}
                   className={`w-1/2 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${authMethod === 'mobile' ? 'bg-[#71873f] text-white shadow' : 'text-[#637554]'}`}
                 >
@@ -587,7 +589,7 @@ export default function LoginPage({
                 <button
                   onClick={() => {
                     setAuthMethod('staffId');
-                    setLoginInput('');
+                    if (!loginInput.includes('@')) setLoginInput('');
                   }}
                   className={`w-1/2 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${authMethod === 'staffId' ? 'bg-[#71873f] text-white shadow' : 'text-[#637554]'}`}
                 >
@@ -720,7 +722,7 @@ export default function LoginPage({
               <div className="space-y-4 text-xs">
                 <div className="bg-[#f0f4ea] p-3.5 rounded-xl border border-[#abbe99] text-center font-mono">
                   <div className="text-[#688557] font-bold">
-                    {t(`OTP Sent to Registered Mobile: ${loginInput}`, `पंजीकृत मोबाइल पर 6-अंकों का ओटीपी भेजा गया: ${loginInput}`)}
+                    {t(`OTP Sent to Registered Mobile: ${sentMobile || loginInput}`, `पंजीकृत मोबाइल पर 6-अंकों का ओटीपी भेजा गया: ${sentMobile || loginInput}`)}
                   </div>
                   <div className="text-[10px] text-[#637554] mt-0.5">
                     Valid for 05:00 minutes {demoOtp ? `[SIH DEMO MODE OTP: ${demoOtp}]` : ''}
