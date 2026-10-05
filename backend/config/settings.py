@@ -3,6 +3,7 @@ from pathlib import Path
 from datetime import timedelta
 import dotenv
 import dj_database_url
+from corsheaders.defaults import default_headers
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -167,6 +168,12 @@ CORS_ALLOWED_ORIGINS = [o.strip() for o in raw_cors.split(',') if o.strip()]
 if 'https://aagam.up.railway.app' not in CORS_ALLOWED_ORIGINS:
     CORS_ALLOWED_ORIGINS.append('https://aagam.up.railway.app')
 CORS_ALLOW_CREDENTIALS = True
+
+# Allow custom request headers sent by the frontend (e.g. idempotent slot booking)
+CORS_ALLOW_HEADERS = [
+    *default_headers,
+    'idempotency-key',
+]
 
 # REST Framework
 REST_FRAMEWORK = {
