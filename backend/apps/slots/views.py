@@ -65,7 +65,10 @@ class SlotViewSet(viewsets.ModelViewSet):
         date_str = request.query_params.get('date')
         qs = Slot.objects.filter(is_available=True)
         if center_id:
-            qs = qs.filter(Q(center__uuid=center_id) | Q(center__code=center_id))
+            if len(str(center_id)) == 36:
+                qs = qs.filter(Q(center__uuid=center_id) | Q(center__code=center_id))
+            else:
+                qs = qs.filter(Q(center__code=center_id) | Q(center__name__iexact=center_id))
         if date_str:
             try:
                 target_date = datetime.strptime(date_str, '%Y-%m-%d').date()
